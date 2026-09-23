@@ -4,7 +4,7 @@
 
 - Language: Markdown (skills) + Python 3.9+ (release tooling in `scripts/python/`)
 - Project type: other — a Claude Code skills plugin
-- Deploy target: distributed package — published through the `claude-marketplace` marketplace
+- Deploy target: distributed package — published through the `jtag-claude-marketplace` marketplace
 
 ## Conventions
 

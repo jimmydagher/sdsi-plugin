@@ -42,4 +42,5 @@ current release and `sdsi:versioning` for what a version bump means.
 - A docs-only commit now folds its Unreleased notes into the current version automatically; previously the hook skipped them and they were left in Unreleased.
 - `.gitattributes` forces LF line endings, so the hooks run after a Windows checkout; `sdsi:versioning` now requires it in every project.
 - The pre-commit hook probes each Python candidate by running it, so a Windows Store `python3` placeholder on PATH no longer breaks the hook.
+- The marketplace is now `jtag-claude-marketplace` everywhere — name, repository (`jimmydagher/jtag-claude-marketplace`), and folder — because Claude Code rejects `claude-marketplace` as impersonating an official marketplace. The 1.0.0 install lines no longer work; use `/plugin marketplace add jimmydagher/jtag-claude-marketplace` then `/plugin install sdsi@jtag-claude-marketplace`.
 

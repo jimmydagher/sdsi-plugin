@@ -8,8 +8,8 @@ fixed order.
 ## Install
 
 ```
-/plugin marketplace add jimmydagher/claude-marketplace
-/plugin install sdsi@claude-marketplace
+/plugin marketplace add jimmydagher/jtag-claude-marketplace
+/plugin install sdsi@jtag-claude-marketplace
 ```
 
 ## How it works
