@@ -9,6 +9,7 @@ description: >
   store. Use when a project handles any credential, API key, token, or
   connection string. Reads sdsi:core first. Triggers on "/sdsi:secrets",
   "secrets", "credentials", "key vault".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Secrets & Credentials

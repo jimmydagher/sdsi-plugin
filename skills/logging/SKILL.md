@@ -9,6 +9,7 @@ description: >
   closes. Use when adding logging to a project, reviewing log output, or
   replacing ad-hoc print statements. Reads sdsi:core first. Triggers on
   "/sdsi:logging", "logging", "add logs".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Logging & Output

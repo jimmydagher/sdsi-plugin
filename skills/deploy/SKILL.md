@@ -10,6 +10,7 @@ description: >
   trust boundaries. Use when setting up how a project runs locally or
   ships. Reads sdsi:core first. Triggers on "/sdsi:deploy", "deploy",
   "docker", "containerize", "run locally".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Local Environment & Deployment

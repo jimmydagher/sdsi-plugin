@@ -9,6 +9,7 @@ description: >
   close automatically. Use when writing or reviewing documentation, or
   tracking outstanding work. Reads sdsi:core first. Triggers on
   "/sdsi:docs", "documentation", "README", "TODO.md".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Documentation
@@ -34,6 +35,7 @@ than a missing one, because it's still believed.
 | A cheat sheet, in `docs/` | The commands reached for when something's wrong — every operation, every flag, where output lands | An operation is added, renamed, or removed |
 | A documentation index, in `docs/` | What each document covers and doesn't | A document is added, renamed, or removed |
 | A features doc, in `docs/` (optional) | What's been built, for a non-technical reader | A user-visible capability ships |
+| Review reports, in `docs/reviews/` | What an SDSI review found and what happened to each finding — `YYYY-MM-DD-<skill>.md` | Never — written once per review when the human exports it (`ref/findings.md`); a new review writes a new file |
 
 - **Every command block names where it runs** — local shell, CI, inside a
   container, a cloud console. The same command can fail in one place for
@@ -71,6 +73,10 @@ bigger than a line item gets promoted to its own `INTENT.md`
 - [x] #1 <what was done> — completed 2026-09-23 · VERSION 1.0.1
 ```
 
+- **A deferred review finding** keeps its finding ID and skill in brackets, so
+  it can be traced to its review:
+  `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44`
+  (`ref/findings.md` adds these automatically for findings not applied).
 - **Numbers are never reused.** A new item takes the highest number in the
   file (open or done) plus one.
 - **The AI updates it continuously** — a session that ends without a pass

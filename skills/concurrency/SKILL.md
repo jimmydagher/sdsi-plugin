@@ -9,6 +9,7 @@ description: >
   pools, background jobs, or signal handling, or when reviewing shutdown
   behavior. Reads sdsi:core first. Triggers on "/sdsi:concurrency",
   "threading", "async", "background worker", "graceful shutdown".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Concurrency
@@ -42,13 +43,13 @@ speculation (core §2, "no over-engineering").
 - **Queues are bounded.** An unbounded queue hides a slow consumer until
   memory runs out; a bounded one surfaces it as back-pressure.
 - **Errors in a worker are never lost.** A failure in a background thread or
-  task reaches the main flow and the fatal handler (`sdsi:errors`) — never
+  task reaches the main flow and the global error handler (`sdsi:errors`) — never
   silently dies with the worker.
 
 ## Graceful shutdown
 
 - **Convert the platform's graceful-stop signal into the normal shutdown
-  path**, so logs drain and fatal handling still runs on a routine stop, not
+  path**, so logs drain and the global error handler still runs on a routine stop, not
   only on a crash. A forceful kill usually can't be caught; plan for it.
 - **Every drain is bounded**, and the total bound sits comfortably under the
   platform's stop-to-kill grace period — a drain still running at the kill

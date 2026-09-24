@@ -9,6 +9,7 @@ description: >
   floating tags in anything deployed. Use when adding, upgrading, or
   auditing dependencies. Reads sdsi:core first. Triggers on
   "/sdsi:dependencies", "add a package", "dependency audit".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Dependencies

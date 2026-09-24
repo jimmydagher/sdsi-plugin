@@ -9,6 +9,7 @@ description: >
   or deciding how a change should move from idea to commit. Reads sdsi:core
   first. Triggers on "/sdsi:workflow", "start a new project", "how should
   we plan this".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Workflow
@@ -123,7 +124,8 @@ The kickoff for a brand-new, empty project:
    - Root: `README.md`, `CLAUDE.md` (with the SDSI profile), `TODO.md`,
      `CHANGELOG.md` (intro plus an empty Unreleased), `VERSION` (`0.1.0`),
      `.gitignore`, `.gitattributes` — and nothing else loose at the root.
-   - The source layout from the project-type skill.
+   - The source layout, following the language's and framework's
+     conventions within core §3's invariants.
    - `tests/`, `config/`, `docs/`, `scripts/`.
    - **The release chain:** copy `scripts/git/{pre-commit,commit-msg}` and
      `scripts/python/release.py` from this plugin into the project and run
@@ -133,3 +135,12 @@ The kickoff for a brand-new, empty project:
      skills, and hooks suited to this stack (e.g. the `claude-code-setup`
      plugin) rather than guessing before anything exists.
 6. **`PLAN.md`, then build.**
+
+## Review checklist
+
+No `CLAUDE.md`, or one without an SDSI profile · a deviation from SDSI used
+in the code but not written in `CLAUDE.md` · a non-trivial change with no
+recorded intent or plan · a historical planning artifact rewritten to match
+new reality (or a superseded one still read as current) · a bug fix without
+a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an
+empty project scaffolded without the release chain.

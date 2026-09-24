@@ -8,6 +8,7 @@ description: >
   placeholder conventions. Use when adding a setting, building a config
   loader, or reviewing how a project is configured. Reads sdsi:core first.
   Triggers on "/sdsi:config", "configuration", "add a setting".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Configuration
@@ -56,9 +57,10 @@ schema leaves it unvalidated.
 
 ## Where a project type differs
 
-A project type may legitimately refine these rules — `sdsi:cli` allows
-per-invocation flag overrides; `sdsi:web` maps config into the framework's
-settings module. That refinement lives in the project-type skill, not here.
+A project type may legitimately refine these rules — a CLI allows
+per-invocation flag overrides; a website maps config into the framework's
+settings module. That refinement lives in the project-type companion's
+`## sdsi:config` section (`ref/<type>.md`, core §1 Step 2), not here.
 
 ## Review checklist
 

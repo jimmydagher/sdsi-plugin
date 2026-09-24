@@ -11,6 +11,7 @@ description: >
   when committing, releasing, setting up a repo, or reviewing version and
   changelog discipline. Reads sdsi:core first. Triggers on
   "/sdsi:versioning", "version bump", "changelog", "commit", "release".
+argument-hint: "[--review|--apply] [path]"
 ---
 
 # SDSI: Versioning, Changelog & Commits
@@ -38,7 +39,9 @@ release is exactly two things:
 
 1. **Write the Unreleased notes as the work happens** — one bullet per change,
    under the right subsection, written for whoever deploys the release. When
-   a change fixes a `TODO.md` item, end the bullet with `(TODO #<n>)`.
+   a change fixes a `TODO.md` item, end the bullet with `(TODO #<n>)`; when
+   it applies a finding from an SDSI review, cite the finding ID too
+   (`(F-003)`).
 2. **Never commit on its own.** The human's approval of the code is the
    trigger; the AI commits only when the human asks it to.
 

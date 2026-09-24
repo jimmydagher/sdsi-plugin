@@ -17,7 +17,30 @@ current release and `sdsi:versioning` for what a version bump means.
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.0.0 📅 2026-09-23
+## 🆕VERSION 1.1.0 📅 2026-09-23
+
+### Added or New Features
+- Every skill runs in **review** or **apply** mode: `/sdsi:<skill> [--review | --apply] [path]`, stated in plain language, or asked. Review scans the code against the skill, catalogs findings (ID, severity, effort, `file:line`, recommendation), presents them, and asks what to apply; apply changes the code directly and verifies it. (TODO #2)
+- `ref/findings.md` — the shared review process (intake → catalog → present → ask → route), replacing the `code-reviewer` plugin's intake and catalog phases. `ref/` is a new folder for shared reference files read on demand.
+- Findings not applied become numbered `TODO.md` items (`- [ ] #n [F-003 sdsi:errors] …`) that the release chain closes when fixed; a review can be exported to `docs/reviews/YYYY-MM-DD-<skill>.md`.
+- `argument-hint` on every skill, so the flags are suggested as the command is typed.
+- `sdsi:workflow` gains the Review checklist every other skill already had.
+- Project-type companions — `ref/web.md`, `ref/mw.md`, `ref/cli.md` — rewritten as language-neutral guidance with one `## sdsi:<topic>` section per topic. Every skill detects the project type from the code (asking only when the evidence is mixed), then adds the companion's section for itself to its rules and its review lens; no section means nothing extra.
+
+### Removed
+- `sdsi:web`, `sdsi:mw`, and `sdsi:cli` skills — replaced by the companions above, which apply automatically instead of being invoked. Their layout/structure sections and Python/Django-specific rules are dropped: source layout now follows the language's and framework's conventions within core's universal invariants, and framework-specific lessons belong in the project's own `CLAUDE.md`.
+- The project-type step from `sdsi:all`'s order — it now runs 12 steps (`sdsi:workflow` through `sdsi:deploy`).
+
+### Changed
+- `sdsi:core` Step 3 "review first, or just apply?" becomes "Resolve the mode" — flags, then plain language, then the question. `sdsi:all` resolves it once and, in review mode, produces one deduplicated report across all steps.
+- `sdsi:errors`: the fatal-error handler becomes a **global error handler** every project must have — wired into the language's uncaught-error hooks, logging every unhandled error, keeping long-running processes alive (only the failing request or unit of work fails), and calling a list of pluggable reporters so a project can add a queue, ServiceNow, or a pager without editing the handler. New rule: try/catch only where the logic requires it; log-and-rethrow or log-and-continue blocks are findings.
+- Changelog notes cite the finding IDs they apply, e.g. `(F-003)`.
+- Apply mode writes changelog notes in `sdsi:versioning`'s template (creating `CHANGELOG.md` from it when missing) and leaves no verification scripts behind in the project.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟥VERSION 1.0.0 📅 2026-09-23
 
 ### Added or New Features
 - Topic skills, each growing independently in its own `SKILL.md`: `sdsi:workflow`, `sdsi:standards`, `sdsi:config`, `sdsi:secrets`, `sdsi:logging`, `sdsi:errors`, `sdsi:concurrency` (new topic), `sdsi:testing`, `sdsi:dependencies`, `sdsi:docs`, `sdsi:versioning`, `sdsi:deploy`.
