@@ -1,7 +1,6 @@
 # Changelog
 
-All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the
-current release and `sdsi:versioning` for what a version bump means.
+All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the current release and `sdsi:versioning` for what a version bump means.
 
 ## 🚧 Unreleased
 
@@ -17,7 +16,22 @@ current release and `sdsi:versioning` for what a version bump means.
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.2.0 📅 2026-09-25
+## 🆕VERSION 1.2.1 📅 2026-09-26
+
+### Added or New Features
+- `ref/web.md` › `sdsi:config`: review the files and assets each environment needs when it's created, and create any that are missing (e.g. `favicon.ico`).
+
+### Removed
+(none)
+
+### Changed
+- Markdown across the plugin puts each paragraph and list item on one line (no hard wraps), and every code block names its language (`text`, `markdown`, `bash`).
+- `sdsi:workflow`: "Verification has two levels" is a plain sentence instead of a bold line standing in for a heading.
+
+### Bug/Issues/Fixes
+- `ref/findings.md` and `sdsi:all`: a wrapped `+ cli` / `+ web` line rendered as a stray nested bullet; it's back in its sentence.
+
+## 🟨VERSION 1.2.0 📅 2026-09-25
 
 ### Added or New Features
 - `sdsi:core` non-negotiable: **confirm before anything destructive or bulk** — explicit approval with the scope stated (what, and how many), not carried over from one action to the next.

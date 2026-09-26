@@ -13,5 +13,6 @@
 ---
 
 ## Done
+
 - [x] #1 Create the GitHub repos `jimmydagher/sdsi-plugin` and `jimmydagher/claude-marketplace` and push both — the marketplace resolves the plugin from GitHub — completed 2026-09-23 · VERSION 1.0.0
 - [x] #2 Add a review skill (from the `code-reviewer` plugin) as the "review first" path of core's review-or-apply question — core currently does the findings pass itself — completed 2026-09-23 · VERSION 1.1.0
