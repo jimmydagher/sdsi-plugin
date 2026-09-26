@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.2.1 📅 2026-09-26
+## 🆕VERSION 1.2.2 📅 2026-09-26
+
+### Added or New Features
+(none)
+
+### Removed
+(none)
+
+### Changed
+- Markdown formatting standards applied to the READMEs, docs, refs and skills (blank-line spacing only; no content changes).
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟩VERSION 1.2.1 📅 2026-09-26
 
 ### Added or New Features
 - `ref/web.md` › `sdsi:config`: review the files and assets each environment needs when it's created, and create any that are missing (e.g. `favicon.ico`).

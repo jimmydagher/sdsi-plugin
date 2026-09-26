@@ -38,7 +38,8 @@ Language-neutral. Distilled from building `ariel` (job, workforce, and spend dat
       page_size: 100
   ```
 
-  Every system declares every key, marking the ones that don't apply, so "unused" reads differently from "forgot to configure".
+Every system declares every key, marking the ones that don't apply, so "unused" reads differently from "forgot to configure".
+
 - **Three derived values, named the same way every time:** `environment` (from the applied override), the reporting mode (from whether the invoker supplied a callback address), and the running version (from `VERSION` baked into the artifact — config ships on its own schedule).
 - **A validate-config task is mandatory** — the deploy runs it before trusting a new artifact.
 

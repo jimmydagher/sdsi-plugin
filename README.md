@@ -22,7 +22,8 @@ A language-neutral development standard for Claude Code, split into skills that 
    /sdsi:all --apply
    ```
 
-   **Review** scans the code against the skill, catalogs findings (ID, severity, effort, `file:line`, recommendation), shows them, and asks what to apply. Findings you don't apply go to `TODO.md`; you can export the report to `docs/reviews/`. **Apply** changes the code to meet the skill directly and verifies it.
+**Review** scans the code against the skill, catalogs findings (ID, severity, effort, `file:line`, recommendation), shows them, and asks what to apply. Findings you don't apply go to `TODO.md`; you can export the report to `docs/reviews/`. **Apply** changes the code to meet the skill directly and verifies it.
+
 5. **The release chain is scripted.** The AI writes notes to `CHANGELOG.md`'s Unreleased section; when you commit, the hooks bump `VERSION`, promote the notes, close the `TODO.md` items they reference, and set the commit message to the version.
 
 ## Skills

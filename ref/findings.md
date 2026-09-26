@@ -64,7 +64,8 @@ Then act on every choice (§5). Choosing nothing to apply is valid: all findings
   - [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44
   ```
 
-  When a later change fixes one, its changelog note says `(TODO #12)` and the release script closes it. If the human answered "discard", unapplied findings are dropped instead — say how many.
+When a later change fixes one, its changelog note says `(TODO #12)` and the release script closes it. If the human answered "discard", unapplied findings are dropped instead — say how many.
+
 - **Exported** — write `docs/reviews/YYYY-MM-DD-<skill>.md` (`sdsi-all` for a full run; a second review the same day adds `-2`):
 
   ```markdown
@@ -78,7 +79,7 @@ Then act on every choice (§5). Choosing nothing to apply is valid: all findings
   | F-002 | sdsi:errors | Retry only what's transient | src/db.py:44 | High | M | … | TODO #12 |
   ```
 
-  The outcome column is filled in after §4's choices are acted on. The file is written once and never edited — a later review writes a new file.
+The outcome column is filled in after §4's choices are acted on. The file is written once and never edited — a later review writes a new file.
 
 ## 6. Close
 

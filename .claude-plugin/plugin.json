@@ -1,6 +1,6 @@
 {
   "name": "sdsi",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Software Development Standard Instructions (SDSI) — a language-neutral development standard split into topic skills that grow independently. sdsi:core holds the non-negotiable rules, the project profile (language, and the project type detected from the code), and the review or apply mode every skill runs in (/sdsi:<skill> --review|--apply [path]). Topics: sdsi:workflow, sdsi:standards, sdsi:config, sdsi:secrets, sdsi:logging, sdsi:errors, sdsi:concurrency, sdsi:testing, sdsi:dependencies, sdsi:docs, sdsi:versioning, sdsi:deploy. Each topic automatically adds the project-type companion's guidance for web, middleware, or CLI projects. sdsi:all runs every step in core's fixed order. Ships a scripted release chain (git hooks + release.py) that bumps VERSION, promotes CHANGELOG.md, closes TODO.md items, and writes the version as the commit message.",
   "author": {
     "name": "Jimmy Dagher"

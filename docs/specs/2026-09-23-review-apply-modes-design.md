@@ -78,7 +78,8 @@ Read only in review mode, by relative path `../../ref/findings.md` from any skil
   - [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44
   ```
 
-  When a later change fixes it, its changelog note says `(TODO #12)` and the release script closes it. Typing "discard" drops unapplied findings instead.
+When a later change fixes it, its changelog note says `(TODO #12)` and the release script closes it. Typing "discard" drops unapplied findings instead.
+
 - **Exported** — `docs/reviews/YYYY-MM-DD-<skill>.md` holds the full catalog with each row's outcome (`Applied` or `TODO #n`). Written once, never edited; a later review makes a new file (a second one the same day gets a `-2` suffix).
 
 ## 4. Apply mode
