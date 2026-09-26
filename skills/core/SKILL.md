@@ -150,6 +150,12 @@ Every SDSI skill enforces them.
 - **Double-check your work.** Nothing is done on the strength of its own
   judgment. It's done once verified against something outside it — a test,
   a build, a run, a second read — and the evidence is shown.
+- **Confirm before anything destructive or bulk.** Deleting, overwriting,
+  or mutating data that can't be trivially restored, and any run over many
+  items (a batch job, a migration, a bulk edit), needs the human's explicit
+  approval first — with the scope stated (what, and how many). Read-only
+  actions and changes a `git checkout` undoes don't need it. Approval for one
+  action or one scope doesn't carry to the next.
 - **Consistency over cleverness.** Predictable code is what makes handoffs,
   debugging, and AI-assisted work fast.
 - **Config and secrets are never code.** No setting falls back to a value

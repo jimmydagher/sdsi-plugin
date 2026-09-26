@@ -17,7 +17,23 @@ current release and `sdsi:versioning` for what a version bump means.
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.1.0 📅 2026-09-23
+## 🆕VERSION 1.2.0 📅 2026-09-25
+
+### Added or New Features
+- `sdsi:core` non-negotiable: **confirm before anything destructive or bulk** — explicit approval with the scope stated (what, and how many), not carried over from one action to the next.
+- `sdsi:workflow` gains **Size the steps** (a plan step should be finishable and verifiable in one session; split past ~30 minutes / ~5 files) and **Read what depends on it before changing it** (read callers first, match existing patterns, run tests after any removal).
+- `sdsi:workflow` verification becomes **two-level**: did the change do its job, and did it break a guardrail (hook, script, lint/type config, `CLAUDE.md` rule, skill) — proved by running the guardrail against a known-bad input. Lint and type check are part of the check. The Review checklist covers all four.
+
+### Removed
+(none)
+
+### Changed
+(none)
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟧VERSION 1.1.0 📅 2026-09-23
 
 ### Added or New Features
 - Every skill runs in **review** or **apply** mode: `/sdsi:<skill> [--review | --apply] [path]`, stated in plain language, or asked. Review scans the code against the skill, catalogs findings (ID, severity, effort, `file:line`, recommendation), presents them, and asks what to apply; apply changes the code directly and verifies it. (TODO #2)
