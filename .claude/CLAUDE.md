@@ -10,7 +10,7 @@
 
 - **One topic, one file.** A topic's rules live only in `skills/<topic>/SKILL.md`. Never restate a topic's rule in another skill — point to it by name (`sdsi:config`).
 - **Every skill's first action is reading `../core/SKILL.md`.** A new topic also gets a row in core's §4 table.
-- **Project types are companions, not skills:** `ref/web.md`, `ref/mw.md`, `ref/cli.md`, one `## sdsi:<topic>` section per topic they add to — that heading is the lookup key core uses, so it must match the skill name exactly. A new project type gets a companion and a row in core §1 Step 2's type table.
+- **Project types are companions, not skills:** `ref/<type>.md` (web, mw, cli, lib, desktop, mobile), one `## sdsi:<topic>` section per topic they add to — that heading is the lookup key core uses, so it must match the skill name exactly. A new project type gets a companion and a row in core §1 Step 2's type table.
 - **Shared reference files live in `ref/`**, read on demand by relative path (`../../ref/<file>.md`) — e.g. `ref/findings.md`, the review process every skill follows in review mode. A skill's own rules still live only in its `SKILL.md`.
 - **Every skill supports `--review` / `--apply`** through core §1 Step 3 and carries `argument-hint: "[--review|--apply] [path]"`; every skill needs a **Review checklist** section, since review mode uses it as the lens.
 - **A rule that must hold every session goes in its topic's `## Upkeep` section**, as one-line triggers in the form *when X → do Y (`sdsi:<topic>`)*, before the Review checklist. `sdsi:upkeep` copies those lines into projects word for word, so keep each line self-contained.

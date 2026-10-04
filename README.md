@@ -1,6 +1,6 @@
 # SDSI — Software Development Standard Instructions
 
-A language-neutral development standard for Claude Code, split into skills that each own one area and grow on their own. Every skill enforces the same short core; each adds web, middleware, or CLI guidance automatically when the project is that type; `sdsi:all` runs everything in a fixed order.
+A language-neutral development standard for Claude Code, split into skills that each own one area and grow on their own. Every skill enforces the same short core; each adds web, middleware, CLI, library, desktop, or mobile guidance automatically when the project is that type; `sdsi:all` runs everything in a fixed order.
 
 ## Install
 
@@ -13,7 +13,7 @@ A language-neutral development standard for Claude Code, split into skills that 
 
 1. **Every skill reads `sdsi:core` first** — the non-negotiable rules.
 2. **The project profile** (language, project type, deploy target) is recorded in the project's `.claude/CLAUDE.md` under `## SDSI profile` — the project type is detected from the code, anything unclear is asked once. Rules are applied in that language's idioms.
-3. **Project-type companions add to every skill automatically.** For a web, middleware (`mw`), or CLI project, each skill also applies its section of `ref/web.md`, `ref/mw.md`, or `ref/cli.md` — "review my project for error handling" on a CLI adds the CLI's exit-code rules. No section for that skill means nothing extra.
+3. **Project-type companions add to every skill automatically.** For a web, middleware (`mw`), CLI, library (`lib`), desktop, or mobile project, each skill also applies its section of `ref/<type>.md` — "review my project for error handling" on a CLI adds the CLI's exit-code rules. No section for that skill means nothing extra.
 4. **Every skill runs in review or apply mode** — pass it, or you're asked:
 
    ```text

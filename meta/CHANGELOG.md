@@ -16,7 +16,23 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.4 📅 2026-10-03
+## 🆕VERSION 1.3.5 📅 2026-10-04
+
+### Added or New Features
+- **Three new project-type companions:** `ref/lib.md` (libraries and packages — the public API is the contract; the library configures no logging, error handler, or threads of its own; dependency ranges instead of pins), `ref/desktop.md` (installed GUI apps — per-user file locations, OS credential store, signed and authenticated updates, never losing the user's work), and `ref/mobile.md` (app stores — build-time config, secure on-device storage, offline-first sync, staged rollouts, a minimum supported version). Each is a researched base with its sources listed, not yet grown from a real project. Core §1 Step 2's type table detects `lib`, `desktop`, and `mobile`, and a project can record a second type whose companion also applies. (TODO #9)
+- **`ref/web.md` — two health endpoints, always:** a basic one (no auth, no dependencies) for the platform's probe, and a full one that checks every service the app depends on, gated by an admin key from the secrets store, sent in a header and compared in constant time. (TODO #15)
+
+### Removed
+(none)
+
+### Changed
+- **`ref/web.md`, `ref/cli.md`, and `ref/mw.md` expanded from published guidelines**, keeping every rule learned from real projects. Web: access control, output encoding, security headers, CORS, session cookies, RFC 9457 errors, security-event logging, conditional updates and idempotency keys, WCAG 2.2 AA, Core Web Vitals targets, API deprecation headers. CLI: argument syntax, conventional flag names, exit-code ranges, `NO_COLOR`, XDG locations, Ctrl-C and broken-pipe handling, generated help and completion. Middleware: idempotent writes, watermarks, paging, reconciliation, quarantine, the outbox, jittered backoff, shared rate limits, lineage. Each companion lists its sources. (TODO #4, TODO #7, TODO #8)
+- Core, the README, the plugin description, and `.claude/CLAUDE.md` list the six project types.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟨VERSION 1.3.4 📅 2026-10-03
 
 ### Added or New Features
 - **`sdsi:upkeep`** (new): leaves a project's standing instructions — the rules that must hold every session, not only while a skill runs — in `.claude/rules/sdsi.md`, which Claude Code loads at every session start. It assembles them from each topic's new `## Upkeep` section; installs, refreshes after a plugin upgrade, removes, or reviews them. The project's own `CLAUDE.md` is untouched apart from a new profile field, `Upkeep`.

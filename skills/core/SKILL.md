@@ -3,7 +3,8 @@ name: core
 description: >
   The core of the Software Development Standard Instructions (SDSI) — the
   short set of non-negotiable rules every SDSI skill enforces, the project
-  profile (language, and the project type — web, middleware, or CLI —
+  profile (language, and the project type — web, middleware, CLI,
+  library, desktop, or mobile —
   detected from the code, whose companion guidance every skill adds to its
   own) every skill works from, the review or
   apply mode every skill runs in (--review / --apply, or asked), and the
@@ -35,7 +36,7 @@ Every rule is applied through the project's profile. Look for an `## SDSI profil
 ## SDSI profile
 
 - Language: <e.g. Python 3.13>
-- Project type: <web | mw | cli | other: short description>
+- Project type: <web | mw | cli | lib | desktop | mobile | other: short description>
 - Deploy target: <recorded by sdsi:deploy when first asked>
 - Upkeep: <recorded by sdsi:upkeep — the installed topics, or declined>
 ```
@@ -50,13 +51,18 @@ If the section or a field the current skill needs is missing, **ask with `AskUse
   | `web` | `ref/web.md` | Anything serving pages or an HTTP API to users | A web framework dependency, routes/handlers, templates |
   | `mw` | `ref/mw.md` | Services moving and reconciling data between systems (sync, ETL, connectors) | Connectors to external systems, scheduled or triggered sync tasks, a destination write |
   | `cli` | `ref/cli.md` | A tool meant to be run and reused, not a one-off | An argument parser at the entry point, commands, no server |
+  | `lib` | `ref/lib.md` | A library or package other code imports — published to a registry or shared internally | A package manifest with an exported API and no entry point of its own; consumers import it |
+  | `desktop` | `ref/desktop.md` | A GUI application installed on users' machines (Windows, macOS, Linux) | A desktop UI toolkit dependency, windows/views, an installer or app bundle definition |
+  | `mobile` | `ref/mobile.md` | An iOS, Android, or cross-platform mobile app | A mobile SDK or framework, app manifests (`Info.plist`, `AndroidManifest.xml`), store build config |
   | `other` | — | Anything else | — |
+
+  A project can be more than one (a web app that ships a CLI); record the main type, and name the second in the profile when its companion should apply too.
 
   **Identify it from the code when it isn't recorded** — say what you found and why ("web: a web framework dependency and route handlers in `src/app/`") and record it. Ask with `AskUserQuestion` only when the evidence is mixed or the project is empty. Never pick one silently.
 
 A topic may ask its own questions (e.g. `sdsi:deploy` asks the deploy target); it records its answer in the same profile section.
 
-**The project-type companion.** Once the type is known, a skill reads its companion (`../../ref/<type>.md`) and applies **only the section headed with its own name** (`## sdsi:errors` for `sdsi:errors`) on top of its own rules — in apply mode as extra rules, in review mode as part of the lens. When the companion has no section for the running skill, or the type is `other`, there's nothing to add: say so in one line ("no web-specific considerations for errors") and continue. A companion never overrides core or the skill; where it deliberately deviates (e.g. the CLI's flag precedence over `sdsi:config`), it says so.
+**The project-type companion.** Once the type is known, a skill reads its companion (`../../ref/<type>.md` — each recorded type's, when there are two) and applies **only the section headed with its own name** (`## sdsi:errors` for `sdsi:errors`) on top of its own rules — in apply mode as extra rules, in review mode as part of the lens. When the companion has no section for the running skill, or the type is `other`, there's nothing to add: say so in one line ("no web-specific considerations for errors") and continue. A companion never overrides core or the skill; where it deliberately deviates (e.g. the CLI's flag precedence over `sdsi:config`), it says so.
 
 ### Step 3 — Resolve the mode: review or apply
 
@@ -189,5 +195,5 @@ A topic grows by editing its own `SKILL.md` — nothing else. A new topic gets a
 ## 5. Loading
 
 - **A skill in this plugin** reads `../core/SKILL.md` by relative path as its first action.
-- **Shared reference files live in the plugin's `ref/` folder** and are read on demand by relative path (`../../ref/<file>.md`) — only when a step needs them: `ref/findings.md` in review mode, and the project-type companion (`ref/web.md`, `ref/mw.md`, `ref/cli.md`) once the type is known.
+- **Shared reference files live in the plugin's `ref/` folder** and are read on demand by relative path (`../../ref/<file>.md`) — only when a step needs them: `ref/findings.md` in review mode, and the project-type companion (`ref/<type>.md`, §1 Step 2's table) once the type is known.
 - **A skill in a different plugin** invokes `sdsi:core` (the rules) or `sdsi:all` (the full run) by name — never a relative path across plugins, since where two plugins sit on disk isn't something either can assume.
