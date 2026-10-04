@@ -16,7 +16,24 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.3 📅 2026-10-03
+## 🆕VERSION 1.3.4 📅 2026-10-03
+
+### Added or New Features
+- **`sdsi:upkeep`** (new): leaves a project's standing instructions — the rules that must hold every session, not only while a skill runs — in `.claude/rules/sdsi.md`, which Claude Code loads at every session start. It assembles them from each topic's new `## Upkeep` section; installs, refreshes after a plugin upgrade, removes, or reviews them. The project's own `CLAUDE.md` is untouched apart from a new profile field, `Upkeep`.
+- **Upkeep sections** in `sdsi:workflow` (design documents first; verify before calling it done; merge ⛏️ In progress when done), `sdsi:docs` (rewrite in place with a changelog sentence; clean up and document after a TODO item; leftover work becomes a TODO item), `sdsi:versioning` (a changelog bullet for every change; never commit), and `sdsi:testing` (a failing test before a bug fix).
+
+### Removed
+(none)
+
+### Changed
+- **Core §1 Step 5:** a skill with an Upkeep section ends by asking whether to leave its upkeep instructions in the project — optional, asked once, and remembered in the profile when declined. `sdsi:all` asks once at the end of the run, for every topic it ran.
+- README and the plugin description list `sdsi:upkeep`.
+- `.claude/CLAUDE.md`: a rule that must hold every session goes in its topic's `## Upkeep` section.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟧VERSION 1.3.3 📅 2026-10-03
 
 ### Added or New Features
 - `sdsi:deploy`: a deploy is verified against `SPEC.md`'s non-functional requirements before it counts as done; `SPEC.md` states performance, availability, and security targets so they can be checked, plus the testing and monitoring strategy. (TODO #10)

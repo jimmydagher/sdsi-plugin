@@ -46,6 +46,7 @@ Run in this order by `sdsi:all`; each can also be run alone (e.g. "apply `/sdsi:
 | 11 | `sdsi:versioning` | `VERSION`, `CHANGELOG.md`, commits, the release hooks |
 | 12 | `sdsi:deploy` | Deploy target (asked), local env, containers |
 | — | `sdsi:all` | Everything above, in order |
+| — | `sdsi:upkeep` | Leaves the topics' standing instructions in a project (`.claude/rules/sdsi.md`, loaded every session) — offered, optional |
 
 From another plugin, invoke `sdsi:core` or `sdsi:all` by name.
 

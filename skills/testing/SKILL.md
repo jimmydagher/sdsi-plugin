@@ -28,6 +28,12 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - **A bug fix starts with a failing test** that fails for the expected reason, then passes without being edited (`sdsi:workflow`). Every incident fix earns a permanent regression test.
 - **Something protecting a real external behavior** (a rotation, a retry, a paging walk) is tested against the real thing at least once, deliberately — a mock only proves the method was called.
 
+## Upkeep
+
+The line `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
+
+- Fixing a bug → first a test that fails for the expected reason, then the fix, without editing the test (`sdsi:testing`)
+
 ## Review checklist
 
 Tests or test config outside `tests/` · two test runners · unit tests calling real external systems · unmarked slow/integration tests in the default run · assertions that can't fail · a test that mocks what it's testing · a bug fix with no regression test · no CI gate.

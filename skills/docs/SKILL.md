@@ -75,6 +75,14 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - **Closing is automated, not manual.** When a change fixes an item, the AI references it in the changelog bullet it writes — `(TODO #4)`. At commit, the release script checks the item off, moves it to **Done** with the date and version, and refuses the commit if the referenced item doesn't exist (`sdsi:versioning`). The AI doesn't move items to Done by hand.
 - No priority tiers, assignees, or due dates unless the project genuinely needs them. If **Done** gets long, lean on `CHANGELOG.md` and git history — **Done** is a convenience, not the archive.
 
+## Upkeep
+
+The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
+
+- Any change that affects a document → update that document in the same change, rewritten in place (never appended), with one short sentence under Changed in `meta/CHANGELOG.md`'s Unreleased (`sdsi:docs`)
+- After finishing a `meta/TODO.md` item → remove anything temporary it left behind, update every document it touched, and cite it as `(TODO #n)` in its changelog bullet (`sdsi:docs`)
+- Work left undone at the end of a session → a numbered `meta/TODO.md` item (`sdsi:docs`)
+
 ## Review checklist
 
 A code change without its matching doc update · a correction appended under stale text instead of rewriting it · the same fact maintained in two documents · a document change with no sentence in the changelog · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.

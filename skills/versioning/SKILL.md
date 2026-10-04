@@ -171,6 +171,13 @@ A project set up before the files lived in `meta/` keeps the old scripts working
 6. **Add an Unreleased bullet** under Changed, naming the move and anything an operator must update.
 7. **Stage everything before committing** — `git add -A`, or every change in the editor's source-control view. `git mv` stages only the moves; a commit without the re-copied scripts and edited files ships old scripts that can't find the moved ones.
 
+## Upkeep
+
+The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
+
+- Every code change → a bullet under the right subsection of `meta/CHANGELOG.md`'s Unreleased, written as it's made, for whoever deploys it (`sdsi:versioning`)
+- Never commit unless the human asks — the human commits and the release hooks do the version, changelog, `TODO.md`, and message (`sdsi:versioning`)
+
 ## Review checklist
 
 No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · changelog missing subsections or out of order · more than one 🆕 · an older (colored) entry rewritten, or the 🆕 one changed other than by a docs-only commit · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.

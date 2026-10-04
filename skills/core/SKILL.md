@@ -37,6 +37,7 @@ Every rule is applied through the project's profile. Look for an `## SDSI profil
 - Language: <e.g. Python 3.13>
 - Project type: <web | mw | cli | other: short description>
 - Deploy target: <recorded by sdsi:deploy when first asked>
+- Upkeep: <recorded by sdsi:upkeep — the installed topics, or declined>
 ```
 
 If the section or a field the current skill needs is missing, **ask with `AskUserQuestion` — never infer it silently** — then write the answer into `.claude/CLAUDE.md` (creating the file if needed) so no later session asks again:
@@ -84,6 +85,10 @@ Resolve the mode in this order:
 ### Step 4 — Respect the project's own deviations
 
 A deliberate, written-down deviation in the project's `CLAUDE.md` wins for that project. Everywhere else SDSI governs. A new deviation gets written into `CLAUDE.md` the moment it's made, so a later session doesn't quietly regress toward SDSI's default.
+
+### Step 5 — Offer upkeep, last
+
+A skill only loads when it's invoked or its triggers match, so its rules lapse between runs. A skill with an `## Upkeep` section ends — after changes were made, in apply mode or by applying review findings — by asking with `AskUserQuestion` whether to leave its upkeep lines in the project: *Leave upkeep instructions* or *Not now*. On yes, install them through `sdsi:upkeep` into `.claude/rules/sdsi.md`, which Claude Code loads every session. Skip the question when the project already has this skill's lines, or the human has declined it before (recorded in `CLAUDE.md`). `sdsi:all` asks once, at the end of the run, for every topic it ran.
 
 ## 2. Non-negotiable principles
 
@@ -176,6 +181,8 @@ project-root/
 | 10 | `sdsi:docs` | README, `docs/`, `TODO.md` |
 | 11 | `sdsi:versioning` | Git hygiene, `VERSION`, `CHANGELOG.md`, the release hooks |
 | 12 | `sdsi:deploy` | Local run environment, deploy target, containers |
+
+Outside the order: **`sdsi:upkeep`** keeps a project's `.claude/rules/sdsi.md` — the standing instructions assembled from each topic's `## Upkeep` section (§1 Step 5).
 
 A topic grows by editing its own `SKILL.md` — nothing else. A new topic gets a row in this table and a slot in the order. A new project type gets a row in Step 2's table and a `ref/<type>.md` companion with one `## sdsi:<topic>` section per topic it adds to.
 
