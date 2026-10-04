@@ -143,6 +143,17 @@ class TodoTest(unittest.TestCase):
         self.assertEqual(release.todo_refs("TODO #3 and TODO #1, again TODO #3"), [1, 3])
 
 
+class ReadmeTest(unittest.TestCase):
+    def test_sync_rewrites_the_version_line_to_the_current_heading(self) -> None:
+        readme = "# App\n\n## 🆕VERSION 1.0.0 📅 2026-09-01\n\nSee the changelog.\n"
+        result = release.sync_readme(readme, release.promote(CHANGELOG, "1.0.1", TODAY))
+        self.assertEqual(result, "# App\n\n## 🆕VERSION 1.0.1 📅 2026-09-23\n\nSee the changelog.\n")
+
+    def test_readme_without_a_version_line_is_untouched(self) -> None:
+        readme = "# App\n\n## Install\n"
+        self.assertEqual(release.sync_readme(readme, CHANGELOG), readme)
+
+
 class HelpersTest(unittest.TestCase):
     def test_bump_patch(self) -> None:
         self.assertEqual(release.bump_patch("1.2.9"), "1.2.10")
@@ -223,6 +234,29 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertIn("- [x] #1 Crash on empty input", self.read("meta/TODO.md"))
         self.assertIn("- [ ] #3 Unrelated item", self.read("meta/TODO.md"))
         self.assertEqual(self.last_message(), "VERSION 1.0.1")
+        self.assertEqual(self.git("status", "--porcelain").stdout, "")
+
+    def test_code_commit_updates_the_readme_version_line(self) -> None:
+        self.write("README.md", "# App\n\n## 🆕VERSION 1.0.0 📅 2026-09-01\n")
+        self.git("add", "README.md")
+        self.git("commit", "-q", "-m", "readme", "--no-verify")
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        self.git("commit", "-q", "-m", "x")
+        self.assertEqual(
+            self.read("README.md"),
+            f"# App\n\n## 🆕VERSION 1.0.1 📅 {date.today().isoformat()}\n",
+        )
+        self.assertEqual(self.git("status", "--porcelain").stdout, "")
+
+    def test_docs_only_commit_redates_the_readme_version_line(self) -> None:
+        self.write("README.md", "# App\n\n## 🆕VERSION 1.0.0 📅 2026-09-01\n")
+        self.git("add", "README.md")
+        self.git("commit", "-q", "-m", "readme", "--no-verify")
+        self.write("docs/setup.md", "setup\n")
+        self.git("add", "docs/setup.md")
+        self.git("commit", "-q", "-m", "x")
+        self.assertIn(f"## 🆕VERSION 1.0.0 📅 {date.today().isoformat()}\n", self.read("README.md"))
         self.assertEqual(self.git("status", "--porcelain").stdout, "")
 
     def test_code_commit_with_empty_unreleased_is_refused(self) -> None:

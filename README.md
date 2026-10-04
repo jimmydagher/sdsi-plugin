@@ -1,5 +1,9 @@
 # SDSI — Software Development Standard Instructions
 
+## 🆕VERSION 1.3.8 📅 2026-10-04
+
+For details on the latest changes and features, please review [CHANGELOG.md](meta/CHANGELOG.md).
+
 A language-neutral development standard for Claude Code, split into skills that each own one area and grow on their own. Every skill enforces the same short core; each adds web, middleware, CLI, library, desktop, or mobile guidance automatically when the project is that type; `sdsi:all` runs everything in a fixed order.
 
 ## Install

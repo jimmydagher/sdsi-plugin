@@ -10,12 +10,17 @@ the code and commits is done here, deterministically:
   code commit       bump VERSION (PATCH, unless a new version is already
                     staged by hand) → promote Unreleased to a new version heading
                     → close referenced TODO.md items with that version →
-                    sync any mirrored version files → stage it all.
+                    sync any mirrored version files and the README's
+                    version line → stage it all.
                     Refused if Unreleased is empty.
   docs-only commit  no bump → fold Unreleased into the current version's
                     entry and date it today → close referenced TODO.md items
-                    with the current version → stage it. Nothing to do if
-                    Unreleased is empty.
+                    with the current version → sync the README's version
+                    line → stage it. Nothing to do if Unreleased is empty.
+
+The README's version line is opt-in: a README.md holding a line in the
+changelog's heading format ("## 🆕VERSION x.y.z 📅 YYYY-MM-DD") has it
+rewritten to the changelog's current heading; without one, it's untouched.
 
 All three files live in meta/, the project's record — the root holds only
 README.md (sdsi:core §3). A staged meta/VERSION is always a release,
@@ -44,6 +49,7 @@ from pathlib import Path
 VERSION_FILE = "meta/VERSION"
 CHANGELOG_FILE = "meta/CHANGELOG.md"
 TODO_FILE = "meta/TODO.md"
+README_FILE = "README.md"
 SETTINGS_FILE = "scripts/git/release.json"
 
 DEFAULT_DOCS_PATTERNS = ["docs/*", "*.md"]
@@ -60,6 +66,7 @@ UNRELEASED_RE = re.compile(r"^## 🚧 Unreleased\n(.*?)(?=^## |\Z)", re.M | re.S
 CURRENT_ENTRY_RE = re.compile(r"^(## 🆕VERSION [^\n]*\n)(.*?)(?=^## |\Z)", re.M | re.S)
 CURRENT_VERSION_RE = re.compile(r"^## 🆕VERSION (\S+)", re.M)
 CURRENT_DATE_RE = re.compile(r"^(## 🆕VERSION \S+ 📅 )\S+", re.M)
+CURRENT_HEADING_RE = re.compile(r"^## 🆕VERSION \S+ 📅 \S+$", re.M)
 TODO_REF_RE = re.compile(r"TODO #(\d+)")
 OPEN_TODO_RE = r"^- \[ \] #{number} (.*)$"
 DONE_TODO_RE = r"^- \[x\] #{number} "
@@ -212,6 +219,22 @@ def fold_into_current(changelog: str, today: str) -> str:
     return UNRELEASED_RE.sub(
         lambda _: f"{UNRELEASED_HEADING}\n{empty_body()}\n", changelog, count=1
     )
+
+
+def sync_readme(readme: str, changelog: str) -> str:
+    """Rewrite the README's version line to the changelog's current heading.
+
+    Input:
+        readme (str): README.md contents.
+        changelog (str): CHANGELOG.md contents, after this commit's changes.
+    Output:
+        str: the updated README, or the input unchanged when either file
+        has no "## 🆕VERSION x.y.z 📅 YYYY-MM-DD" line.
+    """
+    current = CURRENT_HEADING_RE.search(changelog)
+    if current is None:
+        return readme
+    return CURRENT_HEADING_RE.sub(lambda _: current.group(0), readme, count=1)
 
 
 def todo_refs(body: str) -> list[int]:
@@ -374,6 +397,13 @@ def run(root: Path, today: str) -> None:
 
     if refs:
         writes[todo_path] = close_todos(read(todo_path), refs, version, today)
+
+    readme_path = root / README_FILE
+    if readme_path.exists():
+        readme = read(readme_path)
+        synced = sync_readme(readme, writes[root / CHANGELOG_FILE])
+        if synced != readme:
+            writes[readme_path] = synced
 
     for path, text in writes.items():
         with path.open("w", encoding="utf-8", newline="\n") as handle:

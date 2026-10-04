@@ -149,6 +149,8 @@ Put those commands in whatever script bootstraps local development, so a fresh c
 
 `docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A staged `meta/VERSION` is always a release, even if a pattern matches it. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`.
 
+**The README's version line is opt-in.** A root `README.md` holding a line in the changelog's heading format — `## 🆕VERSION x.y.z 📅 YYYY-MM-DD` — has it rewritten on every release and docs-only commit to match the changelog's current heading; add one under the title, followed by a pointer to `meta/CHANGELOG.md` for the details. A README without one is left alone.
+
 **Test the hooks with a real, throwaway commit before trusting them** — don't reason from the scripts alone. The plugin's own `tests/test_release.py` does this end to end.
 
 ## Moving the release files out of the root
