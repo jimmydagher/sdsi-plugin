@@ -7,12 +7,16 @@
 # changed lives in CHANGELOG.md's entry for that version; `git log` is a
 # clean version timeline.
 #
-#   VERSION x.y.z            this commit bumped VERSION (pre-commit ran)
-#   VERSION x.y.z-updated    this commit didn't; x.y.z is the current version
+#   VERSION x.y.z      this commit released x.y.z (pre-commit bumped VERSION)
+#   VERSION x.y.z+k    the k-th docs-only commit since x.y.z — SemVer build
+#                      metadata, so every tool still reads it as x.y.z
 #
-# Idempotent: overwriting gives the same result on `git commit --amend`.
+# k counts back along main's first parents to the last line naming x.y.z.
+# Don't amend on main: an amend is labelled as a new docs-only commit, so
+# make a new commit instead.
 #
 # Installed via:  git config core.hooksPath scripts/git
+#                 git config commit.template scripts/git/commit-template
 
 repo_root=$(git rev-parse --show-toplevel)
 msg_file="$1"
@@ -32,11 +36,20 @@ if [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
 fi
 
 current_version=$(tr -d '[:space:]' < "$repo_root/$VERSION_FILE")
+release="VERSION $current_version"
 
 if git diff --cached --name-only -- "$VERSION_FILE" | grep -qx "$VERSION_FILE"; then
-    line="VERSION $current_version"
+    line="$release"
 else
-    line="VERSION $current_version-updated"
+    # The last line naming this version decides k: the release itself → 1,
+    # "+k" → k + 1. Anything else (a merge, an older "-updated") is skipped.
+    k=$(git log --first-parent --format=%s 2>/dev/null | awk -v release="$release" '
+        $0 == release { print 1; exit }
+        index($0, release "+") == 1 {
+            k = substr($0, length(release) + 2)
+            if (k ~ /^[0-9]+$/) { print k + 1; exit }
+        }')
+    line="$release+${k:-1}"
 fi
 
 printf '%s\n' "$line" > "$msg_file"

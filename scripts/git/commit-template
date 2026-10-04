@@ -1,0 +1,6 @@
+# SDSI release chain (sdsi:versioning). Pre-fills an editor's commit box
+# (VS Code reads it), so a commit never stops to ask for a message; on main,
+# scripts/git/commit-msg replaces it with the version line.
+#
+# Installed via:  git config commit.template scripts/git/commit-template
+VERSION (set by the release hooks on main)

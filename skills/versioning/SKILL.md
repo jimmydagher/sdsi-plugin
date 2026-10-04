@@ -103,13 +103,14 @@ All notable changes, newest first. See `VERSION` for the current release.
 - **Exactly one 🆕** — the current version. Every shipped version gets a color square when it's replaced, cycling 🟥 🟧 🟨 🟩 🟦 🟪 🟫 and wrapping — assigned once, never changed.
 - **📅 date** in `YYYY-MM-DD` — the day of the releasing commit.
 - **A version entry is written once.** A mistake in a shipped entry is corrected by a new version and a new entry, never a rewrite.
-- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump; the notes fold into the current 🆕 entry and the message becomes `VERSION x.y.z-updated`.
+- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump and no notes needed (any in Unreleased fold into the current 🆕 entry); the message becomes `VERSION x.y.z+k`, the k-th docs-only commit since x.y.z. `+k` is SemVer build metadata, so every tool still reads the version as x.y.z, and `VERSION` itself doesn't change.
 - **A code commit with an empty Unreleased is refused.** Add the bullet, then commit. `--no-verify` is the escape hatch for a commit that genuinely isn't a release.
 - **A commit referencing a `TODO #n` that doesn't exist is refused**, so a typo can't silently leave an item open.
 
 ## Commits and git hygiene
 
-- **The commit message is the version, nothing else** — `VERSION x.y.z` or `VERSION x.y.z-updated`, overwritten by the hook. What changed lives only in `CHANGELOG.md`. `git log` reads as a clean version timeline.
+- **The commit message is the version, nothing else** — `VERSION x.y.z` for a release or `VERSION x.y.z+k` for a docs-only commit, overwritten by the hook. What changed lives only in `CHANGELOG.md`. `git log` reads as a clean version timeline.
+- **Don't amend on `main`** — the hook labels an amend as a new docs-only commit (`+k`). Make a new commit instead.
 - **Feature branches off `main`**, reviewed before merge. The hooks only act on the target branch (`main` by default, set in both hooks); a merge commit is exempt, since its commits were released on their own branch.
 - **Promoting a build is a retag of the tested artifact**, never a rebuild.
 - **No secrets in history, ever** — gitignore local secret files and use a secret-scanning pre-commit step where possible (`sdsi:secrets`).
@@ -124,6 +125,7 @@ This plugin ships the working, tested scripts. Copy them into the project — ne
 ```text
 <plugin>/scripts/git/pre-commit        → <project>/scripts/git/pre-commit
 <plugin>/scripts/git/commit-msg        → <project>/scripts/git/commit-msg
+<plugin>/scripts/git/commit-template   → <project>/scripts/git/commit-template
 <plugin>/scripts/python/release.py     → <project>/scripts/python/release.py
 ```
 
@@ -131,9 +133,10 @@ Then, in the project root (local shell):
 
 ```bash
 git config core.hooksPath scripts/git
+git config commit.template scripts/git/commit-template
 ```
 
-Put that command in whatever script bootstraps local development, so a fresh clone gets it. Commit a `.gitattributes` containing `* text=auto eol=lf` (at minimum for `scripts/git/*`) — a hook checked out with Windows line endings fails to run. The scripts need Python 3.9+ on `PATH` whatever language the project itself is written in — they're repo tooling, not application code.
+Put those commands in whatever script bootstraps local development, so a fresh clone gets them. The template pre-fills an editor's commit box (VS Code reads it), so committing never stops to ask for a message; on `main` the hook replaces it with the version line. Commit a `.gitattributes` containing `* text=auto eol=lf` (at minimum for `scripts/git/*`) — a hook checked out with Windows line endings fails to run. The scripts need Python 3.9+ on `PATH` whatever language the project itself is written in — they're repo tooling, not application code.
 
 **Optional per-project settings** — `scripts/git/release.json`:
 
@@ -161,7 +164,7 @@ A project set up before the files lived in `meta/` keeps the old scripts working
    git mv TODO.md meta/TODO.md
    ```
 
-2. **Re-copy the three scripts** from this plugin (Installing, above) — never patch the old copies by hand.
+2. **Re-copy the scripts and run both config commands** (Installing, above) — never patch the old copies by hand.
 3. **Fix `scripts/git/release.json`**, if the project has one — every `docs_patterns` entry for a moved file takes its new path (`CHANGELOG.md` → `meta/CHANGELOG.md`).
 4. **Update everything that reads a moved file by path** — a build step that copies `VERSION` into the artifact, a `--version` implementation, the README, the docs index.
 5. **Decide the bump.** The move stages `meta/VERSION` unchanged; the script reads that as no bump and makes the usual PATCH. For a MINOR or MAJOR, write the new number into `meta/VERSION` and stage it before committing (The release chain, above).
@@ -170,4 +173,4 @@ A project set up before the files lived in `meta/` keeps the old scripts working
 
 ## Review checklist
 
-No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` not set · changelog missing subsections or out of order · more than one 🆕 · a shipped entry rewritten · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.
+No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · changelog missing subsections or out of order · more than one 🆕 · a shipped entry rewritten · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.

@@ -166,7 +166,10 @@ class HookEndToEndTest(unittest.TestCase):
         self.git("config", "user.email", "test@example.com")
         self.git("config", "user.name", "Test")
         self.git("config", "core.autocrlf", "false")
-        for relative in ("scripts/git/pre-commit", "scripts/git/commit-msg", "scripts/python/release.py"):
+        for relative in (
+            "scripts/git/pre-commit", "scripts/git/commit-msg",
+            "scripts/git/commit-template", "scripts/python/release.py",
+        ):
             target = self.repo / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(ROOT / relative, target)
@@ -177,13 +180,16 @@ class HookEndToEndTest(unittest.TestCase):
         self.git("commit", "-q", "-m", "seed")  # hooks not installed yet
         self.git("config", "core.hooksPath", "scripts/git")
 
-    def git(self, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+    def git(self, *args: str, check: bool = True, editor: str = "") -> subprocess.CompletedProcess:
         # The hooks' Python writes to a pipe here, in the locale's encoding unless
         # told otherwise (cp1252 on Windows), and the "—" in a refusal then fails
         # to decode as UTF-8 and loses stderr entirely.
+        env = {**os.environ, "PYTHONIOENCODING": "utf-8"}
+        if editor:
+            env["GIT_EDITOR"] = editor
         return subprocess.run(
             ["git", *args], cwd=self.repo, check=check, capture_output=True,
-            text=True, encoding="utf-8", env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+            text=True, encoding="utf-8", env=env,
         )
 
     def write(self, relative: str, text: str) -> None:
@@ -273,7 +279,37 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertEqual(self.read("meta/VERSION").strip(), "1.0.0")
         self.assertIn("- Initial release.\n- New export command (TODO #2)", self.read("meta/CHANGELOG.md"))
         self.assertIn("completed", self.read("meta/TODO.md"))
-        self.assertEqual(self.last_message(), "VERSION 1.0.0-updated")
+        self.assertEqual(self.last_message(), "VERSION 1.0.0+1")
+
+    def test_docs_only_labels_count_up_and_restart_after_a_release(self) -> None:
+        # Regression: each docs-only commit needs its own label, counted from the
+        # release it follows — never a repeat of an earlier one.
+        for k, name in enumerate(("a", "b"), start=1):
+            self.write(f"docs/{name}.md", f"{name}\n")
+            self.git("add", f"docs/{name}.md")
+            self.git("commit", "-q", "-m", "")
+            self.assertEqual(self.last_message(), f"VERSION 1.0.0+{k}")
+        changelog = self.read("meta/CHANGELOG.md")
+        self.write("meta/CHANGELOG.md", changelog.replace(
+            "### Added or New Features\n(none)", "### Added or New Features\n- Thing.", 1))
+        self.write("src/app.txt", "code\n")
+        self.git("add", "meta/CHANGELOG.md", "src/app.txt")
+        self.git("commit", "-q", "-m", "")
+        self.assertEqual(self.last_message(), "VERSION 1.0.1")
+        self.write("docs/c.md", "c\n")
+        self.git("add", "docs/c.md")
+        self.git("commit", "-q", "-m", "")
+        self.assertEqual(self.last_message(), "VERSION 1.0.1+1")
+
+    def test_untouched_template_is_replaced_on_main(self) -> None:
+        # Regression: git aborts a commit whose message is the untouched template
+        # ("you did not edit the message"); on main the hook must replace it first,
+        # so closing the editor without typing still commits.
+        self.git("config", "commit.template", "scripts/git/commit-template")
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        self.git("commit", "-q", editor="true")
+        self.assertEqual(self.last_message(), "VERSION 1.0.1")
 
     def test_feature_branch_is_exempt(self) -> None:
         self.git("checkout", "-q", "-b", "feature")

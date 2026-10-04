@@ -95,7 +95,7 @@ The kickoff for a brand-new, empty project:
    - `meta/` with `TODO.md`, `CHANGELOG.md` (intro plus an empty Unreleased), and `VERSION` (`0.1.0`).
    - The source layout, following the language's and framework's conventions within core §3's invariants.
    - `tests/`, `config/`, `docs/`, `scripts/`.
-   - **The release chain:** copy `scripts/git/{pre-commit,commit-msg}` and `scripts/python/release.py` from this plugin into the project and run `git config core.hooksPath scripts/git` (`sdsi:versioning`).
+   - **The release chain:** copy it from this plugin and wire it — `sdsi:versioning`, "Installing the release chain".
    - Commit the skeleton on its own, before feature work.
    - Once the skeleton exists, it's worth scanning it for the MCP servers, skills, and hooks suited to this stack (e.g. the `claude-code-setup` plugin) rather than guessing before anything exists.
 6. **`PLAN.md`, then build.**

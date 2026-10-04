@@ -16,7 +16,22 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.0 📅 2026-10-03
+## 🆕VERSION 1.3.1 📅 2026-10-03
+
+### Added or New Features
+- `scripts/git/commit-template`: with `git config commit.template scripts/git/commit-template`, the editor's commit box is pre-filled (VS Code reads it), so committing no longer stops at a `COMMIT_EDITMSG` tab asking for a message. On `main` the hook still replaces it with the version line. A project copies the file and runs the command (`sdsi:versioning`, "Installing the release chain").
+
+### Removed
+(none)
+
+### Changed
+- Docs-only commits are labelled `VERSION x.y.z+k` — the k-th since x.y.z, as SemVer build metadata — instead of `VERSION x.y.z-updated`, which SemVer reads as a pre-release *before* x.y.z. `VERSION` and the changelog are untouched and no Unreleased notes are needed. A project re-copies `scripts/git/commit-msg`.
+- `sdsi:versioning`: don't amend on `main` — the hook labels an amend as a new docs-only commit. The `commit-msg` header no longer claims amending is safe (it already relabelled a release commit `-updated`).
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟪VERSION 1.3.0 📅 2026-10-03
 
 ### Added or New Features
 - `release.py` gives a moved `meta/VERSION` — staged, but still holding the current release — the usual PATCH bump, instead of taking it as a hand-set bump and writing a second changelog entry for a version that already shipped. A missing `meta/VERSION` or `meta/CHANGELOG.md` is refused with a message pointing to the move steps, instead of a traceback.

@@ -51,21 +51,25 @@ From another plugin, invoke `sdsi:core` or `sdsi:all` by name.
 
 ## The release chain in a project
 
-Copy these three files into the project and wire them (local shell, project root):
+Copy these four files into the project and wire them (local shell, project root):
 
 ```text
 scripts/git/pre-commit
 scripts/git/commit-msg
+scripts/git/commit-template
 scripts/python/release.py
 
 git config core.hooksPath scripts/git
+git config commit.template scripts/git/commit-template
 ```
+
+On `main`, every commit message is written for you: `VERSION x.y.z` for a release, `VERSION x.y.z+k` for the k-th docs-only commit after it. The template pre-fills the editor's commit box, so just commit.
 
 They need Python 3.9+ on `PATH`, whatever language the project uses, and read `VERSION`, `CHANGELOG.md`, and `TODO.md` from `meta/` — SDSI keeps only `README.md` at the root. Full behavior, the optional `scripts/git/release.json` settings, and the steps for moving an older project's files out of the root are in `skills/versioning/SKILL.md`.
 
 ## Developing this plugin
 
 - This repo follows SDSI itself: see `.claude/CLAUDE.md` for its profile and conventions, `meta/TODO.md` for outstanding work, `meta/CHANGELOG.md` for releases.
-- Wire the hooks after cloning: `git config core.hooksPath scripts/git`.
+- Wire the hooks after cloning: `git config core.hooksPath scripts/git` and `git config commit.template scripts/git/commit-template`.
 - Test the release chain (local shell, repo root): `python -m unittest discover tests`.
 - To grow a topic, edit only its `skills/<topic>/SKILL.md`; to grow a project type, edit its `ref/<type>.md` under the `## sdsi:<topic>` heading it adds to. To add a topic, add its folder and a row in `sdsi:core` §4; to add a project type, add `ref/<type>.md` and a row in core §1 Step 2.
