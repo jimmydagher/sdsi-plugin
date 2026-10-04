@@ -34,4 +34,4 @@ Apply each step's rules before moving to the next, so later steps build on a cor
 
 ## New, empty project
 
-There's nothing to review, so the run applies. Step 1 (`sdsi:workflow`) drives: its "Starting a new project" sequence brainstorms, asks the decisions, writes the planning artifacts, and scaffolds the skeleton. Steps 2–12 then fill in each part of that skeleton.
+There's nothing to review, so the run applies. Step 1 (`sdsi:workflow`) drives: its "Starting a new project" sequence brainstorms, asks the decisions, writes the design documents, and scaffolds the skeleton. Steps 2–12 then fill in each part of that skeleton.

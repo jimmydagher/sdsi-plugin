@@ -33,7 +33,7 @@ Run in this order by `sdsi:all`; each can also be run alone (e.g. "apply `/sdsi:
 | # | Skill | Covers |
 |---|---|---|
 | 0 | `sdsi:core` | Non-negotiables, profile, project type, review/apply mode, universal layout, the order |
-| 1 | `sdsi:workflow` | Plan before code, INTENT/SPEC/PLAN, scope, new-project kickoff |
+| 1 | `sdsi:workflow` | Plan before code, the living design documents (`docs/design/` INTENT/SPEC/PLAN), scope, new-project kickoff |
 | 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing, input validation |
 | 3 | `sdsi:config` | Config files, schema, validation |
 | 4 | `sdsi:secrets` | Secrets store, naming, rotation, redaction |

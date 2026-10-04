@@ -133,6 +133,7 @@ project-root/
 ├── tests/           # sdsi:testing
 ├── config/          # default.yaml + override/<env>.yaml — sdsi:config
 ├── docs/            # documents people read: processes, how-tos, setup, deployment — sdsi:docs
+│   └── design/      #   INTENT.md, SPEC.md, PLAN.md — the whole project's design (sdsi:workflow)
 ├── meta/            # the project's record — version, history, outstanding work
 │   ├── CHANGELOG.md #   sdsi:versioning
 │   ├── TODO.md      #   sdsi:docs

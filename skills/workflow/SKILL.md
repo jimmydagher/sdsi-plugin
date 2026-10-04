@@ -1,8 +1,10 @@
 ---
 name: workflow
 description: >
-  SDSI's development workflow — plan before code, the INTENT/SPEC/PLAN
-  artifact chain, verifying before calling anything done, flagging scope
+  SDSI's development workflow — plan before code, the project's living
+  design documents (docs/design/INTENT.md, SPEC.md, PLAN.md with its
+  ⛏️ In progress section), reverse-engineering them for an existing
+  project, updating them for every new feature, verifying before calling anything done, flagging scope
   growth, stage gates, closing the loop on production issues, keeping
   institutional knowledge in CLAUDE.md, and the kickoff sequence for a
   brand-new project, sizing plan steps, reading a change's dependents
@@ -19,30 +21,29 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 Adapted from Anthropic's AI-Native SDLC playbook ([claude.com/blog/the-ai-native-sdlc-playbook](https://claude.com/blog/the-ai-native-sdlc-playbook)). Applies in full on new projects; on established code, adopt what fits.
 
-## The artifact chain
+## The design documents
 
-Every stage ends by committing a markdown artifact the next stage reads. The chain is the audit trail — what was asked, decided, built, and found — and it's what makes core's "no assumptions" and "double-check your work" enforceable.
+Idea → Intent (why) → Spec (what) → Plan (how) → Implementation → Validation. Every project has three design documents in `docs/design/`, each describing **the whole project as it stands** — not one change:
 
-| Stage | Artifact | Captures |
+| Document | Answers | Holds |
 |---|---|---|
-| Plan | `INTENT.md` | The problem in the requester's words — what, why, constraints. Open questions stay open here. |
-| Design | `SPEC.md` | Requirements and design, checked against SDSI as it's written. |
-| Build | `PLAN.md` | Which files change, in what order, and what proves it worked — reviewed before code. |
-| Build | the diff + tests | The implementation and what verifies it (`sdsi:testing`). |
-| Deploy | the PR + review findings | What was checked, by whom, what was decided. |
-| Maintain | a new `INTENT.md` | Anything production surfaces re-enters at Plan. |
+| `INTENT.md` | Why | The problem in the requester's words, who it's for, goals, constraints, non-goals, open questions — open questions stay open here until answered |
+| `SPEC.md` | What | Every feature and its behavior, interfaces, data, and the non-functional requirements — performance, availability, security — each stated so it can be checked; the testing strategy (`sdsi:testing`) and the monitoring strategy; written against SDSI |
+| `PLAN.md` | How | Architecture, components, and how each is built and verified — plus **⛏️ In progress** (below) |
 
-- **A historical artifact is left alone when later work changes what it describes** — it's a permanent record, not a living reference. **The exception:** when it's actively misleading (a superseded direction still written as current), update it or mark it superseded — and flag that judgment call explicitly each time.
-- **The artifacts live in a per-change folder under `docs/`**, never loose at the root (core §3).
-- **On an established codebase** a per-change folder of three files often goes unread. It's fine to land each stage elsewhere — intent in the commit body or a `TODO.md` item, a standing design decision in `CLAUDE.md`, the plan in the change itself — as long as every stage lands somewhere version-controlled and the plan existed before the code.
+- **They're living documents**, rewritten in place (`sdsi:docs`): after any change they read as if the project had been designed that way from the start. A feature that's dropped is removed, not struck through.
+- **⛏️ In progress** is the first section of `PLAN.md`: the steps of the change underway — which files change, in what order, and what proves each step worked. The human approves it before code. When the change is done, its steps are merged into the plan's body, and the section goes back to `(none)`.
+- **Brainstorming sits above SDSI.** A brainstorming skill (such as `superpowers:brainstorming`) turns an idea into something concrete; its result is merged into these three documents, and any per-topic design file it writes isn't kept.
 
 ## Plan before code, always
 
-Nothing is implemented from an unstated plan. Beyond a trivial fix: `INTENT.md` → `SPEC.md` → `PLAN.md`, then code. It scales down — a one-line fix doesn't need three files, but it still needs a stated reason, and if it isn't self-evidently safe, a one-sentence plan beats none.
+Nothing is implemented from an unstated plan. **Every new feature — from `TODO.md` or straight from a prompt — updates the design documents before any code:** `INTENT.md` if the why changes, then `SPEC.md`, then `PLAN.md`'s ⛏️ In progress. It scales down — a one-line fix doesn't touch the documents, but it still needs a stated reason, and if it isn't self-evidently safe, a one-sentence plan beats none.
+
+**A project without the documents gets them reverse-engineered** from the code, `README.md`, config, tests, and history. Mark every inferred statement `(inferred — confirm)` and ask the human about each; `INTENT.md` most of all, since code shows what and how but rarely why. Until the human confirms them, they're a draft.
 
 ## Size the steps
 
-Each step in `PLAN.md` is small enough to finish and verify in one focused session — a rough guide is under ~30 minutes and ~5 files. A step past that gets split before work starts, because errors compound across a large step and a failure deep into one is expensive to unwind. A step that turns out bigger than planned is a scope change (below), not something to push through.
+Each step in ⛏️ In progress is small enough to finish and verify in one focused session — a rough guide is under ~30 minutes and ~5 files. A step past that gets split before work starts, because errors compound across a large step and a failure deep into one is expensive to unwind. A step that turns out bigger than planned is a scope change (below), not something to push through.
 
 ## Read what depends on it before changing it
 
@@ -54,7 +55,7 @@ Before modifying or removing a function, type, config key, or file, read what us
 
 ## Verify before calling anything done
 
-Every task has a way to check itself, and the check runs before the work is reported done. For a bug fix: write the failing test, confirm it fails for the expected reason, then make it pass without touching the test. The project's own linter and type checker run as part of the check, not after it.
+Every task has a way to check itself, and the check runs before the work is reported done. Validation closes the chain: the change does what `SPEC.md` says, and the deployed system meets its non-functional requirements (`sdsi:deploy`). For a bug fix: write the failing test, confirm it fails for the expected reason, then make it pass without touching the test. The project's own linter and type checker run as part of the check, not after it.
 
 Verification has two levels, and **both are required**:
 
@@ -67,7 +68,7 @@ A project's conventions, gotchas, and repeated corrections live in its `CLAUDE.m
 
 ## Review runs in both directions
 
-A change is reviewed against SDSI, the accepted `SPEC.md`, and the accepted `PLAN.md`. Findings carry a severity; only ones that break behavior, leak data, or breach a stated policy block. The same mistake caught twice goes into `CLAUDE.md`.
+A change is reviewed against SDSI, `SPEC.md`, and `PLAN.md`'s approved ⛏️ In progress. Findings carry a severity; only ones that break behavior, leak data, or breach a stated policy block. The same mistake caught twice goes into `CLAUDE.md`.
 
 ## Scope changes get flagged, not absorbed
 
@@ -75,11 +76,11 @@ When a request grows past what was understood — a small fix that turns out to 
 
 ## Stage gates
 
-Human judgment concentrates at the gates — approving `INTENT.md`, accepting `SPEC.md`, approving `PLAN.md`, approving the code for commit — not on re-litigating each line. Departing from an approved plan means updating `PLAN.md` in the same change.
+Human judgment concentrates at the gates — approving the `INTENT.md` and `SPEC.md` changes, approving ⛏️ In progress, approving the code for commit — not on re-litigating each line. Departing from an approved plan means updating ⛏️ In progress in the same change.
 
 ## Closing the loop
 
-Production issues re-enter as a new `INTENT.md` (or `TODO.md` item), not an off-process hotfix. Every incident that ships a fix earns a permanent regression test.
+Production issues re-enter as a `TODO.md` item or a design-document update, not an off-process hotfix. Every incident that ships a fix earns a permanent regression test.
 
 ## Starting a new project
 
@@ -87,8 +88,8 @@ The kickoff for a brand-new, empty project:
 
 1. **Brainstorm before planning.** Turn the first ask into something concrete (a brainstorming skill such as `superpowers:brainstorming` if available): scope, users, constraints, what success looks like.
 2. **Ask every real decision with `AskUserQuestion`** — core's profile (language, project type) plus: MVP scope, real constraints (deadline, systems to integrate, data sensitivity), and anywhere the project should deviate from SDSI. The deploy target is asked by `sdsi:deploy`.
-3. **Write `INTENT.md`** from the brainstorm and decisions; let the human correct it.
-4. **Write `SPEC.md`** against SDSI and the project's constraints.
+3. **Write `docs/design/INTENT.md`** from the brainstorm and decisions; let the human correct it.
+4. **Write `docs/design/SPEC.md`** against SDSI and the project's constraints.
 5. **Scaffold the full skeleton before any real logic** — explicitly, not organically:
    - Root: `README.md`, `.gitignore`, `.gitattributes` — and nothing else loose at the root (core §3).
    - `.claude/CLAUDE.md` (with the SDSI profile).
@@ -98,8 +99,8 @@ The kickoff for a brand-new, empty project:
    - **The release chain:** copy it from this plugin and wire it — `sdsi:versioning`, "Installing the release chain".
    - Commit the skeleton on its own, before feature work.
    - Once the skeleton exists, it's worth scanning it for the MCP servers, skills, and hooks suited to this stack (e.g. the `claude-code-setup` plugin) rather than guessing before anything exists.
-6. **`PLAN.md`, then build.**
+6. **`docs/design/PLAN.md`, then build** — the first feature's steps in ⛏️ In progress.
 
 ## Review checklist
 
-No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a non-trivial change with no recorded intent or plan · a historical planning artifact rewritten to match new reality (or a superseded one still read as current) · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.
+No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a missing `docs/design/INTENT.md`, `SPEC.md`, or `PLAN.md` · a feature in the code the design documents don't describe, or one they describe that's gone · a non-functional requirement that can't be checked · a non-trivial change with no approved ⛏️ In progress · ⛏️ In progress left holding a finished change · a per-change design file kept beside the documents · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.

@@ -40,6 +40,7 @@ Don't assume containers because it's the default recommendation — the human de
 - **Each target's security settings are configured for its own trust boundary**, explicitly. Never inherit another environment's settings (a TLS-terminated cloud deployment's, say) as a safe default for a differently exposed one.
 - **The build definition lives in the repo**, not typed into a CI tool's UI; the CI tool holds only a registration pointing at it plus genuinely environment-specific bits (connections, approvals).
 - **Document local run/debug separately from deployment** (`sdsi:docs`).
+- **A deploy is verified against `SPEC.md`'s non-functional requirements** (`sdsi:workflow`) — each performance, availability, and security target checked on the deployed system the way the spec says, with the result shown, before the deploy counts as done. A target nobody can check on the deployed system is a spec finding.
 
 ## Containers
 
@@ -67,4 +68,4 @@ Don't assume containers because it's the default recommendation — the human de
 
 ## Review checklist
 
-No recorded deploy target · local run config missing or out of date · a credential in a committed run file · local wiring that differs from deployed wiring · config baked into the artifact · promotion by rebuild · a floating base-image tag · a managed volume mounted over baked-in files · security settings inherited across trust boundaries · a build definition that lives only in the CI tool.
+No recorded deploy target · local run config missing or out of date · a credential in a committed run file · local wiring that differs from deployed wiring · config baked into the artifact · promotion by rebuild · a floating base-image tag · a managed volume mounted over baked-in files · security settings inherited across trust boundaries · a build definition that lives only in the CI tool · a deploy called done without checking `SPEC.md`'s non-functional requirements.

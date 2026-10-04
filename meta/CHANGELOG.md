@@ -16,7 +16,22 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.2 📅 2026-10-03
+## 🆕VERSION 1.3.3 📅 2026-10-03
+
+### Added or New Features
+- `sdsi:deploy`: a deploy is verified against `SPEC.md`'s non-functional requirements before it counts as done; `SPEC.md` states performance, availability, and security targets so they can be checked, plus the testing and monitoring strategy. (TODO #10)
+
+### Removed
+(none)
+
+### Changed
+- `sdsi:workflow`: every project has three living design documents in `docs/design/` — `INTENT.md` (why), `SPEC.md` (what), `PLAN.md` (how) — describing the whole project, not one change. Every new feature updates them before code; the change's steps go in `PLAN.md`'s ⛏️ In progress section, merged into the plan once done. A project without them gets them reverse-engineered, with every inference marked for the human to confirm. Brainstorming stays above SDSI and its result is merged in. `sdsi:docs`, core §3, and `sdsi:all` follow; planning documents are no longer write-once records.
+- README: the skills table describes `sdsi:workflow`'s design documents.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟥VERSION 1.3.2 📅 2026-10-03
 
 ### Added or New Features
 - `sdsi:docs`: a document is rewritten in place as the single source of truth — never a correction appended under stale text — and each document change gets one short sentence under Changed in the changelog. (TODO #13)
