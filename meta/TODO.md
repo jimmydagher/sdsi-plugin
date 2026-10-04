@@ -1,6 +1,5 @@
 # SDSI
 
-- [ ] #5 Grow `sdsi:concurrency` from a real project — only its shutdown rules come from practice so far
 - [ ] #11 Add an audit trail to `sdsi:logging` — security-relevant decisions (authorization grants and denials, permission changes) recorded as their own replayable stream, separate from application logs; read `sdsi:logging` and `sdsi:errors` in full first — from the Simple-AI-DLC review; matters most for larger organizations
 - [ ] #16 Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
 
@@ -22,3 +21,4 @@
 - [x] #8 Grow `ref/mw.md` from a second middleware project — so far distilled from `ariel` alone — completed 2026-10-04 · VERSION 1.3.5
 - [x] #9 Add companions for more project types (e.g. library, desktop, mobile) as real projects need them — completed 2026-10-04 · VERSION 1.3.5
 - [x] #15 for `ref/web.md` include the ability to always have a health endpoint to check the services, basic and one full using an admin key. — completed 2026-10-04 · VERSION 1.3.5
+- [x] #5 Grow `sdsi:concurrency` from a real project — only its shutdown rules come from practice so far — completed 2026-10-04 · VERSION 1.3.6

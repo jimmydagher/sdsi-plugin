@@ -16,7 +16,29 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.5 📅 2026-10-04
+## 🆕VERSION 1.3.6 📅 2026-10-04
+
+### Added or New Features
+- **`sdsi:concurrency` grows from a seed into a full standard** (TODO #5):
+  - **Choosing the model:** an async event loop for many I/O waits, process or thread pools for CPU work, a thread-pool offload for blocking calls in async code, a dedicated worker with its own queue for long-lived duties, a durable job for work that outlasts a request — with one explicit boundary between models.
+  - **Parallelism:** bounded pools sized from config, separate pools per kind of work, bounded fan-out with a complete fan-in, structured cancellation, partitioned data, deliberate result order.
+  - **Synchronization:** which primitive for which need — mutex, semaphore, future, event, latch, barrier, condition variable, read-write lock; locks never held across I/O or an `await`; async primitives in async code; key steps wait on what they depend on, with a timeout, never on a `sleep`.
+  - **Deadlocks:** one global lock order, one lock at a time, no unknown code under a lock, timed acquisition, no task waiting on work queued behind it in the same pool, no circular waits through bounded queues.
+  - **Starvation and livelock:** short critical sections, FIFO with aging priorities, fair shares of shared resources, jittered retries, queue wait time made visible.
+  - **The Asynchronous Request-Reply pattern** for long-running work — persist, return a handle at once, run under a leased worker, report status, retain and expire results, cancel, reclaim stuck jobs — built **once** as a job harness that each long operation registers a handler with.
+  - **Testing:** timeouts on every concurrent test, race detectors in CI, stress tests, and the harness tested once with a fake clock.
+  - **An Upkeep line**, so the rules can stay on in a project between runs (`sdsi:upkeep`).
+
+### Removed
+(none)
+
+### Changed
+(none)
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟩VERSION 1.3.5 📅 2026-10-04
 
 ### Added or New Features
 - **Three new project-type companions:** `ref/lib.md` (libraries and packages — the public API is the contract; the library configures no logging, error handler, or threads of its own; dependency ranges instead of pins), `ref/desktop.md` (installed GUI apps — per-user file locations, OS credential store, signed and authenticated updates, never losing the user's work), and `ref/mobile.md` (app stores — build-time config, secure on-device storage, offline-first sync, staged rollouts, a minimum supported version). Each is a researched base with its sources listed, not yet grown from a real project. Core §1 Step 2's type table detects `lib`, `desktop`, and `mobile`, and a project can record a second type whose companion also applies. (TODO #9)
