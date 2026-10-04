@@ -149,7 +149,7 @@ Put those commands in whatever script bootstraps local development, so a fresh c
 
 `docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A staged `meta/VERSION` is always a release, even if a pattern matches it. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`.
 
-**The README's version line is opt-in.** A root `README.md` holding a line in the changelog's heading format — `## 🆕VERSION x.y.z 📅 YYYY-MM-DD` — has it rewritten on every release and docs-only commit to match the changelog's current heading; add one under the title, followed by a pointer to `meta/CHANGELOG.md` for the details. A README without one is left alone.
+**The README carries the version line — required.** The root `README.md` holds a line in the changelog's heading format — `## 🆕VERSION x.y.z 📅 YYYY-MM-DD` — directly under its title, followed by a pointer to `meta/CHANGELOG.md` for the details. The script rewrites it on every release and docs-only commit to match the changelog's current heading, so it's never edited by hand. Add it when the release chain is installed; before the first release, write the version in `VERSION` and today's date, and the first commit corrects it. The script leaves a README without the line alone, so its absence is caught in review, not by a refused commit.
 
 **Test the hooks with a real, throwaway commit before trusting them** — don't reason from the scripts alone. The plugin's own `tests/test_release.py` does this end to end.
 
@@ -182,4 +182,4 @@ The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 ## Review checklist
 
-No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · changelog missing subsections or out of order · more than one 🆕 · an older (colored) entry rewritten, or the 🆕 one changed other than by a docs-only commit · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.
+No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · a root `README.md` without the version line under its title, or one that doesn't match the changelog's 🆕 heading · changelog missing subsections or out of order · more than one 🆕 · an older (colored) entry rewritten, or the 🆕 one changed other than by a docs-only commit · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.

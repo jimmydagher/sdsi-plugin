@@ -18,9 +18,10 @@ the code and commits is done here, deterministically:
                     with the current version → sync the README's version
                     line → stage it. Nothing to do if Unreleased is empty.
 
-The README's version line is opt-in: a README.md holding a line in the
-changelog's heading format ("## 🆕VERSION x.y.z 📅 YYYY-MM-DD") has it
-rewritten to the changelog's current heading; without one, it's untouched.
+The README's version line is required by sdsi:versioning: a README.md
+holding a line in the changelog's heading format ("## 🆕VERSION x.y.z
+📅 YYYY-MM-DD") has it rewritten to the changelog's current heading. A
+README without one is left untouched; review catches the missing line.
 
 All three files live in meta/, the project's record — the root holds only
 README.md (sdsi:core §3). A staged meta/VERSION is always a release,

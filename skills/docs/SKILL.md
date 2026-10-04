@@ -30,7 +30,7 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 | Document | Answers | Update when… |
 |---|---|---|
-| `README.md` — the only document at the root | What it does, local setup, how to run/debug/test locally, how to deploy, every config key and environment variable it depends on | Any of those change |
+| `README.md` — the only document at the root | The current version, under the title (`sdsi:versioning`), what it does, local setup, how to run/debug/test locally, how to deploy, every config key and environment variable it depends on | Any of those change |
 | `.claude/CLAUDE.md` | Project-specific conventions, the SDSI profile, deliberate deviations (`sdsi:workflow`) | A convention is set, a mistake recurs, a deviation is made |
 | `meta/CHANGELOG.md` | What changed per release and what an operator must do (`sdsi:versioning`) | Every change — the AI writes to Unreleased as it works |
 | `meta/TODO.md` | What's outstanding (below) | Continuously |

@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.9 📅 2026-10-04
+## 🆕VERSION 1.3.10 📅 2026-10-04
+
+### Added or New Features
+(none)
+
+### Removed
+(none)
+
+### Changed
+- **The README's version line is now required** (`sdsi:versioning`): every project's root `README.md` carries `## 🆕VERSION x.y.z 📅 YYYY-MM-DD` under its title, followed by a pointer to `meta/CHANGELOG.md`, and the release script keeps it in sync. A README without it is a review finding; the script still doesn't refuse the commit. `sdsi:docs` lists it among what the README holds. Operator: add the line to any project whose README lacks it.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟥VERSION 1.3.9 📅 2026-10-04
 
 ### Added or New Features
 - **`sdsi:security` — one home for every security rule**, at step 4 of the order, where `sdsi:secrets` was. It holds the secrets rules (unchanged), untrusted-input validation (moved from `sdsi:standards`), per-trust-boundary security settings (moved from `sdsi:deploy`), and a new rule: protected data reaches only its owner. Personal, key, or restricted data is never returned to anyone not signed in with their own account, whether through a page, an API response, an error, a message, or a file. A guest flow that must confirm identity, like paying a cable or electric bill with an account number and a card, gets only server-side redacted fragments ("Jane D.", the last four digits). `SPEC.md` names every guest flow and the fields it returns, guest sessions are limited to their one transaction, and guest lookups are rate-limited. Core §2 adds the matching principle, and an Upkeep line keeps it on between runs. The other skills now point to `sdsi:security` instead of restating its rules. The audit trail stays in `sdsi:logging`.
