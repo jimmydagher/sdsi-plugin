@@ -16,7 +16,22 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.6 📅 2026-10-04
+## 🆕VERSION 1.3.7 📅 2026-10-04
+
+### Added or New Features
+- **`sdsi:logging` — the audit trail** (TODO #11): wherever a program makes security decisions, every one of them — sign-ins, authorization grants and denials, permission and role changes, admin actions, security-setting changes, access to sensitive data — is recorded through one audit recorder as its own stream, separate from the application logs and never filtered by the log level. Events have a fixed, versioned shape (when, who, from, action, target, outcome, change, context), are written at the decision, append-only and tamper-evident, never silently lost — permission and admin changes fail closed when their record can't be written — and tested like a contract. `SPEC.md` states whether a project has one. An Upkeep line keeps it on between runs.
+
+### Removed
+(none)
+
+### Changed
+- **Core §3:** the logging invariant includes the audit trail wherever the program makes security decisions.
+- **`ref/web.md`:** security decisions go to the audit trail; security anomalies that aren't decisions (rejected input, CSRF or session anomalies, rate-limit trips) stay in the application log.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟦VERSION 1.3.6 📅 2026-10-04
 
 ### Added or New Features
 - **`sdsi:concurrency` grows from a seed into a full standard** (TODO #5):

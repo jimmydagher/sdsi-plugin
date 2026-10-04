@@ -50,7 +50,7 @@ Language- and framework-neutral: apply each rule through the framework the proje
 - **Every request gets a correlation ID**, carried on every log line the request produces and returned in a response header, so a user's report can be traced to its lines. Where tracing exists, take it from the W3C `traceparent` header rather than inventing a second ID.
 - **One access line per request:** method, path, status, duration, correlation ID.
 - **Never log request bodies, cookies, or authorization headers** — they carry credentials and personal data. The same goes for session IDs and query strings that may hold tokens; mask or hash a value that's needed only to correlate.
-- **Security events are always logged, at warning or above:** sign-in success and failure, sign-out, access denied, input rejected at validation, CSRF or session anomalies, rate-limit trips, and every administrative or privilege change — each with who (user ID, client address), what, and the outcome.
+- **Security decisions go to the audit trail** (`sdsi:logging`) — sign-in success and failure, sign-out, access denied, and every administrative or privilege change. Security anomalies that aren't decisions — input rejected at validation, CSRF or session anomalies, rate-limit trips — go to the application log at warning or above, with the user ID, client address, and correlation ID.
 
 ## sdsi:errors
 

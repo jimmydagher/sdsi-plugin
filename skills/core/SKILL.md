@@ -124,7 +124,7 @@ Whatever the language or project type, every program SDSI governs has:
 | Code conventions | Named constants, no magic strings, typed boundaries, reuse over reimplementation | `sdsi:standards` |
 | Configuration | One source of truth, schema-validated before work starts, no defaults in code | `sdsi:config` |
 | Secrets | Never in code/config/history; read at runtime from a secrets store | `sdsi:secrets` |
-| Logging | One central logger, standard levels | `sdsi:logging` |
+| Logging | One central logger, standard levels — plus a separate audit trail wherever the program makes security decisions | `sdsi:logging` |
 | Error handling | One global error handler that logs every unhandled error, typed errors, try/catch only where logic requires it, a machine-readable outcome on every exit | `sdsi:errors` |
 | Concurrency | Shared state owned, background work bounded and drained on shutdown | `sdsi:concurrency` |
 | Tests | Under one `tests/` folder; every test names the regression it catches | `sdsi:testing` |
