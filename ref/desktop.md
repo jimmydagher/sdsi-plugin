@@ -9,10 +9,6 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 ## sdsi:standards
 
 - **The UI layer is thin.** A window, view, or event handler reads input, calls one service, and renders the result. Business rules in an event handler are a finding: they can't be tested without driving the UI, and they can't be reused from a menu, a shortcut, or a command-line entry point.
-- **Every way into the app is an untrusted boundary.** That includes files the user opens, drag-and-drop, the clipboard, command-line arguments, URL-scheme or deep-link activations, file-type associations, and messages from other processes (IPC between the app's own processes included). Validate each one once, at the point it enters (`sdsi:standards`). A deep link that becomes a file path or a shell command without validation is a remote-code-execution bug.
-- **Opening something externally goes through one helper with an allowlist.** URLs handed to the OS's "open" mechanism are limited to an explicit allowlist of schemes (typically `https:` and `mailto:`), and never come straight from content. Without it, a crafted link runs whatever handler the OS has registered.
-- **Embedded web content is treated as hostile.** When the UI renders web content, the renderer gets no direct OS or file-system access: keep it isolated and sandboxed, apply a restrictive content-security policy, don't load remote code over plain HTTP, restrict navigation and new windows, and check the sender of every message the privileged side receives. Each relaxation is written down with its reason.
-- **Runs as a standard user.** No feature needs elevation or writes to machine-wide locations at runtime. A task that truly needs admin rights is split into a separate, minimal, explicitly elevated helper, never the whole app.
 - **Accessible through the platform's accessibility API.** Every interactive control has an accessible name and can be reached and operated with the keyboard alone, in a logical tab order. Color is never the only signal, text contrast is at least 4.5:1, and the app follows the OS's text-size, high-contrast, and reduced-motion settings. A custom-drawn control exposes itself to the accessibility API, or screen readers can't see it.
 - **Scales with the display.** Layouts, fonts, and images follow the OS scale factor, including a window moving between monitors with different scales. No pixel sizes are hard-coded on the assumption of a 100% display, and image assets come at the resolutions the platform asks for.
 
@@ -30,8 +26,12 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 - **Resolve every location through one path helper** that asks the OS, not by building paths from a hard-coded home directory or by relying on the working directory, which a launcher or package virtualization can change.
 - **The update channel is a configured value** (for example `stable` or `beta`), changed through the UI, so one build can move between channels without a reinstall.
 
-## sdsi:secrets
+## sdsi:security
 
+- **Every way into the app is an untrusted boundary.** That includes files the user opens, drag-and-drop, the clipboard, command-line arguments, URL-scheme or deep-link activations, file-type associations, and messages from other processes (IPC between the app's own processes included). Validate each one once, at the point it enters (`sdsi:security`). A deep link that becomes a file path or a shell command without validation is a remote-code-execution bug.
+- **Opening something externally goes through one helper with an allowlist.** URLs handed to the OS's "open" mechanism are limited to an explicit allowlist of schemes (typically `https:` and `mailto:`), and never come straight from content. Without it, a crafted link runs whatever handler the OS has registered.
+- **Embedded web content is treated as hostile.** When the UI renders web content, the renderer gets no direct OS or file-system access: keep it isolated and sandboxed, apply a restrictive content-security policy, don't load remote code over plain HTTP, restrict navigation and new windows, and check the sender of every message the privileged side receives. Each relaxation is written down with its reason.
+- **Runs as a standard user.** No feature needs elevation or writes to machine-wide locations at runtime. A task that truly needs admin rights is split into a separate, minimal, explicitly elevated helper, never the whole app.
 - **Everything shipped to a user's machine is public.** An API key, client secret, or signing key bundled into the app, its config, or its resources can be extracted. A credential that must stay secret stays on a server the app calls. The only keys that ship are public client identifiers, labeled as public where they're configured.
 - **The user's own credentials go in the OS credential store**: the platform keychain, credential vault, or Secret Service, read at runtime. They never go into a preferences file, a plain local database, or the cache. Locally persisted sensitive data that doesn't fit a credential store is encrypted with the OS's per-user data-protection API.
 - **Sign-in follows OAuth for native apps.** Use the system browser, not an embedded web view; use PKCE; and redirect to a loopback address, a private-use URI scheme, or a claimed HTTPS URI. Never ship a client secret.
@@ -39,9 +39,9 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 
 ## sdsi:logging
 
-- **Logs are written to the OS's per-user log or state location**, with size-bounded rotation, so a long-running install never fills the disk.
+- **Logs are written to the OS's per-user log or state location**, rotated and retained by `sdsi:logging`'s settings, so a long-running install never fills the disk.
 - **The user can find them.** A menu item or the about screen opens the log folder or copies a diagnostics bundle, which is how a support request gets evidence.
-- **Logs stay on the machine unless the user agrees otherwise.** Sending diagnostics or usage data off the device requires the user's explicit consent, is off until they give it, and is redacted before it leaves (`sdsi:secrets`). Never log the contents of the user's documents, file paths under their home folder beyond what's needed, or personal data.
+- **Logs stay on the machine unless the user agrees otherwise.** Sending diagnostics or usage data off the device requires the user's explicit consent, is off until they give it, and is redacted before it leaves (`sdsi:security`). Never log the contents of the user's documents, file paths under their home folder beyond what's needed, or personal data.
 
 ## sdsi:errors
 
@@ -55,7 +55,7 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 - **The UI thread never blocks.** File and network I/O and any computation the user could notice moves off the UI thread. Results come back to it through the toolkit's dispatch mechanism, because UI objects are touched only from the thread that owns them.
 - **Long operations show progress and can be cancelled.** Cancelling stops the work at the next safe point and leaves data consistent.
 - **Closing a window is not the same as exiting.** On the OS's quit, log-off, or shutdown signal, the app saves state and drains background work within the OS's bounded grace period (`sdsi:concurrency`). If it handles the OS's session-end or restart notification, an installer or update can close it cleanly instead of forcing a reboot.
-- **Single instance is a stated decision.** If the app allows one instance, a second launch passes its arguments (a file to open, a deep link) to the running instance through IPC and exits. That IPC channel is an input boundary (`sdsi:standards` above).
+- **Single instance is a stated decision.** If the app allows one instance, a second launch passes its arguments (a file to open, a deep link) to the running instance through IPC and exits. That IPC channel is an input boundary (`sdsi:security` above).
 
 ## sdsi:testing
 

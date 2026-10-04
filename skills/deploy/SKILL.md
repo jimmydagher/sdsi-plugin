@@ -31,13 +31,13 @@ Don't assume containers because it's the default recommendation — the human de
 ## Universal rules
 
 - **Local run/debug configuration is part of the application** (IDE launch configs, compose files, task runners) — versioned, and updated in the same change as anything that changes how the program is invoked (a new operation, a new required environment variable, a new environment).
-- **No credential in a committed local-run file.** Local secrets come from the developer's shell or a gitignored local env file (`sdsi:secrets`).
+- **No credential in a committed local-run file.** Local secrets come from the developer's shell or a gitignored local env file (`sdsi:security`).
 - **Local wiring mirrors deployed wiring** — the same environment variables and the same config-loading path — so a local run previews the deployed one instead of being a separate code path.
 - **Config stays out of the built artifact.** Mount or inject it per environment, so one artifact is promotable without rebuilding.
 - **Promote by retagging the tested artifact, never by rebuilding** (`sdsi:versioning`).
 - **A clear naming/tagging convention per environment**, so what's running where is never ambiguous.
 - **Prefer a job that does one thing and exits** over a long-running service when the workload is batch or triggered.
-- **Each target's security settings are configured for its own trust boundary**, explicitly. Never inherit another environment's settings (a TLS-terminated cloud deployment's, say) as a safe default for a differently exposed one.
+- **Each target's security settings follow its own trust boundary** (`sdsi:security`).
 - **The build definition lives in the repo**, not typed into a CI tool's UI; the CI tool holds only a registration pointing at it plus genuinely environment-specific bits (connections, approvals).
 - **Document local run/debug separately from deployment** (`sdsi:docs`).
 - **A deploy is verified against `SPEC.md`'s non-functional requirements** (`sdsi:workflow`) — each performance, availability, and security target checked on the deployed system the way the spec says, with the result shown, before the deploy counts as done. A target nobody can check on the deployed system is a spec finding.
@@ -53,13 +53,13 @@ Don't assume containers because it's the default recommendation — the human de
 ## Cloud platform service
 
 - Prefer the platform's native scheduling and orchestration over standing up separate infrastructure, unless there's a concrete reason it doesn't fit.
-- **Check for the platform's native identity and secrets mechanism before building any workaround** (`sdsi:secrets`) — it's usually simpler than provisioning storage just to avoid environment variables.
+- **Check for the platform's native identity and secrets mechanism before building any workaround** (`sdsi:security`) — it's usually simpler than provisioning storage just to avoid environment variables.
 
 ## Self-hosted host
 
 - Run under the OS's service manager, with restart policy and log location stated in the deployment doc.
-- There's no workload identity here — decide the secrets approach explicitly (`sdsi:secrets`, "a workload outside the platform's identity fabric").
-- Its trust boundary (LAN-only, no TLS termination) usually differs from any cloud target; configure its security settings for that, explicitly.
+- There's no workload identity here — decide the secrets approach explicitly (`sdsi:security`, "a workload outside the platform's identity fabric").
+- Its trust boundary (LAN-only, no TLS termination) usually differs from any cloud target (`sdsi:security`).
 
 ## Distributed package
 
@@ -68,4 +68,4 @@ Don't assume containers because it's the default recommendation — the human de
 
 ## Review checklist
 
-No recorded deploy target · local run config missing or out of date · a credential in a committed run file · local wiring that differs from deployed wiring · config baked into the artifact · promotion by rebuild · a floating base-image tag · a managed volume mounted over baked-in files · security settings inherited across trust boundaries · a build definition that lives only in the CI tool · a deploy called done without checking `SPEC.md`'s non-functional requirements.
+No recorded deploy target · local run config missing or out of date · a credential in a committed run file · local wiring that differs from deployed wiring · config baked into the artifact · promotion by rebuild · a floating base-image tag · a managed volume mounted over baked-in files · a build definition that lives only in the CI tool · a deploy called done without checking `SPEC.md`'s non-functional requirements.

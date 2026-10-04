@@ -113,7 +113,7 @@ All notable changes, newest first. See `VERSION` for the current release.
 - **Don't amend on `main`** — the hook labels an amend as a new docs-only commit (`+k`). Make a new commit instead.
 - **Feature branches off `main`**, reviewed before merge. The hooks only act on the target branch (`main` by default, set in both hooks); a merge commit is exempt, since its commits were released on their own branch.
 - **Promoting a build is a retag of the tested artifact**, never a rebuild.
-- **No secrets in history, ever** — gitignore local secret files and use a secret-scanning pre-commit step where possible (`sdsi:secrets`).
+- **No secrets in history, ever** — gitignore local secret files and use a secret-scanning pre-commit step where possible (`sdsi:security`).
 - **`.gitignore` excludes everything that isn't reviewable source** — build/compiled output, caches, local environment files, scratch/log folders, editor backups, and any config rendered with real values by a deploy script. Use the language's standard ignore template as the base.
 - **Repeat the changelog check server-side in CI**, where `--no-verify` can't reach.
 - **Never hard-reset to undo a commit when the working tree may hold other uncommitted work** — it discards every uncommitted change, not just the commit. Use a soft or mixed reset unless the tree is known clean.

@@ -3,8 +3,8 @@ name: standards
 description: >
   SDSI's coding standards, language-neutral — naming and casing, no magic
   strings (constants and enums), comments and docstrings, reuse over
-  reimplementation (DRY), SOLID applied practically, strict typing, and
-  validating untrusted input at the boundary. Use when writing or reviewing
+  reimplementation (DRY), SOLID applied practically, and strict typing
+  (input validation and every other security rule live in sdsi:security). Use when writing or reviewing
   code for readability and consistency, or when asked to apply coding
   standards to a project. Reads sdsi:core first and applies each rule in the
   project language's own idioms. Triggers on "/sdsi:standards", "coding
@@ -60,9 +60,9 @@ One source of truth for logic, constants, types, and validation rules. Refactor 
 
 - **Every public signature is fully typed**, using the language's type system or its standard type-annotation layer. Types are load-bearing, not decorative; run the language's type checker where one exists.
 - **No blanket suppression** (an unexplained ignore comment, a cast to the "any" type) in place of fixing the mismatch. A justified suppression says why, next to the line.
-- **Validate untrusted input once, at the boundary.** An API response, file, CLI argument, or webhook payload enters unvalidated and is checked before anything downstream trusts it.
+- **Untrusted input is validated once, at the boundary** (`sdsi:security`). Once validated, it's typed like any other value.
 - **Give easily confused primitives their own small type** (an ID, a money amount, a currency code) so they can't be passed in the wrong order.
 
 ## Review checklist
 
-Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · untrusted input used before validation.
+Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression.

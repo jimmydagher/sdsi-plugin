@@ -16,7 +16,22 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.8 📅 2026-10-04
+## 🆕VERSION 1.3.9 📅 2026-10-04
+
+### Added or New Features
+- **`sdsi:security` — one home for every security rule**, at step 4 of the order, where `sdsi:secrets` was. It holds the secrets rules (unchanged), untrusted-input validation (moved from `sdsi:standards`), per-trust-boundary security settings (moved from `sdsi:deploy`), and a new rule: protected data reaches only its owner. Personal, key, or restricted data is never returned to anyone not signed in with their own account, whether through a page, an API response, an error, a message, or a file. A guest flow that must confirm identity, like paying a cable or electric bill with an account number and a card, gets only server-side redacted fragments ("Jane D.", the last four digits). `SPEC.md` names every guest flow and the fields it returns, guest sessions are limited to their one transaction, and guest lookups are rate-limited. Core §2 adds the matching principle, and an Upkeep line keeps it on between runs. The other skills now point to `sdsi:security` instead of restating its rules. The audit trail stays in `sdsi:logging`.
+
+### Removed
+- **`sdsi:secrets`** — replaced by `sdsi:security`, which keeps all its rules. Run `/sdsi:security` instead, and refresh any project's `.claude/rules/sdsi.md` with `/sdsi:upkeep`.
+
+### Changed
+- **`sdsi:logging` — logging is a message queue.** Whatever the language or system, and whether the program is single- or multi-threaded, a log call only builds a record, stamped at call time, and enqueues it. One log writer per process pulls the records in order of arrival and writes each one to every destination in turn, so lines never interleave. With threads, the writer is a background worker; on an event loop, it's a task; with neither, the queue is drained right after each enqueue. The queue is bounded, and the `when_full` setting decides what a full queue does: `wait` makes the log call wait for room, and `drop` discards `DEBUG`–`WARNING` records (`ERROR` and `CRITICAL` still wait) and then logs a warning with the drop count. A failing destination never breaks the program, and shutdown drains the queue within a bounded time. Log files roll over at a configured time of day (`rotate_at`, e.g. midnight, in a configured time zone) into date-named files, and `keep` sets how many rotated files stay before the oldest is deleted (7, 15, 30…). A restart catches up a missed rotation. The desktop companion's size-based rotation now defers to these settings.
+- **The companions' `## sdsi:secrets` sections are now `## sdsi:security`**, and they pick up the security rules that sat in other sections. Web: access control, guest response types, output encoding, HTTPS/HSTS, trusted origins and proxies, CORS, security headers, the LAN-only settings, and the security tests. Mobile: untrusted entry points, transport security, and pinning. Desktop: untrusted entry points, the external-open allowlist, embedded web content, and running as a standard user. Each old section keeps a pointer.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟫VERSION 1.3.8 📅 2026-10-04
 
 ### Added or New Features
 - **The README's version line** (`sdsi:versioning`): a root `README.md` holding a line in the changelog's heading format (`## 🆕VERSION x.y.z 📅 YYYY-MM-DD`) has it kept equal to the changelog's current heading by the release script, on release and docs-only commits alike. Opt-in — a README without the line is untouched. This plugin's README now carries one, with a pointer to the changelog.

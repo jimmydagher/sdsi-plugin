@@ -30,7 +30,7 @@ Language-neutral: apply each rule through the project language's own module syst
 - **Never read environment variables or files implicitly** to decide behavior. If an environment fallback is offered at all, it's opt-in, named with the library's prefix, and documented.
 - **Validate options at construction and fail with a typed error naming the bad option** — the fail-early rule, applied at the library's front door.
 
-## sdsi:secrets
+## sdsi:security
 
 - **The library never fetches its own credentials from a store.** The caller passes a credential, or better a credential provider (a callable or object the library asks when it needs a token), so the application keeps one secrets accessor and rotation works without rebuilding the client.
 - **Credential-holding types redact themselves** in their string/debug representation and in every error they raise.

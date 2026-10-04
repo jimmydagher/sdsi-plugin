@@ -17,20 +17,21 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 - **The UI layer only renders state and forwards events.** Screens hold no business rules and no network or storage calls; a state holder per screen exposes immutable state built from the data layer, and user events flow back to it — state down, events up. Business and data code doesn't depend on platform UI types, so it's testable without a device.
 - **Every data type has one owner** (a repository or equivalent) that alone writes it; everything else reads its exposed state. Two screens caching and editing their own copy of the same record is a finding.
 - **User state survives the lifecycle** — backgrounding, rotation or resize, and the OS killing the process to reclaim memory. Restoring to the same screen with in-progress input intact is expected behavior, not polish.
-- **Every externally reachable entry is an untrusted boundary**: deep links and universal/app links, push-notification payloads, data shared in from other apps, exported components, and anything a web view passes back. Validate there (`sdsi:standards`); a component that isn't meant to be reached from outside isn't exposed, and a web view never bridges native functions to content the app doesn't control.
 - **Permissions are requested at the moment of use, with a purpose string that says why**, only for what a core feature needs — and the app keeps working, with that feature degraded, when the user says no.
 - **Accessibility is a coding standard, not an audit:** every interactive element has an accessibility label, touch targets meet the platform minimum (44×44 pt on iOS, 48×48 dp on Android), text scales with the system text-size setting without clipping, contrast meets WCAG AA, meaning never rests on color alone, and the system reduce-motion setting is honored.
 
 ## sdsi:config
 
-- **A sanctioned deviation from `sdsi:config`'s runtime loading:** the app can't read `config/` from the device, so config is resolved **at build time** — `config/default.yaml` deep-merged with the environment's override, schema-validated by the build, and baked into that environment's build variant. A build with invalid config fails; the build, not app start, is where "before any work starts" happens. Everything in it ships to every user, so it holds nothing secret (`sdsi:secrets`).
+- **A sanctioned deviation from `sdsi:config`'s runtime loading:** the app can't read `config/` from the device, so config is resolved **at build time** — `config/default.yaml` deep-merged with the environment's override, schema-validated by the build, and baked into that environment's build variant. A build with invalid config fails; the build, not app start, is where "before any work starts" happens. Everything in it ships to every user, so it holds nothing secret (`sdsi:security`).
 - **Build variants map one-to-one to the project's environments** (one variant per `config/override/<env>.yaml`), selected by the build, never by an in-code `if` on a flag. The backend base URL and every other per-environment value comes from that environment's config.
+- **Transport security and certificate pinning are configured per build variant**, under the rules in `## sdsi:security` below.
 - **Remote configuration (feature flags, kill switches, the minimum supported version) is a second, runtime layer with the same discipline:** its keys are in the schema, its bundled fallback values are generated from `config/default.yaml` rather than written as literals in code, and a fetched payload that fails validation is rejected whole and logged.
+
+## sdsi:security
+
+- **Every externally reachable entry is an untrusted boundary**: deep links and universal/app links, push-notification payloads, data shared in from other apps, exported components, and anything a web view passes back. Validate there (`sdsi:security`); a component that isn't meant to be reached from outside isn't exposed, and a web view never bridges native functions to content the app doesn't control.
 - **Transport security is configured, not left to defaults:** cleartext traffic is disabled in every release variant through the platform's network-security configuration; debug-only trust anchors (a proxy's CA) live in a debug-only override the release build ignores.
 - **Certificate or public-key pinning is a stated decision recorded in `CLAUDE.md`, not a default.** It applies only to endpoints the team controls; when used, it carries at least one backup pin and a written rotation plan, since a pin the server outgrows cuts off every installed copy until users update.
-
-## sdsi:secrets
-
 - **The shipped app is public.** Anything in the binary or its resources — config, strings, obfuscated or not — can be extracted by anyone who installs it. No server credential ships in the app; an operation that needs one goes through the project's own backend, which holds it.
 - **A key that has to ship** (a maps key, a public client ID, an analytics write key) is restricted at its provider to this app's bundle identifier or signing certificate and to the narrowest scope, and is labelled as public where it's configured.
 - **Credentials at rest on the device live only in the platform's secure store** (Keychain on iOS, the Keystore on Android, or a wrapper over them) — never in preferences, plain files, or the app's database. Keys are generated non-exportable and hardware-backed where the device supports it.
@@ -41,7 +42,7 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 ## sdsi:logging
 
 - **The device's system log is readable off the device** (attached debuggers, other tools, bug reports). Release builds strip debug and verbose logging at compile time — not just filter it at runtime — and nothing user-identifying goes to the system log at any level.
-- **Crash reporting and analytics are log destinations that leave the device**, so they're fed through the central logger's fan-out (`sdsi:logging`) and redacted (`sdsi:secrets`) like any other off-box text — never wired up as a parallel logging path.
+- **Crash reporting and analytics are log destinations that leave the device**, so they're fed through the central logger's fan-out (`sdsi:logging`) and redacted (`sdsi:security`) like any other off-box text — never wired up as a parallel logging path.
 - **Every request to the backend carries a per-session correlation ID** that also tags the app's own logs and crash reports, so one user's problem can be traced across device and server. It's random per install or session — never a hardware identifier or the advertising ID.
 - **Telemetry upload respects the device:** buffered on disk with a size cap, sent in batches when the network is available, never a request per event.
 - **What's collected is what's declared.** Every analytics event or crash field that carries user data matches the store privacy declarations (`sdsi:docs`); tracking a user across other companies' apps or sites needs the platform's tracking consent (App Tracking Transparency on iOS) before any tracking call.

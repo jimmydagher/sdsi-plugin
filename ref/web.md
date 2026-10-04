@@ -10,14 +10,12 @@ Language- and framework-neutral: apply each rule through the framework the proje
 
 - **`SPEC.md` states the web non-functional targets up front** — the accessibility level (WCAG 2.2 AA unless stated otherwise), the performance budget (Core Web Vitals "good" at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1), and the browsers supported. A target nobody wrote down can't be verified at deploy.
 - **An HTTP API is designed contract-first.** The endpoint's request, response, and error shapes are written in the project's API description (an OpenAPI document or the framework's equivalent) and approved with the plan, before the handler is written.
-- **Every new endpoint or page names who may use it** in the plan — anonymous, signed in, or a specific role — so access control is designed, not discovered in review.
+- **Every new endpoint or page names who may use it** in the plan — anonymous, signed in, or a specific role — so access control is designed, not discovered in review. An anonymous one also names every field it returns. Guest flows such as bill pay return redacted fragments only (`sdsi:security`).
 
 ## sdsi:standards
 
 - **The request layer is thin.** A route/handler parses and validates input at the boundary, calls one service, and shapes the response. A business rule inside a handler is a finding.
 - **Services never see request or response objects** — they take plain, validated values, so they can be called from a job, a test, or another handler unchanged.
-- **Access control is deny-by-default and checked server-side on every request**, including per object: loading a record by an ID from the request checks that this user may see that record. A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk).
-- **Output is encoded for its context by the template engine's auto-escaping**, and every query is parameterized. A bypass of either (a raw-HTML marker, string-built SQL or shell) is justified in a comment next to the line, or it's a finding.
 - **Safe methods never change state.** `GET` and `HEAD` only read; anything that writes uses `POST`, `PUT`, `PATCH`, or `DELETE`, and an endpoint rejects methods it doesn't support with `405`.
 - **API shapes are conservative and extensible** — a JSON response's root is an object, never a bare array; unknown or read-only input fields are rejected rather than silently bound (no mass assignment); field naming follows one casing across the whole API; every list endpoint is paginated.
 - **UI code reuses the established design** — palette, type, spacing, components. Load a design skill before writing new markup or styles, and ground new tokens in what's already on the page rather than starting a parallel visual language.
@@ -26,24 +24,43 @@ Language- and framework-neutral: apply each rule through the framework the proje
 
 ## sdsi:config
 
-- **Forcing HTTPS is its own explicit setting, never derived from debug mode.** Turning debug off without stating HTTPS forcing inherits a default that redirects to an `https://` nothing serves and sets secure-only cookies the browser refuses, anywhere without TLS termination. Every environment override states it.
-- **HSTS, secure-only cookies, and the HTTPS redirect are each stated per environment** alongside HTTPS forcing — same reason. HSTS (`Strict-Transport-Security`) is only ever sent from an environment that genuinely serves HTTPS, since browsers remember it.
+- **HTTPS forcing, HSTS, trusted origins and proxies, CORS, and the security headers are settings in config**, but the rules for them are in `## sdsi:security` below.
 - **Allowed hosts list both the bare domain and its `www.` variant** for every environment reachable by either — the forgotten one fails with a 400 or a silent CSRF rejection.
-- **Trusted origins are added only when needed** — when a request's `Origin` won't match its own scheme and host (a TLS-terminating proxy changes the scheme). A plain-HTTP deployment reached at its own address usually needs none.
-- **Trusted proxies are configured explicitly**, so the client address, scheme, and host read from forwarding headers come only from a proxy you run — never trusted from any caller.
-- **CORS is an explicit allowlist of origins in config**, off when nothing cross-origin needs it. Never `*` with credentials, and a response that varies by origin sends `Vary: Origin`.
-- **Security headers are set once, centrally, from config** — a `Content-Security-Policy` (strict: nonces or hashes, no `unsafe-inline`, `object-src 'none'`, `base-uri 'none'`; rolled out first as `Content-Security-Policy-Report-Only`), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, framing denied (`frame-ancestors 'none'` or `X-Frame-Options: DENY`), and a `Permissions-Policy` for unused features. Headers that only advertise the stack (`Server` detail, `X-Powered-By`) are removed.
 - **Session and timeout values are settings** — idle timeout, absolute session lifetime, upload size limit, and rate limits live in config with the rest, not as framework defaults nobody chose.
 - **The framework's settings module is a bridge, not a source.** It maps validated SDSI config onto framework settings; no setting is authored there and no environment variable is read there for an ordinary setting.
 - **Every environment has the files and assets it serves.** When creating an environment, check that each file the site expects (`favicon.ico`, `robots.txt`, error pages, static assets) is in place for it, and create any that's missing rather than letting it 404.
 
-## sdsi:secrets
+## sdsi:security
+
+Access and data exposure:
+
+- **Access control is deny-by-default and checked server-side on every request**, including per object: loading a record by an ID from the request checks that this user may see that record. A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk).
+- **A guest endpoint's response is shaped by a dedicated, redacted response type.** It's never the account model serialized with fields hidden in the template or the script. A page reached without signing in also gets no protected data in its markup, inline script state, or hidden inputs, and is served `Cache-Control: no-store`.
+- **Output is encoded for its context by the template engine's auto-escaping**, and every query is parameterized. A bypass of either (a raw-HTML marker, string-built SQL or shell) is justified in a comment next to the line, or it's a finding.
+
+Transport and headers, each stated in every environment override:
+
+- **Forcing HTTPS is its own explicit setting, never derived from debug mode.** Turning debug off without stating HTTPS forcing inherits a default that redirects to an `https://` nothing serves and sets secure-only cookies the browser refuses, anywhere without TLS termination. Every environment override states it.
+- **HSTS, secure-only cookies, and the HTTPS redirect are each stated per environment** alongside HTTPS forcing — same reason. HSTS (`Strict-Transport-Security`) is only ever sent from an environment that genuinely serves HTTPS, since browsers remember it.
+- **A self-hosted, LAN-only deployment gets its own security settings** — HTTPS forcing off, its own address in allowed hosts — never a cloud deployment's settings inherited as a default.
+- **Trusted origins are added only when needed** — when a request's `Origin` won't match its own scheme and host (a TLS-terminating proxy changes the scheme). A plain-HTTP deployment reached at its own address usually needs none.
+- **Trusted proxies are configured explicitly**, so the client address, scheme, and host read from forwarding headers come only from a proxy you run — never trusted from any caller.
+- **CORS is an explicit allowlist of origins in config**, off when nothing cross-origin needs it. Never `*` with credentials, and a response that varies by origin sends `Vary: Origin`.
+- **Security headers are set once, centrally, from config** — a `Content-Security-Policy` (strict: nonces or hashes, no `unsafe-inline`, `object-src 'none'`, `base-uri 'none'`; rolled out first as `Content-Security-Policy-Report-Only`), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, framing denied (`frame-ancestors 'none'` or `X-Frame-Options: DENY`), and a `Permissions-Policy` for unused features. Headers that only advertise the stack (`Server` detail, `X-Powered-By`) are removed.
+
+Secrets and sessions:
 
 - **Session, signing, and CSRF keys are secrets** — from the secrets store, one per environment, never a framework-generated default left in a settings file.
 - **Nothing secret reaches the browser.** Client-side bundles, page source, and API responses never carry a server credential; a public client key is labelled as public where it's configured.
 - **A credential never travels in a URL** — not an API key, token, password, or session ID in a path or query string, where it lands in access logs, browser history, and `Referer` headers. It goes in a header or the body.
 - **Session cookies are `Secure`, `HttpOnly`, and `SameSite=Lax` or `Strict`**, and use the `__Host-` prefix where the deployment allows. The session ID is regenerated at sign-in and any privilege change, and destroyed server-side at sign-out.
 - **Passwords are stored only with a slow, salted password-hashing function** built for the job (Argon2id first; scrypt; bcrypt for legacy; PBKDF2 where FIPS is required — at OWASP's current recommended cost), never a fast general hash or reversible encryption.
+
+Tests:
+
+- **Access control is tested as denial, not only as success:** for each protected route, a test proves an anonymous caller, the wrong role, and a different user's object are all refused.
+- **A test asserts each guest endpoint's whole response body**: only the fields `SPEC.md` names, each one redacted. The test checks the raw payload, not the rendered page, and confirms no full value appears anywhere in it.
+- **A test asserts the security headers and cookie attributes** on a representative page and API response, so a framework upgrade or middleware reorder can't drop them silently.
 
 ## sdsi:logging
 
@@ -69,14 +86,13 @@ Language- and framework-neutral: apply each rule through the framework the proje
 - **Shutdown stops accepting before it drains** — on the stop signal the server stops listening (and reports not-ready), lets in-flight requests finish within the bounded drain, then exits.
 - **Concurrent updates don't silently overwrite each other.** An update to a resource two users can edit is conditional — an `ETag` with `If-Match`, or a version column — and the loser gets `412` or `409`, not a lost write.
 - **A non-idempotent operation a client may retry is made safe to repeat** — a payment, an order, a send accepts an idempotency key and returns the first result for a repeat, rather than doing the work twice.
-- **Expensive or abusable endpoints are rate-limited** — sign-in, password reset, sign-up, search, and anything that sends mail or costs money — with the limit in config and `429` on excess.
+- **Expensive or abusable endpoints are rate-limited** — sign-in, password reset, sign-up, guest account lookup, search, and anything that sends mail or costs money — with the limit in config and `429` on excess.
 
 ## sdsi:testing
 
 - **Services are tested directly**, without the HTTP layer.
 - **Request-level tests use the framework's test client** — status codes, error shapes, and auth behavior.
-- **Access control is tested as denial, not only as success:** for each protected route, a test proves an anonymous caller, the wrong role, and a different user's object are all refused.
-- **A test asserts the security headers and cookie attributes** on a representative page and API response, so a framework upgrade or middleware reorder can't drop them silently.
+- **Security tests — access denial, guest response bodies, headers and cookies — are in `## sdsi:security` above.**
 - **A few end-to-end browser tests cover the critical user flows** (sign-in, the main task), not every page — and run an automated accessibility check on the pages they visit. Automated checks catch only part of WCAG; they are a floor, not a pass.
 
 ## sdsi:dependencies
@@ -99,7 +115,6 @@ Language- and framework-neutral: apply each rule through the framework the proje
 
 ## sdsi:deploy
 
-- **A self-hosted, LAN-only deployment gets its own security settings** — HTTPS forcing off, its own address in allowed hosts — never a cloud deployment's settings inherited as a default.
 - **Every web project has two health endpoints, always.** A **basic** one (e.g. `/healthz/`) — no authentication, no dependencies, it only proves the process answers — for the platform's probe and uptime checks. A **full** one (e.g. `/healthz/deep/`) checks every service the app depends on — database, secrets store, queues and caches, outbound services, writable storage — and reports each as ok or failed, returning `200` when all pass and `503` otherwise.
 - **The full health endpoint is gated by an admin key** from the secrets store, sent in a header (never the query string) and compared in constant time: `404` when no key is configured for the environment, `403` with no detail for a wrong key. Its report is redacted — no secret, connection string, or file path — and it never serves as the platform's probe, so one slow dependency can't get a healthy container restarted.
 - **A deploy is checked by reading the version off the deployed page** and comparing it with the release just shipped — proof the new build is the one serving, not a cached or previous one.

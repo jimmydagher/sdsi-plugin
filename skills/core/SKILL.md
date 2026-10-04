@@ -108,6 +108,7 @@ These hold regardless of project, language, or how small the change looks. Every
 - **Confirm before anything destructive or bulk.** Deleting, overwriting, or mutating data that can't be trivially restored, and any run over many items (a batch job, a migration, a bulk edit), needs the human's explicit approval first — with the scope stated (what, and how many). Read-only actions and changes a `git checkout` undoes don't need it. Approval for one action or one scope doesn't carry to the next.
 - **Consistency over cleverness.** Predictable code is what makes handoffs, debugging, and AI-assisted work fast.
 - **Config and secrets are never code.** No setting falls back to a value baked into code; no credential appears in source, config, or history.
+- **Protected data reaches only its owner.** Personal, key, or restricted data is never returned to anyone not signed in with their own account. A guest flow that must confirm identity, like paying a bill, gets server-side redacted fragments only (`sdsi:security`).
 - **Fail loud, fail early, fail once.** Stop at the earliest point and report everything wrong in one pass.
 - **Observable by default.** Logging and error reporting are designed in from the start.
 - **One front door per capability.** One logger, one config loader, one secrets accessor, one error handler, one HTTP client. Extend it for everyone rather than working around it in one place.
@@ -123,8 +124,8 @@ Whatever the language or project type, every program SDSI governs has:
 | A layout | Root holds `README.md` and top-level folders — no other loose file (below). Dependencies point one way (shared helpers ← integrations ← operations ← entry point). One home for shared code, never a second `utils/`/`common/` beside it | the language's and framework's conventions |
 | Code conventions | Named constants, no magic strings, typed boundaries, reuse over reimplementation | `sdsi:standards` |
 | Configuration | One source of truth, schema-validated before work starts, no defaults in code | `sdsi:config` |
-| Secrets | Never in code/config/history; read at runtime from a secrets store | `sdsi:secrets` |
-| Logging | One central logger, standard levels — plus a separate audit trail wherever the program makes security decisions | `sdsi:logging` |
+| Security | Secrets never in code/config/history, read at runtime from a secrets store; untrusted input validated at the boundary; protected data only to its owner; security settings per trust boundary | `sdsi:security` |
+| Logging | One central logger, standard levels, log calls enqueue and one writer writes in arrival order, files rotated on a schedule — plus a separate audit trail wherever the program makes security decisions | `sdsi:logging` |
 | Error handling | One global error handler that logs every unhandled error, typed errors, try/catch only where logic requires it, a machine-readable outcome on every exit | `sdsi:errors` |
 | Concurrency | Shared state owned, background work bounded and drained on shutdown | `sdsi:concurrency` |
 | Tests | Under one `tests/` folder; every test names the regression it catches | `sdsi:testing` |
@@ -176,9 +177,9 @@ project-root/
 |---|---|---|
 | 0 | `sdsi:core` | This file — profile, project type, review/apply mode, non-negotiables |
 | 1 | `sdsi:workflow` | Plan before code, the artifact chain, scope, starting a new project |
-| 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing, input validation |
+| 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing |
 | 3 | `sdsi:config` | Configuration files, schema, validation |
-| 4 | `sdsi:secrets` | Secrets store, naming, rotation, redaction |
+| 4 | `sdsi:security` | Secrets (store, naming, rotation, redaction), untrusted input, protected-data exposure, trust-boundary settings |
 | 5 | `sdsi:logging` | Central logger, levels, output destinations |
 | 6 | `sdsi:errors` | Global error handler, error hierarchy, retries, exit outcomes |
 | 7 | `sdsi:concurrency` | Threads, async, background work, shutdown |

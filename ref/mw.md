@@ -62,7 +62,7 @@ Language- and framework-neutral: apply each rule through whatever integration fr
 - **Three derived values, named the same way every time:** `environment` (from the applied override), the reporting mode (from whether the invoker supplied a callback address), and the running version (from `VERSION` baked into the artifact — config ships on its own schedule).
 - **A validate-config task is mandatory** — the deploy runs it before trusting a new artifact.
 
-## sdsi:secrets
+## sdsi:security
 
 - **Secret names are derived from the system's `auth:` value:**
 

@@ -37,7 +37,7 @@ Language- and framework-neutral: apply each rule through the project language's 
 - **Respect the standard environment variables for capabilities the tool has:** `NO_COLOR`, `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`, `TMPDIR`, `PAGER`, `EDITOR`, `HOME`. This is a second sanctioned deviation from `sdsi:config`'s rule about environment variables, because users set these once for every tool they use.
 - **Never edit a file the tool doesn't own** (a shell profile, another tool's config) without asking first.
 
-## sdsi:secrets
+## sdsi:security
 
 - **A secret is never accepted as a flag.** It would show up in shell history and process listings. Read it from the secrets store, or from an environment variable or file the user points to.
 - **Prefer a file or stdin to an environment variable** (`--token-file <path>`, or `-` for stdin). Environment variables are inherited by every child process and show up in crash dumps and container inspection. Never put a secret in the environment of a subprocess the tool starts unless that subprocess needs it.

@@ -3,7 +3,7 @@ name: all
 description: >
   Runs the full SDSI standard against a project, every topic in core's
   fixed order — workflow, standards, config,
-  secrets, logging, errors, concurrency, testing, dependencies, docs,
+  security, logging, errors, concurrency, testing, dependencies, docs,
   versioning, deploy — in review mode (one combined findings report) or
   apply mode (fix step by step). Use when the human wants all the core
   standards applied or reviewed at once ("apply SDSI to this project", "run
