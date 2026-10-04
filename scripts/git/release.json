@@ -1,4 +1,4 @@
 {
-  "docs_patterns": ["README.md", ".claude/CLAUDE.md", "meta/CHANGELOG.md", "meta/TODO.md", "docs/*"],
+  "docs_patterns": ["README.md", ".claude/CLAUDE.md", "meta/*.md", "docs/*"],
   "version_files": [".claude-plugin/plugin.json"]
 }

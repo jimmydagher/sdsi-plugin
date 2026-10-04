@@ -101,9 +101,9 @@ All notable changes, newest first. See `VERSION` for the current release.
 - **🚧 Unreleased** sits permanently at the top and is the only section the AI edits. Log each change as it's made, not saved for the end.
 - **Four fixed subsections, always in that order.** An empty one stays, marked `(none)`, so a reader never wonders whether it was skipped.
 - **Exactly one 🆕** — the current version. Every shipped version gets a color square when it's replaced, cycling 🟥 🟧 🟨 🟩 🟦 🟪 🟫 and wrapping — assigned once, never changed.
-- **📅 date** in `YYYY-MM-DD` — the day of the releasing commit.
-- **A version entry is written once.** A mistake in a shipped entry is corrected by a new version and a new entry, never a rewrite.
-- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump and no notes needed (any in Unreleased fold into the current 🆕 entry); the message becomes `VERSION x.y.z+k`, the k-th docs-only commit since x.y.z. `+k` is SemVer build metadata, so every tool still reads the version as x.y.z, and `VERSION` itself doesn't change.
+- **📅 date** in `YYYY-MM-DD` — the day of the entry's latest change: the releasing commit, then any docs-only commit folded into it.
+- **Only the 🆕 entry ever changes after release**, and only by a docs-only commit (below). Every older entry is final: a mistake there is corrected by a new version and a new entry, never a rewrite.
+- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump; the notes in Unreleased — one short sentence under Changed per document changed (`sdsi:docs`) — fold into the current 🆕 entry, and its 📅 moves to the day of the commit. With nothing in Unreleased (an edit to `TODO.md`, say), the changelog is left alone. The message becomes `VERSION x.y.z+k`, the k-th docs-only commit since x.y.z. `+k` is SemVer build metadata, so every tool still reads the version as x.y.z, and `VERSION` itself doesn't change.
 - **A code commit with an empty Unreleased is refused.** Add the bullet, then commit. `--no-verify` is the escape hatch for a commit that genuinely isn't a release.
 - **A commit referencing a `TODO #n` that doesn't exist is refused**, so a typo can't silently leave an item open.
 
@@ -173,4 +173,4 @@ A project set up before the files lived in `meta/` keeps the old scripts working
 
 ## Review checklist
 
-No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · changelog missing subsections or out of order · more than one 🆕 · a shipped entry rewritten · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.
+No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` or `commit.template` not set · changelog missing subsections or out of order · more than one 🆕 · an older (colored) entry rewritten, or the 🆕 one changed other than by a docs-only commit · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.

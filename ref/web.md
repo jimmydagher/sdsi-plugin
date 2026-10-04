@@ -52,6 +52,12 @@ Language- and framework-neutral: apply each rule through the framework the proje
 - **Request-level tests use the framework's test client** — status codes, error shapes, and auth behavior.
 - **A few end-to-end browser tests cover the critical user flows** (sign-in, the main task), not every page.
 
+## sdsi:versioning
+
+- **The running version shows in the UI, in several places** — the footer of every page, the about or help screen, and every error page beside the correlation ID, so a user's screenshot of a problem names the release it happened on. It's read from `VERSION` at build or startup, never typed into a template.
+- **On pages anyone can reach without signing in** — the login page, public error pages — showing the version is a stated decision, recorded in `CLAUDE.md`. It helps support, but security scans flag version disclosure.
+
 ## sdsi:deploy
 
 - **A self-hosted, LAN-only deployment gets its own security settings** — HTTPS forcing off, its own address in allowed hosts — never a cloud deployment's settings inherited as a default.
+- **A deploy is checked by reading the version off the deployed page** and comparing it with the release just shipped — proof the new build is the one serving, not a cached or previous one.

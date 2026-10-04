@@ -14,6 +14,6 @@
 - **Shared reference files live in `ref/`**, read on demand by relative path (`../../ref/<file>.md`) — e.g. `ref/findings.md`, the review process every skill follows in review mode. A skill's own rules still live only in its `SKILL.md`.
 - **Every skill supports `--review` / `--apply`** through core §1 Step 3 and carries `argument-hint: "[--review|--apply] [path]"`; every skill needs a **Review checklist** section, since review mode uses it as the lens.
 - **Rules are language-neutral — companions included.** Language- or framework-specific lessons belong in the project that taught them (its `CLAUDE.md`), not in this plugin.
-- **Markdown is the product here**, so `scripts/git/release.json` narrows docs-only commits to `README.md`, `.claude/CLAUDE.md`, `meta/CHANGELOG.md`, `meta/TODO.md`, and `docs/` — a change to any `SKILL.md` is a release.
+- **Markdown is the product here**, so `scripts/git/release.json` narrows docs-only commits to `README.md`, `.claude/CLAUDE.md`, `docs/`, and the Markdown files in `meta/` — a change to any `SKILL.md` is a release.
 - **`.claude-plugin/plugin.json`'s version is synced from `meta/VERSION` by the release script** — never edit it by hand.
 - **Run the tests after touching the release scripts:** `python -m unittest discover tests` (local shell, repo root).

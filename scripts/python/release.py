@@ -13,8 +13,9 @@ the code and commits is done here, deterministically:
                     sync any mirrored version files → stage it all.
                     Refused if Unreleased is empty.
   docs-only commit  no bump → fold Unreleased into the current version's
-                    entry → close referenced TODO.md items with the current
-                    version → stage it. Nothing to do if Unreleased is empty.
+                    entry and date it today → close referenced TODO.md items
+                    with the current version → stage it. Nothing to do if
+                    Unreleased is empty.
 
 All three files live in meta/, the project's record — the root holds only
 README.md (sdsi:core §3). A staged meta/VERSION is always a release,
@@ -58,6 +59,7 @@ UNRELEASED_HEADING = "## 🚧 Unreleased"
 UNRELEASED_RE = re.compile(r"^## 🚧 Unreleased\n(.*?)(?=^## |\Z)", re.M | re.S)
 CURRENT_ENTRY_RE = re.compile(r"^(## 🆕VERSION [^\n]*\n)(.*?)(?=^## |\Z)", re.M | re.S)
 CURRENT_VERSION_RE = re.compile(r"^## 🆕VERSION (\S+)", re.M)
+CURRENT_DATE_RE = re.compile(r"^(## 🆕VERSION \S+ 📅 )\S+", re.M)
 TODO_REF_RE = re.compile(r"TODO #(\d+)")
 OPEN_TODO_RE = r"^- \[ \] #{number} (.*)$"
 DONE_TODO_RE = r"^- \[x\] #{number} "
@@ -182,11 +184,14 @@ def promote(changelog: str, version: str, today: str) -> str:
     return UNRELEASED_RE.sub(lambda _: promoted, changelog, count=1)
 
 
-def fold_into_current(changelog: str) -> str:
+def fold_into_current(changelog: str, today: str) -> str:
     """Move Unreleased's bullets into the current 🆕 entry (no version bump).
+
+    The entry's 📅 moves to today, so it reads as the day of its latest change.
 
     Input:
         changelog (str): CHANGELOG.md contents.
+        today (str): the commit date, YYYY-MM-DD.
     Output:
         str: the updated changelog, or the input unchanged when no version
         has been released yet (the notes then ride with the first release).
@@ -203,6 +208,7 @@ def fold_into_current(changelog: str) -> str:
         + render_subsections(merged)
         + changelog[current.end(2):]
     )
+    changelog = CURRENT_DATE_RE.sub(lambda heading: heading.group(1) + today, changelog, count=1)
     return UNRELEASED_RE.sub(
         lambda _: f"{UNRELEASED_HEADING}\n{empty_body()}\n", changelog, count=1
     )
@@ -348,7 +354,7 @@ def run(root: Path, today: str) -> None:
         if not has_entries(pending):
             return
         version = current_version
-        writes[root / CHANGELOG_FILE] = fold_into_current(changelog)
+        writes[root / CHANGELOG_FILE] = fold_into_current(changelog, today)
     else:
         if not has_entries(pending):
             raise ReleaseError(

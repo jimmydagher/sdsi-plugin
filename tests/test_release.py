@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,16 +96,25 @@ class PromoteTest(unittest.TestCase):
 
 class FoldTest(unittest.TestCase):
     def test_fold_appends_to_current_entry_and_replaces_none(self) -> None:
-        result = release.fold_into_current(CHANGELOG)
+        result = release.fold_into_current(CHANGELOG, TODAY)
         current = result.split("## 🆕VERSION 1.0.0")[1]
         self.assertIn("- Initial release.\n- New export command (TODO #2)", current)
         self.assertIn("### Bug/Issues/Fixes\n- Fixed crash on empty input (TODO #1)", current)
         self.assertFalse(release.has_entries(release.unreleased_body(result)))
 
+    def test_fold_dates_the_current_entry_by_the_change(self) -> None:
+        # Regression: a docs change folded into 1.0.0 must move its date to the
+        # day of the change, and leave every older entry's date alone.
+        shipped = CHANGELOG + "\n## 🟥VERSION 0.9.0 📅 2026-08-01\n"
+        result = release.fold_into_current(shipped, TODAY)
+        self.assertIn("## 🆕VERSION 1.0.0 📅 2026-09-23\n", result)
+        self.assertNotIn("2026-09-01", result)
+        self.assertIn("## 🟥VERSION 0.9.0 📅 2026-08-01\n", result)
+
     def test_fold_without_any_release_is_a_no_op(self) -> None:
         # Regression: before the first release there is no entry to fold into.
         unreleased_only = CHANGELOG.split("## 🆕VERSION")[0]
-        self.assertEqual(release.fold_into_current(unreleased_only), unreleased_only)
+        self.assertEqual(release.fold_into_current(unreleased_only, TODAY), unreleased_only)
 
 
 class TodoTest(unittest.TestCase):
@@ -278,6 +288,7 @@ class HookEndToEndTest(unittest.TestCase):
         self.git("commit", "-q", "-m", "x")
         self.assertEqual(self.read("meta/VERSION").strip(), "1.0.0")
         self.assertIn("- Initial release.\n- New export command (TODO #2)", self.read("meta/CHANGELOG.md"))
+        self.assertIn(f"## 🆕VERSION 1.0.0 📅 {date.today().isoformat()}\n", self.read("meta/CHANGELOG.md"))
         self.assertIn("completed", self.read("meta/TODO.md"))
         self.assertEqual(self.last_message(), "VERSION 1.0.0+1")
 

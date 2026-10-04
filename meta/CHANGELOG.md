@@ -16,7 +16,23 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.1 📅 2026-10-03
+## 🆕VERSION 1.3.2 📅 2026-10-03
+
+### Added or New Features
+- `sdsi:docs`: a document is rewritten in place as the single source of truth — never a correction appended under stale text — and each document change gets one short sentence under Changed in the changelog. (TODO #13)
+- A docs-only commit files its notes under the current 🆕 version and moves that version's 📅 to the day of the commit (`release.py`, `sdsi:versioning`); a commit with no notes, such as a `TODO.md` edit, leaves the changelog alone.
+- `ref/web.md` gains a `sdsi:versioning` section: the running version shows in the UI — every page's footer, the about or help screen, every error page — and showing it on pages reachable without signing in is a stated decision. Its `sdsi:deploy` section checks a deploy by reading the version off the deployed page. (TODO #14)
+
+### Removed
+(none)
+
+### Changed
+- `.claude/CLAUDE.md`: docs-only commits cover every Markdown file in `meta/`.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟫VERSION 1.3.1 📅 2026-10-03
 
 ### Added or New Features
 - `scripts/git/commit-template`: with `git config commit.template scripts/git/commit-template`, the editor's commit box is pre-filled (VS Code reads it), so committing no longer stops at a `COMMIT_EDITMSG` tab asking for a message. On `main` the hook still replaces it with the version line. A project copies the file and runs the command (`sdsi:versioning`, "Installing the release chain").

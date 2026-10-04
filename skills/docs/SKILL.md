@@ -3,7 +3,9 @@ name: docs
 description: >
   SDSI's documentation standard — the root README, operational docs under
   docs/ (setup, deployment, cheat sheet, index, features), updating a
-  document in the same change as the code it describes, naming where every
+  document in the same change as the code it describes — rewritten in place
+  as the single source of truth, noted in one changelog sentence — naming
+  where every
   command runs, a what-changed-to-what-to-update table, and TODO.md as the
   numbered, cross-session list of outstanding work that the release scripts
   close automatically. Use when writing or reviewing documentation, or
@@ -20,6 +22,10 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 **Any change that affects a document updates that document in the same change** — not eventually, not in a follow-up. A document that lags is worse than a missing one, because it's still believed.
 
+**Update the source of truth in place — never append.** Rewrite the passage that describes what changed, so the document reads as true today: no "Update:" note under the old text, no second version of an instruction below the first. Each fact has one home; another document that needs it links there instead of restating it. Records are the exception — changelog entries, review reports, and the planning artifacts (`sdsi:workflow`) are written once and never rewritten.
+
+**Note every document change in the changelog** — one short sentence under **Changed** in Unreleased, saying what the document says now: `- README: the config keys include PAYMENTS_TIMEOUT.` On a docs-only commit the release script files it under the current version and moves that version's date to the day of the change (`sdsi:versioning`). Edits to `meta/`'s own files — the changelog, `TODO.md` — need no note.
+
 ## What exists, and what each answers
 
 | Document | Answers | Update when… |
@@ -35,7 +41,7 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 | A features doc, in `docs/` (optional) | What's been built, for a non-technical reader | A user-visible capability ships |
 | Review reports, in `docs/reviews/` | What an SDSI review found and what happened to each finding — `YYYY-MM-DD-<skill>.md` | Never — written once per review when the human exports it (`ref/findings.md`); a new review writes a new file |
 
-- **`docs/` holds what people read to understand or operate the project** — processes, information, how-tos, setup, deployment, transitions, designs, reviews. The project's record — `VERSION`, `CHANGELOG.md`, `TODO.md`, which the release chain reads and writes — lives in `meta/` instead (core §3).
+- **`docs/` holds what people read to understand or operate the project** — processes, information, how-tos, setup, deployment, transitions, designs, reviews. The project's record — `VERSION`, `CHANGELOG.md`, `TODO.md` — lives in `meta/` instead (core §3).
 - **Every other document lives in a folder, never loose at the root** — a contributing guide, notes, a design doc all go under `docs/`.
 - **Every command block names where it runs** — local shell, CI, inside a container, a cloud console. The same command can fail in one place for reasons unrelated to the command.
 - **Keep a "what changed → what else must be updated" table** for the project's own moving parts (adding an operation touches its registry and the cheat sheet and the local run config; adding a secret touches the setup doc). The table above is the starting point. Extend it the moment a new kind of moving part appears.
@@ -70,4 +76,4 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 ## Review checklist
 
-A code change without its matching doc update · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.
+A code change without its matching doc update · a correction appended under stale text instead of rewriting it · the same fact maintained in two documents · a document change with no sentence in the changelog · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.
