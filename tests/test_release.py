@@ -6,6 +6,7 @@ since a hook is only proven by a real commit.
 
 Run from the repo root:  python -m unittest discover tests
 """
+import os
 import shutil
 import subprocess
 import sys
@@ -169,17 +170,20 @@ class HookEndToEndTest(unittest.TestCase):
             target = self.repo / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(ROOT / relative, target)
-        self.write("VERSION", "1.0.0\n")
-        self.write("CHANGELOG.md", CHANGELOG)
-        self.write("TODO.md", TODO)
+        self.write("meta/VERSION", "1.0.0\n")
+        self.write("meta/CHANGELOG.md", CHANGELOG)
+        self.write("meta/TODO.md", TODO)
         self.git("add", "-A")
         self.git("commit", "-q", "-m", "seed")  # hooks not installed yet
         self.git("config", "core.hooksPath", "scripts/git")
 
     def git(self, *args: str, check: bool = True) -> subprocess.CompletedProcess:
+        # The hooks' Python writes to a pipe here, in the locale's encoding unless
+        # told otherwise (cp1252 on Windows), and the "—" in a refusal then fails
+        # to decode as UTF-8 and loses stderr entirely.
         return subprocess.run(
             ["git", *args], cwd=self.repo, check=check, capture_output=True,
-            text=True, encoding="utf-8",
+            text=True, encoding="utf-8", env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         )
 
     def write(self, relative: str, text: str) -> None:
@@ -198,16 +202,16 @@ class HookEndToEndTest(unittest.TestCase):
         self.write("src/app.txt", "code\n")
         self.git("add", "src/app.txt")
         self.git("commit", "-q", "-m", "anything typed here is replaced")
-        self.assertEqual(self.read("VERSION").strip(), "1.0.1")
-        self.assertIn("## 🆕VERSION 1.0.1", self.read("CHANGELOG.md"))
-        self.assertIn("- [x] #1 Crash on empty input", self.read("TODO.md"))
-        self.assertIn("- [ ] #3 Unrelated item", self.read("TODO.md"))
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.0.1")
+        self.assertIn("## 🆕VERSION 1.0.1", self.read("meta/CHANGELOG.md"))
+        self.assertIn("- [x] #1 Crash on empty input", self.read("meta/TODO.md"))
+        self.assertIn("- [ ] #3 Unrelated item", self.read("meta/TODO.md"))
         self.assertEqual(self.last_message(), "VERSION 1.0.1")
         self.assertEqual(self.git("status", "--porcelain").stdout, "")
 
     def test_code_commit_with_empty_unreleased_is_refused(self) -> None:
-        self.write("CHANGELOG.md", release.promote(CHANGELOG, "1.0.1", TODAY))
-        self.git("add", "CHANGELOG.md")
+        self.write("meta/CHANGELOG.md", release.promote(CHANGELOG, "1.0.1", TODAY))
+        self.git("add", "meta/CHANGELOG.md")
         self.git("commit", "-q", "-m", "x", "--no-verify")
         self.write("src/app.txt", "code\n")
         self.git("add", "src/app.txt")
@@ -216,20 +220,59 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertIn("COMMIT REFUSED", result.stderr)
 
     def test_hand_staged_minor_bump_is_respected(self) -> None:
-        self.write("VERSION", "1.1.0\n")
+        self.write("meta/VERSION", "1.1.0\n")
         self.write("src/app.txt", "code\n")
-        self.git("add", "VERSION", "src/app.txt")
+        self.git("add", "meta/VERSION", "src/app.txt")
         self.git("commit", "-q", "-m", "x")
-        self.assertEqual(self.read("VERSION").strip(), "1.1.0")
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.1.0")
         self.assertEqual(self.last_message(), "VERSION 1.1.0")
+
+    def test_hand_staged_bump_is_a_release_even_when_docs_patterns_match_it(self) -> None:
+        # Regression: with meta/* counted as docs, a hand-set bump plus a doc edit
+        # folded the notes into 1.0.0 while commit-msg labelled the commit 1.1.0.
+        self.write("scripts/git/release.json", '{"docs_patterns": ["docs/*", "meta/*"]}\n')
+        self.git("add", "scripts/git/release.json")
+        self.git("commit", "-q", "-m", "settings", "--no-verify")
+        self.write("meta/VERSION", "1.1.0\n")
+        self.write("docs/setup.md", "setup\n")
+        self.git("add", "meta/VERSION", "docs/setup.md")
+        self.git("commit", "-q", "-m", "x")
+        self.assertIn("## 🆕VERSION 1.1.0", self.read("meta/CHANGELOG.md"))
+        self.assertEqual(self.last_message(), "VERSION 1.1.0")
+
+    def test_moved_version_file_gets_a_patch_bump(self) -> None:
+        # Regression: a moved VERSION is staged unchanged; taken as a hand-set bump,
+        # it wrote a second changelog entry for 1.0.0 (and then was refused outright).
+        self.git("mv", "meta/VERSION", "VERSION")
+        self.git("commit", "-q", "-m", "old root layout", "--no-verify")
+        self.git("mv", "VERSION", "meta/VERSION")
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        self.git("commit", "-q", "-m", "")
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.0.1")
+        self.assertEqual(self.read("meta/CHANGELOG.md").count("VERSION 1.0.0"), 1)
+        self.assertIn("## 🆕VERSION 1.0.1", self.read("meta/CHANGELOG.md"))
+        self.assertEqual(self.last_message(), "VERSION 1.0.1")
+
+    def test_release_files_at_the_root_are_refused_with_a_pointer(self) -> None:
+        # Regression: a project still on the root layout got a bare traceback.
+        for name in ("VERSION", "CHANGELOG.md", "TODO.md"):
+            self.git("mv", f"meta/{name}", name)
+        self.git("commit", "-q", "-m", "old root layout", "--no-verify")
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        result = self.git("commit", "-q", "-m", "x", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("COMMIT REFUSED — There is no meta/VERSION", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
     def test_docs_only_commit_folds_without_bump(self) -> None:
         self.write("docs/setup.md", "setup\n")
         self.git("add", "docs/setup.md")
         self.git("commit", "-q", "-m", "x")
-        self.assertEqual(self.read("VERSION").strip(), "1.0.0")
-        self.assertIn("- Initial release.\n- New export command (TODO #2)", self.read("CHANGELOG.md"))
-        self.assertIn("completed", self.read("TODO.md"))
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.0.0")
+        self.assertIn("- Initial release.\n- New export command (TODO #2)", self.read("meta/CHANGELOG.md"))
+        self.assertIn("completed", self.read("meta/TODO.md"))
         self.assertEqual(self.last_message(), "VERSION 1.0.0-updated")
 
     def test_feature_branch_is_exempt(self) -> None:
@@ -237,7 +280,7 @@ class HookEndToEndTest(unittest.TestCase):
         self.write("src/app.txt", "code\n")
         self.git("add", "src/app.txt")
         self.git("commit", "-q", "-m", "wip")
-        self.assertEqual(self.read("VERSION").strip(), "1.0.0")
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.0.0")
         self.assertEqual(self.last_message(), "wip")
 
 

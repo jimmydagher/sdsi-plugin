@@ -20,6 +20,8 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 **Non-negotiable, on every project, from day one** — regardless of size, stack, or number of committers.
 
+The chain's files live in `meta/`, the project's record — `meta/VERSION`, `meta/CHANGELOG.md`, `meta/TODO.md` — never at the root and never in `docs/` (core §3). Below, each is named without its folder.
+
 ## The release chain
 
 ```text
@@ -44,7 +46,7 @@ The AI never bumps `VERSION` for a PATCH, promotes the changelog, ticks `TODO.md
 
 ## Version semantics
 
-One `VERSION` file at the root is the single source of truth, starting at `0.1.0`. Semantics follow **operational impact on whoever deploys it**:
+One `meta/VERSION` file is the single source of truth, starting at `0.1.0`. Semantics follow **operational impact on whoever deploys it**:
 
 | Bump | Means | Operator has to… |
 |---|---|---|
@@ -142,10 +144,30 @@ Put that command in whatever script bootstraps local development, so a fresh clo
 }
 ```
 
-`docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`.
+`docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A staged `meta/VERSION` is always a release, even if a pattern matches it. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`.
 
 **Test the hooks with a real, throwaway commit before trusting them** — don't reason from the scripts alone. The plugin's own `tests/test_release.py` does this end to end.
 
+## Moving the release files out of the root
+
+A project set up before the files lived in `meta/` keeps the old scripts working until it moves. The current scripts read only `meta/` and refuse a commit without `meta/VERSION` and `meta/CHANGELOG.md` — so the files and the scripts move together, in one commit:
+
+1. **Move the files** (local shell, project root):
+
+   ```bash
+   mkdir meta
+   git mv VERSION meta/VERSION
+   git mv CHANGELOG.md meta/CHANGELOG.md
+   git mv TODO.md meta/TODO.md
+   ```
+
+2. **Re-copy the three scripts** from this plugin (Installing, above) — never patch the old copies by hand.
+3. **Fix `scripts/git/release.json`**, if the project has one — every `docs_patterns` entry for a moved file takes its new path (`CHANGELOG.md` → `meta/CHANGELOG.md`).
+4. **Update everything that reads a moved file by path** — a build step that copies `VERSION` into the artifact, a `--version` implementation, the README, the docs index.
+5. **Decide the bump.** The move stages `meta/VERSION` unchanged; the script reads that as no bump and makes the usual PATCH. For a MINOR or MAJOR, write the new number into `meta/VERSION` and stage it before committing (The release chain, above).
+6. **Add an Unreleased bullet** under Changed, naming the move and anything an operator must update.
+7. **Stage everything before committing** — `git add -A`, or every change in the editor's source-control view. `git mv` stages only the moves; a commit without the re-copied scripts and edited files ships old scripts that can't find the moved ones.
+
 ## Review checklist
 
-No `VERSION`, `CHANGELOG.md`, or hooks installed · `core.hooksPath` not set · changelog missing subsections or out of order · more than one 🆕 · a shipped entry rewritten · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.
+No `VERSION`, `CHANGELOG.md`, or hooks installed · `VERSION`, `CHANGELOG.md`, or `TODO.md` anywhere but `meta/`, or scripts older than that layout · `core.hooksPath` not set · changelog missing subsections or out of order · more than one 🆕 · a shipped entry rewritten · a commit message that isn't a version line · `TODO.md` items closed by hand · a version string maintained in two places · build output or local env files tracked in git.

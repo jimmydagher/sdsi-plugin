@@ -33,6 +33,7 @@ Every stage ends by committing a markdown artifact the next stage reads. The cha
 | Maintain | a new `INTENT.md` | Anything production surfaces re-enters at Plan. |
 
 - **A historical artifact is left alone when later work changes what it describes** — it's a permanent record, not a living reference. **The exception:** when it's actively misleading (a superseded direction still written as current), update it or mark it superseded — and flag that judgment call explicitly each time.
+- **The artifacts live in a per-change folder under `docs/`**, never loose at the root (core §3).
 - **On an established codebase** a per-change folder of three files often goes unread. It's fine to land each stage elsewhere — intent in the commit body or a `TODO.md` item, a standing design decision in `CLAUDE.md`, the plan in the change itself — as long as every stage lands somewhere version-controlled and the plan existed before the code.
 
 ## Plan before code, always
@@ -89,7 +90,9 @@ The kickoff for a brand-new, empty project:
 3. **Write `INTENT.md`** from the brainstorm and decisions; let the human correct it.
 4. **Write `SPEC.md`** against SDSI and the project's constraints.
 5. **Scaffold the full skeleton before any real logic** — explicitly, not organically:
-   - Root: `README.md`, `CLAUDE.md` (with the SDSI profile), `TODO.md`, `CHANGELOG.md` (intro plus an empty Unreleased), `VERSION` (`0.1.0`), `.gitignore`, `.gitattributes` — and nothing else loose at the root.
+   - Root: `README.md`, `.gitignore`, `.gitattributes` — and nothing else loose at the root (core §3).
+   - `.claude/CLAUDE.md` (with the SDSI profile).
+   - `meta/` with `TODO.md`, `CHANGELOG.md` (intro plus an empty Unreleased), and `VERSION` (`0.1.0`).
    - The source layout, following the language's and framework's conventions within core §3's invariants.
    - `tests/`, `config/`, `docs/`, `scripts/`.
    - **The release chain:** copy `scripts/git/{pre-commit,commit-msg}` and `scripts/python/release.py` from this plugin into the project and run `git config core.hooksPath scripts/git` (`sdsi:versioning`).
@@ -99,4 +102,4 @@ The kickoff for a brand-new, empty project:
 
 ## Review checklist
 
-No `CLAUDE.md`, or one without an SDSI profile · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a non-trivial change with no recorded intent or plan · a historical planning artifact rewritten to match new reality (or a superseded one still read as current) · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.
+No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a non-trivial change with no recorded intent or plan · a historical planning artifact rewritten to match new reality (or a superseded one still read as current) · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.

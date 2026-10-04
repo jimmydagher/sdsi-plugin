@@ -24,10 +24,10 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 | Document | Answers | Update when… |
 |---|---|---|
-| `README.md` (root) | What it does, local setup, how to run/debug/test locally, how to deploy, every config key and environment variable it depends on | Any of those change |
-| `CLAUDE.md` (root) | Project-specific conventions, the SDSI profile, deliberate deviations (`sdsi:workflow`) | A convention is set, a mistake recurs, a deviation is made |
-| `CHANGELOG.md` (root) | What changed per release and what an operator must do (`sdsi:versioning`) | Every change — the AI writes to Unreleased as it works |
-| `TODO.md` (root) | What's outstanding (below) | Continuously |
+| `README.md` — the only document at the root | What it does, local setup, how to run/debug/test locally, how to deploy, every config key and environment variable it depends on | Any of those change |
+| `.claude/CLAUDE.md` | Project-specific conventions, the SDSI profile, deliberate deviations (`sdsi:workflow`) | A convention is set, a mistake recurs, a deviation is made |
+| `meta/CHANGELOG.md` | What changed per release and what an operator must do (`sdsi:versioning`) | Every change — the AI writes to Unreleased as it works |
+| `meta/TODO.md` | What's outstanding (below) | Continuously |
 | A setup doc, in `docs/` (one per deployable shape) | Standing up an environment from nothing | A resource, credential, or one-time step is added |
 | A deployment doc, in `docs/` | How to ship a change | The deploy sequence, a check, or a rollback step changes |
 | A cheat sheet, in `docs/` | The commands reached for when something's wrong — every operation, every flag, where output lands | An operation is added, renamed, or removed |
@@ -35,6 +35,8 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 | A features doc, in `docs/` (optional) | What's been built, for a non-technical reader | A user-visible capability ships |
 | Review reports, in `docs/reviews/` | What an SDSI review found and what happened to each finding — `YYYY-MM-DD-<skill>.md` | Never — written once per review when the human exports it (`ref/findings.md`); a new review writes a new file |
 
+- **`docs/` holds what people read to understand or operate the project** — processes, information, how-tos, setup, deployment, transitions, designs, reviews. The project's record — `VERSION`, `CHANGELOG.md`, `TODO.md`, which the release chain reads and writes — lives in `meta/` instead (core §3).
+- **Every other document lives in a folder, never loose at the root** — a contributing guide, notes, a design doc all go under `docs/`.
 - **Every command block names where it runs** — local shell, CI, inside a container, a cloud console. The same command can fail in one place for reasons unrelated to the command.
 - **Keep a "what changed → what else must be updated" table** for the project's own moving parts (adding an operation touches its registry and the cheat sheet and the local run config; adding a secret touches the setup doc). The table above is the starting point. Extend it the moment a new kind of moving part appears.
 - **Document local run/debug separately from deployment** — they solve different problems.
@@ -68,4 +70,4 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 
 ## Review checklist
 
-A code change without its matching doc update · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.
+A code change without its matching doc update · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.

@@ -23,7 +23,7 @@ Before anything else, read `../core/SKILL.md` and run its steps. Every rule here
 - **Types/classes are as short as stays unambiguous.** Prefer one clear word over a compound; keep a qualifier only when dropping it would collide with or blur against something else in the codebase (`LogFile` because `Log` is the logger; `HttpStatus` because `Status` is the run outcome).
 - **Modules/files are named for the capability they own** (`logs`, `secrets`, `config`), not forced to mirror one class name.
 - **Folders:** `kebab-case` unless the language requires otherwise (a package name that must be a valid identifier, for instance).
-- **Markdown:** root-level project documents are `UPPERCASE.md` (`README.md`, `CHANGELOG.md`, `TODO.md`, `CLAUDE.md`); everything else, including `docs/`, is `lowercase-kebab-case.md`.
+- **Markdown:** the fixed-name project documents are `UPPERCASE.md` wherever they live (`README.md`, `CLAUDE.md`, `CHANGELOG.md`, `TODO.md`); every other Markdown file, including the rest of `docs/`, is `lowercase-kebab-case.md`.
 - **Config files:** YAML, unless the project type or language gives a strong reason otherwise (write that reason in `CLAUDE.md`).
 - **Mark internal members as internal** using the language's mechanism (a leading underscore, `private`, unexported names).
 

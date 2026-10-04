@@ -29,7 +29,7 @@ Tell the human which SDSI skill is running, which files it read to get there (e.
 
 ### Step 2 — Load the project profile
 
-Every rule is applied through the project's profile. Look for an `## SDSI profile` section in the project's `CLAUDE.md`:
+Every rule is applied through the project's profile. Look for an `## SDSI profile` section in the project's `.claude/CLAUDE.md` — a `CLAUDE.md` still at the root moves there first (§3):
 
 ```markdown
 ## SDSI profile
@@ -39,7 +39,7 @@ Every rule is applied through the project's profile. Look for an `## SDSI profil
 - Deploy target: <recorded by sdsi:deploy when first asked>
 ```
 
-If the section or a field the current skill needs is missing, **ask with `AskUserQuestion` — never infer it silently** — then write the answer into `CLAUDE.md` (creating the file if needed) so no later session asks again:
+If the section or a field the current skill needs is missing, **ask with `AskUserQuestion` — never infer it silently** — then write the answer into `.claude/CLAUDE.md` (creating the file if needed) so no later session asks again:
 
 - **Language** — which language (and major version) the project uses. SDSI's rules are language-neutral; apply each one using that language's own idioms, tooling, and conventions (its casing rules, its enum construct, its standard test runner, package manager, lockfile, and vulnerability scanner). Where a language convention and an SDSI example disagree on *form* (casing, file naming), the language convention wins; the rule's *intent* doesn't bend.
 - **Project type** — what kind of program this is, which decides the companion (below):
@@ -70,7 +70,7 @@ Every skill runs against code in one of two modes:
 
 - **Review** — report findings and recommendations; change nothing until the human chooses. Follow `../../ref/findings.md` (intake → catalog → present → ask → route each finding).
 - **Apply** — the human trusts the skill: change the code to meet it, verify (core §2, "double-check your work"), report what changed, and write the changelog notes. Never commit (`sdsi:versioning`).
-  - **Changelog notes use `sdsi:versioning`'s format** — the `🚧 Unreleased` section with its four fixed subsections. If the project has no `CHANGELOG.md`, create it from that template, never an improvised shape.
+  - **Changelog notes use `sdsi:versioning`'s format** — the `🚧 Unreleased` section with its four fixed subsections. If the project has no `meta/CHANGELOG.md`, create it from that template, never an improvised shape.
   - **Verification leaves nothing behind.** A throwaway check script runs from outside the project (a scratch or temp directory) or is removed before reporting; never leave one in the project, least of all at the root.
 
 Resolve the mode in this order:
@@ -109,7 +109,7 @@ Whatever the language or project type, every program SDSI governs has:
 | Element | Invariant | Detail |
 |---|---|---|
 | An entry point | Holds no logic — wires things together and exits with the outcome the orchestration layer returns | the language's and framework's conventions |
-| A layout | Root holds only project files and top-level folders — no loose code. Dependencies point one way (shared helpers ← integrations ← operations ← entry point). One home for shared code, never a second `utils/`/`common/` beside it | the language's and framework's conventions |
+| A layout | Root holds `README.md` and top-level folders — no other loose file (below). Dependencies point one way (shared helpers ← integrations ← operations ← entry point). One home for shared code, never a second `utils/`/`common/` beside it | the language's and framework's conventions |
 | Code conventions | Named constants, no magic strings, typed boundaries, reuse over reimplementation | `sdsi:standards` |
 | Configuration | One source of truth, schema-validated before work starts, no defaults in code | `sdsi:config` |
 | Secrets | Never in code/config/history; read at runtime from a secrets store | `sdsi:secrets` |
@@ -118,27 +118,41 @@ Whatever the language or project type, every program SDSI governs has:
 | Concurrency | Shared state owned, background work bounded and drained on shutdown | `sdsi:concurrency` |
 | Tests | Under one `tests/` folder; every test names the regression it catches | `sdsi:testing` |
 | Dependencies | Few, pinned, locked, scanned | `sdsi:dependencies` |
-| Documentation | `README.md`, `docs/`, `TODO.md`, updated in the same change | `sdsi:docs` |
-| A version | `VERSION` + `CHANGELOG.md` + the release hooks, automated by script | `sdsi:versioning` |
+| Documentation | `README.md`, `docs/`, `meta/TODO.md`, updated in the same change | `sdsi:docs` |
+| A version | `meta/VERSION` + `meta/CHANGELOG.md` + the release hooks, automated by script | `sdsi:versioning` |
 | A way to run it | Local run config versioned; deploy target chosen by the human | `sdsi:deploy` |
 
-**The project root is the same for every type** — only these files and folders, nothing runnable loose at this level. What goes inside the source folder follows the language's and framework's own conventions, within the invariants above:
+**The project root is the same for every type: `README.md` is the only file a person puts there — everything else lives in a folder.** The only other files allowed at the root are ones a tool reads nowhere else: git's `.gitignore` and `.gitattributes`, and the language's manifest and lockfile when its tooling requires the root. Habit isn't a reason — a file that works from a folder goes in one. What goes inside the source folder follows the language's and framework's own conventions, within the invariants above:
 
 ```text
 project-root/
+├── README.md        # the only document at the root (sdsi:docs)
+├── .claude/
+│   └── CLAUDE.md    # conventions + SDSI profile (§1 Step 2); Claude Code loads it from here
 ├── <source>/        # named by language/framework convention (src/ by default)
 ├── tests/           # sdsi:testing
 ├── config/          # default.yaml + override/<env>.yaml — sdsi:config
-├── docs/            # sdsi:docs
+├── docs/            # documents people read: processes, how-tos, setup, deployment — sdsi:docs
+├── meta/            # the project's record, read and written by the release chain
+│   ├── CHANGELOG.md #   sdsi:versioning
+│   ├── TODO.md      #   sdsi:docs
+│   └── VERSION      #   sdsi:versioning
 ├── scripts/         # operational tooling, never imported by <source>
 │   ├── git/         #   release hooks — mandatory (sdsi:versioning)
 │   └── python/      #   release.py — mandatory; other tooling by language
 ├── <deploy files>   # e.g. docker/ — per sdsi:deploy's target
 ├── <IDE run config> # e.g. .vscode/ — versioned (sdsi:deploy)
-├── <manifest + lockfile>  # the language's own (sdsi:dependencies)
-├── .gitignore  .gitattributes
-├── VERSION  CHANGELOG.md  TODO.md  CLAUDE.md  README.md
+├── <manifest + lockfile>  # the language's own, only where its tooling needs the root (sdsi:dependencies)
+└── .gitignore  .gitattributes  # git applies these repo-wide only from the root
 ```
+
+**An existing project with other files at the root moves them in one change**, with `git mv` so history follows, and updates everything that references a moved file by path in the same change:
+
+| At the root | Moves to | Steps |
+|---|---|---|
+| `CLAUDE.md` | `.claude/CLAUDE.md` | Just the move |
+| `VERSION`, `CHANGELOG.md`, `TODO.md` | `meta/` | Together with the release scripts that read them there — `sdsi:versioning`, "Moving the release files out of the root" |
+| Anything else | The folder that owns it — `docs/`, `scripts/`, `config/`, the deploy folder | Ask with `AskUserQuestion` when the right home isn't clear |
 
 **The release chain is automated from day one on every project** — the `scripts/git/` hooks and `scripts/python/release.py` this plugin ships. The AI writes changelog notes; scripts do the bump, promotion, `TODO.md` closure, and commit message. See `sdsi:versioning`.
 

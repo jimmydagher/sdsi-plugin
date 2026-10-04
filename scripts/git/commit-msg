@@ -17,6 +17,9 @@
 repo_root=$(git rev-parse --show-toplevel)
 msg_file="$1"
 
+# Keep in sync with VERSION_FILE in scripts/python/release.py.
+VERSION_FILE="meta/VERSION"
+
 # Keep in sync with scripts/git/pre-commit.
 TARGET_BRANCH="main"
 branch=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
@@ -28,9 +31,9 @@ if [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
     exit 0
 fi
 
-current_version=$(tr -d '[:space:]' < "$repo_root/VERSION")
+current_version=$(tr -d '[:space:]' < "$repo_root/$VERSION_FILE")
 
-if git diff --cached --name-only -- VERSION | grep -qx "VERSION"; then
+if git diff --cached --name-only -- "$VERSION_FILE" | grep -qx "$VERSION_FILE"; then
     line="VERSION $current_version"
 else
     line="VERSION $current_version-updated"

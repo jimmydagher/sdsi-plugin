@@ -16,7 +16,23 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.2.2 📅 2026-09-26
+## 🆕VERSION 1.3.0 📅 2026-10-03
+
+### Added or New Features
+- `release.py` gives a moved `meta/VERSION` — staged, but still holding the current release — the usual PATCH bump, instead of taking it as a hand-set bump and writing a second changelog entry for a version that already shipped. A missing `meta/VERSION` or `meta/CHANGELOG.md` is refused with a message pointing to the move steps, instead of a traceback.
+
+### Removed
+- `docs/specs/2026-09-23-review-apply-modes-design.md`, the design spec for the review/apply modes shipped in 1.1.0.
+
+### Changed
+- **The project root holds only `README.md` and folders** (`sdsi:core` §3), plus files a tool reads nowhere else (`.gitignore`, `.gitattributes`, a manifest and lockfile where the language's tooling requires the root). `CLAUDE.md` moves to `.claude/CLAUDE.md`; `VERSION`, `CHANGELOG.md`, and `TODO.md` move to a new `meta/` folder, the project's record; `docs/` is for what people read to understand or operate the project (processes, how-tos, setup, deployment, transitions), including `sdsi:workflow`'s planning artifacts in a per-change folder. `sdsi:docs`, `sdsi:versioning`, `sdsi:workflow`, and `sdsi:standards` follow, and their review checklists flag a stray root file. (TODO #12)
+- **The release scripts read `meta/VERSION`, `meta/CHANGELOG.md`, and `meta/TODO.md`.** A project that re-copies `pre-commit`, `commit-msg`, and `release.py` must move those files in the same commit and point any `docs_patterns` entry for them at the new path — the commit gets a PATCH bump on its own; a MINOR or MAJOR is written into `meta/VERSION` by hand as before — see `sdsi:versioning`, "Moving the release files out of the root". A project keeping its current copies is unaffected. A staged `meta/VERSION` always counts as a release, even if a `docs_patterns` entry matches it.
+- This repo follows the new layout: `.claude/CLAUDE.md`, `meta/VERSION`, `meta/CHANGELOG.md`, `meta/TODO.md`, with `scripts/git/release.json`'s `docs_patterns` to match.
+
+### Bug/Issues/Fixes
+- `tests/test_release.py`: the end-to-end tests of a refused commit failed on Windows with Python 3.14 — the hook's message reached the test as cp1252 and couldn't be decoded. The harness now runs the hooks with UTF-8 output.
+
+## 🟦VERSION 1.2.2 📅 2026-09-26
 
 ### Added or New Features
 (none)

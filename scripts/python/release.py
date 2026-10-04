@@ -7,14 +7,18 @@ into CHANGELOG.md's "## 🚧 Unreleased" section (referencing any TODO.md
 item a change fixes as "TODO #<n>"); everything after the human approves
 the code and commits is done here, deterministically:
 
-  code commit       bump VERSION (PATCH, unless a bump is already staged
-                    by hand) → promote Unreleased to a new version heading
+  code commit       bump VERSION (PATCH, unless a new version is already
+                    staged by hand) → promote Unreleased to a new version heading
                     → close referenced TODO.md items with that version →
                     sync any mirrored version files → stage it all.
                     Refused if Unreleased is empty.
   docs-only commit  no bump → fold Unreleased into the current version's
                     entry → close referenced TODO.md items with the current
                     version → stage it. Nothing to do if Unreleased is empty.
+
+All three files live in meta/, the project's record — the root holds only
+README.md (sdsi:core §3). A staged meta/VERSION is always a release,
+whatever docs_patterns match.
 
 scripts/git/commit-msg then overwrites the message with the version line.
 
@@ -35,9 +39,10 @@ import sys
 from datetime import date
 from pathlib import Path
 
-VERSION_FILE = "VERSION"
-CHANGELOG_FILE = "CHANGELOG.md"
-TODO_FILE = "TODO.md"
+# Keep VERSION_FILE in sync with scripts/git/commit-msg.
+VERSION_FILE = "meta/VERSION"
+CHANGELOG_FILE = "meta/CHANGELOG.md"
+TODO_FILE = "meta/TODO.md"
 SETTINGS_FILE = "scripts/git/release.json"
 
 DEFAULT_DOCS_PATTERNS = ["docs/*", "*.md"]
@@ -52,6 +57,7 @@ UNRELEASED_HEADING = "## 🚧 Unreleased"
 
 UNRELEASED_RE = re.compile(r"^## 🚧 Unreleased\n(.*?)(?=^## |\Z)", re.M | re.S)
 CURRENT_ENTRY_RE = re.compile(r"^(## 🆕VERSION [^\n]*\n)(.*?)(?=^## |\Z)", re.M | re.S)
+CURRENT_VERSION_RE = re.compile(r"^## 🆕VERSION (\S+)", re.M)
 TODO_REF_RE = re.compile(r"TODO #(\d+)")
 OPEN_TODO_RE = r"^- \[ \] #{number} (.*)$"
 DONE_TODO_RE = r"^- \[x\] #{number} "
@@ -233,7 +239,7 @@ def close_todos(todo: str, numbers: list[int], version: str, today: str) -> str:
             if re.search(DONE_TODO_RE.format(number=number), todo, re.M):
                 continue  # already closed by an earlier commit
             raise ReleaseError(
-                f"CHANGELOG.md references TODO #{number}, but {TODO_FILE} has no open item #{number}."
+                f"{CHANGELOG_FILE} references TODO #{number}, but {TODO_FILE} has no open item #{number}."
             )
         todo = todo[: match.start()] + todo[match.end() + 1:]
         closed.append(f"- [x] #{number} {match.group(1)} — completed {today} · VERSION {version}")
@@ -319,17 +325,26 @@ def run(root: Path, today: str) -> None:
     docs_patterns = settings.get("docs_patterns", DEFAULT_DOCS_PATTERNS)
     version_files = settings.get("version_files", [])
 
+    for required in (VERSION_FILE, CHANGELOG_FILE):
+        if not (root / required).exists():
+            raise ReleaseError(
+                f"There is no {required}. VERSION, CHANGELOG.md, and TODO.md live in meta/; "
+                "a project that keeps them at the root moves them there (sdsi:versioning)."
+            )
+
     changelog = read(root / CHANGELOG_FILE)
     pending = unreleased_body(changelog)
     todo_path = root / TODO_FILE
     refs = todo_refs(pending)
     if refs and not todo_path.exists():
-        raise ReleaseError(f"CHANGELOG.md references TODO items, but there is no {TODO_FILE}.")
+        raise ReleaseError(f"{CHANGELOG_FILE} references TODO items, but there is no {TODO_FILE}.")
 
     current_version = read(root / VERSION_FILE).strip()
+    version_staged = VERSION_FILE in staged
     writes: dict[Path, str] = {}
 
-    if is_docs_only(staged, docs_patterns):
+    # A staged version is always a release, even where docs_patterns match it.
+    if not version_staged and is_docs_only(staged, docs_patterns):
         if not has_entries(pending):
             return
         version = current_version
@@ -341,7 +356,11 @@ def run(root: Path, today: str) -> None:
                 "describing this change under Added/Removed/Changed/Bug fixes, then commit "
                 "(or commit --no-verify if this genuinely isn't a release)."
             )
-        version = current_version if VERSION_FILE in staged else bump_patch(current_version)
+        # A version staged unchanged — moving the file does that — isn't a bump set
+        # by hand; taken as one, it would write a second entry for a shipped version.
+        released = CURRENT_VERSION_RE.search(changelog)
+        hand_bumped = version_staged and (released is None or released.group(1) != current_version)
+        version = current_version if hand_bumped else bump_patch(current_version)
         writes[root / VERSION_FILE] = version + "\n"
         writes[root / CHANGELOG_FILE] = promote(changelog, version, today)
         for path in version_files:
