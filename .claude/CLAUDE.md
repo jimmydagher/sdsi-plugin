@@ -17,4 +17,5 @@
 - **Rules are language-neutral — companions included.** Language- or framework-specific lessons belong in the project that taught them (its `CLAUDE.md`), not in this plugin.
 - **Markdown is the product here**, so `scripts/git/release.json` narrows docs-only commits to `README.md`, `.claude/CLAUDE.md`, `docs/`, and the Markdown files in `meta/` — a change to any `SKILL.md` is a release.
 - **`.claude-plugin/plugin.json`'s version is synced from `meta/VERSION` by the release script** — never edit it by hand.
+- **A skill's `description` stays at or under 1024 characters** — claude.ai truncates and flags anything longer; `tests/test_skills.py` enforces it.
 - **Run the tests after touching the release scripts:** `python -m unittest discover tests` (local shell, repo root).

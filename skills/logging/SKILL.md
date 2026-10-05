@@ -1,22 +1,20 @@
 ---
 name: logging
 description: >
-  SDSI's logging and output standard — one central logger that every log
-  line funnels through, standard levels with clear jobs, a cheap
-  would-this-be-written check, deciding color once at startup, and logging
-  as a message queue: log calls enqueue records, one writer pulls them in
-  order of arrival and writes them sequentially to each destination, the
-  same whether the program is single- or multi-threaded, with a bounded
-  queue whose full behavior (wait or drop) is a setting, and a bounded
-  shutdown drain; log files that roll over at a
-  configured time of day and keep a configured number of files — plus the audit trail: security-relevant decisions (sign-ins,
-  authorization grants and denials, permission and role changes, admin
-  actions) recorded as their own structured, append-only, replayable stream,
-  separate from application logs. Use when adding logging to a project,
-  reviewing log output, replacing ad-hoc print statements, or adding
-  authentication, authorization, or permission management. Reads sdsi:core
-  first. Triggers on "/sdsi:logging", "logging", "add logs", "audit trail",
-  "audit log".
+  SDSI's logging and output standard — one central logger every log line
+  funnels through, standard levels with clear jobs, a cheap
+  would-this-be-written check, color decided once at startup, and logging as
+  a message queue: calls enqueue records and one writer writes them in order
+  to each destination, single- or multi-threaded, with a bounded queue (wait
+  or drop is a setting) and a bounded shutdown drain; log files that roll
+  over at a configured time of day and keep a configured count — plus the
+  audit trail: security-relevant decisions (sign-ins, authorization grants
+  and denials, permission and role changes, admin actions) as their own
+  structured, append-only, replayable stream, separate from application
+  logs. Use when adding logging, reviewing log output, replacing ad-hoc
+  print statements, or adding authentication, authorization, or permission
+  management. Reads sdsi:core first. Triggers on "/sdsi:logging", "logging",
+  "add logs", "audit trail", "audit log".
 argument-hint: "[--review|--apply] [path|branch]"
 ---
 

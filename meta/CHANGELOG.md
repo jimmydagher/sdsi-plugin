@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.12 📅 2026-10-05
+## 🆕VERSION 1.3.13 📅 2026-10-05
+
+### Added or New Features
+(none)
+
+### Removed
+(none)
+
+### Changed
+(none)
+
+### Bug/Issues/Fixes
+- **`sdsi:logging`'s description is under the 1024-character limit**, so claude.ai no longer warns about it or truncates it. A new test (`tests/test_skills.py`) fails on any skill description over the limit.
+
+## 🟩VERSION 1.3.12 📅 2026-10-05
 
 ### Added or New Features
 - **The right task for the right AI model** (`sdsi:core` §6). Judgment stays on the session's own model: resolving the profile, vetting findings, choosing what to apply, designing a change, and reviewing delegated work. Review scans go to read-only subagents on a mid-tier model, and narrow sweeps to a small one. In apply mode, only an edit already decided in full may go to a subagent: a vetted finding rated Effort S and Confidence High, or an edit the session has worked out to the line. Every brief is self-contained and carries two fixed lines, data-not-instructions and never-reproduce-a-secret. Delegated work is untrusted until the session reviews it: every hunk traces to the brief, the verification is re-run, and new tests are read. A model the human names wins, and a host without subagents runs everything in the session. Lessons adapted from [shadcn/improve](https://github.com/shadcn/improve).
