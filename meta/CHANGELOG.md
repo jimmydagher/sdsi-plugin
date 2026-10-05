@@ -16,7 +16,33 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.13 📅 2026-10-05
+## 🆕VERSION 1.3.14 📅 2026-10-05
+
+### Added or New Features
+- **`sdsi:security` gains four rule areas**, adapted from [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill):
+  - **Isolation reaches every path and every copy**: every query path binds records to the signed-in owner or tenant, every shared key includes the tenant, and derived copies (caches, indexes, exports, backups, logs) apply the source's access rule when read. Deletion and revocation reach every copy, and restores and imports are authorized as writes. It comes with a new upkeep line. Operator: run `/sdsi:upkeep` in each project to pick it up.
+  - **AI and LLM features**: model and tool output are untrusted input, a guardrail prompt isn't a control, tools run with the user's authority, and content can't trigger a consequential action the user didn't approve.
+  - **Bounded cost**: every untrusted input is bounded in size, count, depth, and time, and paid or shared work gets a per-caller quota.
+  - **CI and the release path**: CI config is authorization code, outside contributions never run with secrets, tokens are least-privilege, and release checksums come from a root not hosted beside the artifact.
+- **`sdsi:security`: rating and fixing a security finding.** Its severity table replaces findings' generic guide for every security finding. A finding names the boundary and the result (who, what, which control, who's harmed). A broken rule with no such path is Medium. A visibly harmless gap, or one another layer in the repository blocks, is a Low hardening note. A control that might exist outside the repository makes the finding Needs validation, not Low. Severity is anchored to demonstrated impact (a live credential in history stays Critical), with "fully defeats or only weakens the control?" separating High from Medium. The fix enforces the invariant at the last trusted decision point, with a regression test that attempts the crossing. A review never probes deployed systems.
+
+### Removed
+(none)
+
+### Changed
+- **The review process (`ref/findings.md`) adds a Needs-validation confidence, a vet that tries to disprove, and reads earlier reviews.**
+  - **Needs validation** replaces Low confidence. It's for a finding that turns on one named fact the code can't show. It has no severity, is never applied by "apply all", sorts last, and goes to `TODO.md` as `Check: …` instead of `Investigate: …`. A hunch with no nameable fact is dropped.
+  - **The vet tries to disprove each finding** instead of confirming it, looking for the control, caller, or decision that already handles it.
+  - **Earlier reviews:** a review reads the latest export for its lens. Its Not-reviewed areas go first, its open TODO findings are re-checked, and what it dropped stays dropped only while that file is unchanged since the export's commit. Exports gain a **Commit** field and a **Dropped by vet** section to make that possible.
+  - A topic may replace the generic severity guide with its own table; `sdsi:security` does.
+- `ref/web.md`: per-object access control points to `sdsi:security`'s general isolation rule.
+- `sdsi:docs`: a deferred Needs-validation finding's `TODO.md` item reads `Check: …`.
+- README: `sdsi:security`'s row lists the new areas.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟦VERSION 1.3.13 📅 2026-10-05
 
 ### Added or New Features
 (none)

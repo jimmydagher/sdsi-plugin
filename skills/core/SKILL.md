@@ -127,7 +127,7 @@ Whatever the language or project type, every program SDSI governs has:
 | A layout | Root holds `README.md` and top-level folders — no other loose file (below). Dependencies point one way (shared helpers ← integrations ← operations ← entry point). One home for shared code, never a second `utils/`/`common/` beside it | the language's and framework's conventions |
 | Code conventions | Named constants, no magic strings, typed boundaries, reuse over reimplementation | `sdsi:standards` |
 | Configuration | One source of truth, schema-validated before work starts, no defaults in code | `sdsi:config` |
-| Security | Secrets never in code/config/history, read at runtime from a secrets store; untrusted input validated at the boundary; protected data only to its owner; security settings per trust boundary | `sdsi:security` |
+| Security | Secrets never in code/config/history, read at runtime from a secrets store; untrusted input validated and bounded at the boundary; protected data only to its owner; isolation on every path and copy; security settings per trust boundary | `sdsi:security` |
 | Logging | One central logger, standard levels, log calls enqueue and one writer writes in arrival order, files rotated on a schedule — plus a separate audit trail wherever the program makes security decisions | `sdsi:logging` |
 | Error handling | One global error handler that logs every unhandled error, typed errors, try/catch only where logic requires it, a machine-readable outcome on every exit | `sdsi:errors` |
 | Concurrency | Shared state owned, background work bounded and drained on shutdown | `sdsi:concurrency` |
@@ -182,7 +182,7 @@ project-root/
 | 1 | `sdsi:workflow` | Plan before code, the artifact chain, scope, starting a new project |
 | 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing |
 | 3 | `sdsi:config` | Configuration files, schema, validation |
-| 4 | `sdsi:security` | Secrets (store, naming, rotation, redaction), untrusted input, protected-data exposure, trust-boundary settings |
+| 4 | `sdsi:security` | Secrets (store, naming, rotation, redaction), untrusted input, protected-data exposure, isolation across paths and copies, AI features, bounded cost, CI and release, trust-boundary settings, rating security findings |
 | 5 | `sdsi:logging` | Central logger, levels, output destinations |
 | 6 | `sdsi:errors` | Global error handler, error hierarchy, retries, exit outcomes |
 | 7 | `sdsi:concurrency` | Threads, async, background work, shutdown |

@@ -34,7 +34,7 @@ Language- and framework-neutral: apply each rule through the framework the proje
 
 Access and data exposure:
 
-- **Access control is deny-by-default and checked server-side on every request**, including per object: loading a record by an ID from the request checks that this user may see that record. A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk).
+- **Access control is deny-by-default and checked server-side on every request**, including per object: loading a record by an ID from the request checks that this user may see that record. That's the web form of `sdsi:security`'s "Isolation reaches every path and every copy". A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk).
 - **A guest endpoint's response is shaped by a dedicated, redacted response type.** It's never the account model serialized with fields hidden in the template or the script. A page reached without signing in also gets no protected data in its markup, inline script state, or hidden inputs, and is served `Cache-Control: no-store`.
 - **Output is encoded for its context by the template engine's auto-escaping**, and every query is parameterized. A bypass of either (a raw-HTML marker, string-built SQL or shell) is justified in a comment next to the line, or it's a finding.
 

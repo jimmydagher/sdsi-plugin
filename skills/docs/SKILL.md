@@ -69,7 +69,7 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - [x] #1 <what was done> — completed 2026-09-23 · VERSION 1.0.1
 ```
 
-- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review, and its recommendation, so a later session can act on it without the review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44. Fix: retry only timeouts and dropped connections.` A Low-confidence finding is an investigation instead: `[F-007 sdsi:concurrency] Investigate: …`. (`ref/findings.md` adds these automatically for findings not applied).
+- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review, and its recommendation, so a later session can act on it without the review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44. Fix: retry only timeouts and dropped connections.` A Needs-validation finding is a fact to check instead: `[F-007 sdsi:security] Check: …`. (`ref/findings.md` adds these automatically for findings not applied).
 - **Re-check an item before working on it.** Code moves. Confirm what the item describes still exists where it says. Moved → update its location. Already fixed by other work → tell the human and drop the line rather than leave it open.
 - **Numbers are never reused.** A new item takes the highest number in the file (open or done) plus one.
 - **The AI updates it continuously** — a session that ends without a pass over `TODO.md` leaves it stale. **The human can add items any time**, in the same format.

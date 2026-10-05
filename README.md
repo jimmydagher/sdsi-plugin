@@ -1,6 +1,6 @@
 # SDSI — Software Development Standard Instructions
 
-## 🆕VERSION 1.3.13 📅 2026-10-05
+## 🆕VERSION 1.3.14 📅 2026-10-05
 
 For details on the latest changes and features, please review [CHANGELOG.md](meta/CHANGELOG.md).
 
@@ -43,7 +43,7 @@ Run in this order by `sdsi:all`; each can also be run alone (e.g. "apply `/sdsi:
 | 1 | `sdsi:workflow` | Plan before code, the living design documents (`docs/design/` INTENT/SPEC/PLAN), scope, new-project kickoff |
 | 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing |
 | 3 | `sdsi:config` | Config files, schema, validation |
-| 4 | `sdsi:security` | Every security rule in one place: secrets (store, naming, rotation, redaction), untrusted input, protected data only to its owner (guest flows get redacted fragments), trust-boundary settings — the other skills point here |
+| 4 | `sdsi:security` | Every security rule in one place: secrets (store, naming, rotation, redaction), untrusted input, protected data only to its owner (guest flows get redacted fragments), tenant isolation on every path and copy, AI/LLM features, bounded cost, CI and release, trust-boundary settings, and how a security finding is rated and fixed — the other skills point here |
 | 5 | `sdsi:logging` | Central logger, levels, the log queue and its single writer, file rotation and retention, the audit trail |
 | 6 | `sdsi:errors` | Global error handler, try/catch discipline, error hierarchy, retries, exit outcomes |
 | 7 | `sdsi:concurrency` | Threads/async, timeouts, shutdown |
