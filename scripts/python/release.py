@@ -29,6 +29,12 @@ whatever docs_patterns match.
 
 scripts/git/commit-msg then overwrites the message with the version line.
 
+A commit that would consume Unreleased notes (a release, or a docs-only
+fold) is refused while any change is left out of it — a tracked file with
+unstaged edits, or an untracked file git doesn't ignore — so notes never
+ship in a version that lacks the work they describe. The release files
+themselves don't count: this script rewrites and stages them.
+
 Everything is computed before anything is written: on any error the files
 are left untouched and the commit is refused (exit 1).
 
@@ -54,6 +60,12 @@ README_FILE = "README.md"
 SETTINGS_FILE = "scripts/git/release.json"
 
 DEFAULT_DOCS_PATTERNS = ["docs/*", "*.md"]
+
+# The files the release rewrites and stages itself — unstaged edits to them
+# never make a commit partial.
+RELEASE_FILES = frozenset({VERSION_FILE, CHANGELOG_FILE, TODO_FILE})
+# How many left-behind paths a partial-commit refusal lists before counting the rest.
+LISTED_PATHS = 10
 
 # The fixed rotation every already-shipped entry's marker cycles through,
 # wrapping back to the first after the last.
@@ -337,6 +349,42 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def left_behind() -> list[str]:
+    """Changed paths this commit doesn't include: tracked files with unstaged
+    edits, and untracked files git doesn't ignore.
+
+    The release files are left out: the release rewrites and stages them
+    itself, and notes written but not yet staged are the normal case, not a
+    partial commit.
+
+    Output:
+        list[str]: repo-relative paths, sorted.
+    """
+    unstaged = git("diff", "--name-only").splitlines()
+    untracked = git("ls-files", "--others", "--exclude-standard").splitlines()
+    return sorted({path for path in unstaged + untracked if path and path not in RELEASE_FILES})
+
+
+def refuse_partial_commit(paths: list[str]) -> None:
+    """Refuse a commit that would release the notes without all of the change.
+
+    Input:
+        paths (list[str]): left_behind() — what the commit doesn't include.
+    Raises:
+        ReleaseError: when any path was left behind, naming them.
+    """
+    if not paths:
+        return
+    listed = "\n    ".join(paths[:LISTED_PATHS])
+    more = f"\n    … and {len(paths) - LISTED_PATHS} more" if len(paths) > LISTED_PATHS else ""
+    raise ReleaseError(
+        f"{len(paths)} changed file(s) aren't in this commit, but it would release every "
+        f"note under '{UNRELEASED_HEADING}' — notes for work it doesn't contain:\n    "
+        f"{listed}{more}\n  Stage the whole change (git add -A) and commit again, or commit "
+        "--no-verify if this genuinely isn't a release."
+    )
+
+
 def run(root: Path, today: str) -> None:
     """Compute and write the release for whatever is staged under root.
 
@@ -364,6 +412,10 @@ def run(root: Path, today: str) -> None:
 
     changelog = read(root / CHANGELOG_FILE)
     pending = unreleased_body(changelog)
+    if has_entries(pending):
+        # The notes describe the whole change; releasing them from a commit that
+        # holds only part of it strands the rest with nothing left to release.
+        refuse_partial_commit(left_behind())
     todo_path = root / TODO_FILE
     refs = todo_refs(pending)
     if refs and not todo_path.exists():

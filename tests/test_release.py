@@ -269,6 +269,55 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("COMMIT REFUSED", result.stderr)
 
+    def test_partial_commit_is_refused_while_it_would_release_the_notes(self) -> None:
+        # Regression: with only part of a change staged, the commit took the
+        # whole Unreleased section — notes for work it didn't contain — and
+        # the next commit, carrying the rest, was refused for empty notes.
+        self.write("src/staged.txt", "code\n")
+        self.write("src/also.txt", "more\n")
+        self.git("add", "src/staged.txt")
+        result = self.git("commit", "-q", "-m", "x", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("COMMIT REFUSED", result.stderr)
+        self.assertIn("src/also.txt", result.stderr)
+        self.assertEqual(self.read("meta/VERSION").strip(), "1.0.0")  # nothing released
+
+    def test_partial_commit_is_refused_for_unstaged_edits_to_tracked_files(self) -> None:
+        self.write("src/app.txt", "v1\n")
+        self.git("add", "src/app.txt")
+        self.git("commit", "-q", "-m", "x", "--no-verify")
+        self.write("src/app.txt", "v2\n")
+        self.write("src/other.txt", "new\n")
+        self.git("add", "src/other.txt")
+        result = self.git("commit", "-q", "-m", "x", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("src/app.txt", result.stderr)
+
+    def test_unstaged_release_files_dont_count_as_a_partial_commit(self) -> None:
+        # The hook stages CHANGELOG/VERSION/TODO itself; notes written but not
+        # staged are the normal case, not a partial commit.
+        changelog = self.read("meta/CHANGELOG.md").replace(
+            "- New export command (TODO #2)", "- New export command, documented (TODO #2)"
+        )
+        self.write("meta/CHANGELOG.md", changelog)
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        self.git("commit", "-q", "-m", "x")
+        self.assertEqual(self.last_message(), "VERSION 1.0.1")
+        self.assertIn("documented", self.read("meta/CHANGELOG.md"))
+
+    def test_partial_commit_is_allowed_when_it_releases_no_notes(self) -> None:
+        # A docs-only commit with nothing in Unreleased takes nothing, so
+        # committing part of the tree can't strand anyone's notes.
+        self.write("meta/CHANGELOG.md", release.promote(CHANGELOG, "1.0.1", TODAY))
+        self.git("add", "meta/CHANGELOG.md")
+        self.git("commit", "-q", "-m", "x", "--no-verify")
+        self.write("docs/guide.md", "guide\n")
+        self.write("src/later.txt", "not yet\n")
+        self.git("add", "docs/guide.md")
+        self.git("commit", "-q", "-m", "x")
+        self.assertIn("docs/guide.md", self.git("show", "--name-only", "--format=").stdout)
+
     def test_hand_staged_minor_bump_is_respected(self) -> None:
         self.write("meta/VERSION", "1.1.0\n")
         self.write("src/app.txt", "code\n")

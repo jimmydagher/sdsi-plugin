@@ -16,7 +16,22 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.10 📅 2026-10-04
+## 🆕VERSION 1.3.11 📅 2026-10-04
+
+### Added or New Features
+(none)
+
+### Removed
+(none)
+
+### Changed
+- **Three additions to core §2's principles**, adapted from [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md): *No over-engineering* adds a second check after writing — code far longer than the problem needs gets rewritten before it's done. *No assumptions* now covers a request that reads two ways (lay out both readings, don't pick one) and a simpler approach than the one asked for (say so and push back). *No random or pointless changes* adds cleanup scope — remove what your change made unused; pre-existing dead code is mentioned, not deleted. `sdsi:standards`' Review checklist gains the matching findings.
+- **`sdsi:versioning` gains an upkeep line**: hand a change over to commit fully staged or not at all, never half-staged. Operator: run `/sdsi:upkeep` in each project to pick it up.
+
+### Bug/Issues/Fixes
+- **The release script refuses a partial commit that would release notes** (`scripts/python/release.py`). Before this, a commit made with only some files staged (an editor's commit button does this when a few are already staged) still promoted every Unreleased note. The notes then shipped in a version without half their work, and the rest was stranded. Now it's refused, with the files left out listed. Operator: re-copy `scripts/python/release.py` into each project.
+
+## 🟧VERSION 1.3.10 📅 2026-10-04
 
 ### Added or New Features
 (none)

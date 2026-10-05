@@ -65,4 +65,4 @@ One source of truth for logic, constants, types, and validation rules. Refactor 
 
 ## Review checklist
 
-Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression.
+Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · code far longer than the problem needs · an import, variable, or function the change made unused and left behind · pre-existing dead code deleted in an unrelated change (core §2).

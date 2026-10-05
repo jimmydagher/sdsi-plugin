@@ -101,9 +101,9 @@ A skill only loads when it's invoked or its triggers match, so its rules lapse b
 These hold regardless of project, language, or how small the change looks. Every SDSI skill enforces them.
 
 - **Communicate what you are doing.** See Step 1.
-- **No over-engineering.** Solve the problem in front of you, not the one that might show up later. A pattern, abstraction, or config option earns its place by having a second real caller today.
-- **No assumptions.** A requirement, value, or behavior that isn't stated gets surfaced — asked, or written down as an open question — never silently decided.
-- **No random or pointless changes.** Every line in a change traces to a stated reason. Reformatting, renaming, or "while I'm in here" edits get their own change.
+- **No over-engineering.** Solve the problem in front of you, not the one that might show up later. A pattern, abstraction, or config option earns its place by having a second real caller today. The check runs again after writing: code far longer than the problem needs (200 lines that could be 50) gets rewritten before it's called done.
+- **No assumptions.** A requirement, value, or behavior that isn't stated gets surfaced — asked, or written down as an open question — never silently decided. A request that reads two ways gets both readings laid out instead of one picked; when a simpler approach than the one asked for exists, say so and push back.
+- **No random or pointless changes.** Every line in a change traces to a stated reason. Reformatting, renaming, or "while I'm in here" edits get their own change. Clean up only your own leftovers: remove what this change made unused (an import, a variable, a function); dead code that was already there gets mentioned, not deleted.
 - **Double-check your work.** Nothing is done on the strength of its own judgment. It's done once verified against something outside it — a test, a build, a run, a second read — and the evidence is shown.
 - **Confirm before anything destructive or bulk.** Deleting, overwriting, or mutating data that can't be trivially restored, and any run over many items (a batch job, a migration, a bulk edit), needs the human's explicit approval first — with the scope stated (what, and how many). Read-only actions and changes a `git checkout` undoes don't need it. Approval for one action or one scope doesn't carry to the next.
 - **Consistency over cleverness.** Predictable code is what makes handoffs, debugging, and AI-assisted work fast.
