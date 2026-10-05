@@ -11,7 +11,7 @@ description: >
   close automatically. Use when writing or reviewing documentation, or
   tracking outstanding work. Reads sdsi:core first. Triggers on
   "/sdsi:docs", "documentation", "README", "TODO.md".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Documentation
@@ -69,7 +69,8 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - [x] #1 <what was done> — completed 2026-09-23 · VERSION 1.0.1
 ```
 
-- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44` (`ref/findings.md` adds these automatically for findings not applied).
+- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review, and its recommendation, so a later session can act on it without the review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44. Fix: retry only timeouts and dropped connections.` A Low-confidence finding is an investigation instead: `[F-007 sdsi:concurrency] Investigate: …`. (`ref/findings.md` adds these automatically for findings not applied).
+- **Re-check an item before working on it.** Code moves. Confirm what the item describes still exists where it says. Moved → update its location. Already fixed by other work → tell the human and drop the line rather than leave it open.
 - **Numbers are never reused.** A new item takes the highest number in the file (open or done) plus one.
 - **The AI updates it continuously** — a session that ends without a pass over `TODO.md` leaves it stale. **The human can add items any time**, in the same format.
 - **Closing is automated, not manual.** When a change fixes an item, the AI references it in the changelog bullet it writes — `(TODO #4)`. At commit, the release script checks the item off, moves it to **Done** with the date and version, and refuses the commit if the referenced item doesn't exist (`sdsi:versioning`). The AI doesn't move items to Done by hand.

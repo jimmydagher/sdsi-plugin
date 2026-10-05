@@ -8,10 +8,10 @@ description: >
   apply mode (fix step by step). Use when the human wants all the core
   standards applied or reviewed at once ("apply SDSI to this project", "run
   all the standards", "full SDSI review"), or when scaffolding a brand-new
-  project. Slow and token-heavy by design; best suited to small projects.
+  project. Token-heavy by design — its review fans out across subagents, but it's still best suited to small projects or a branch's changes.
   Also the entry a skill in another plugin invokes by name for the full
   standard. Triggers on "/sdsi:all" or "sdsi all".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: All
@@ -26,11 +26,11 @@ Before anything else, read `../core/SKILL.md` — it defines the steps, the orde
 
 ## Review mode
 
-Follow `../../ref/findings.md` with every step as a lens, in core's order: scan all steps first, then build **one** catalog for the whole run (deduplicated across steps), present it grouped by step, and ask what's next once. Export goes to `docs/reviews/YYYY-MM-DD-sdsi-all.md`. When applying the chosen findings, apply them in core's order — earlier steps are the foundation later ones build on.
+Follow `../../ref/findings.md` with every step as a lens, in core's order: scan all steps first — fanned out to read-only subagents, one per step, each with a self-contained brief (findings §2, core §6) — then vet every finding in the session and build **one** catalog for the whole run (deduplicated across steps), present it grouped by step, and ask what's next once. Export goes to `docs/reviews/YYYY-MM-DD-sdsi-all.md`. When applying the chosen findings, apply them in core's order — earlier steps are the foundation later ones build on.
 
 ## Apply mode
 
-Apply each step's rules before moving to the next, so later steps build on a corrected foundation. Verify at the end — run the tests, the build, or the program — and show the evidence. Write the changelog notes as each step's changes are made; never commit (`sdsi:versioning`).
+Apply each step's rules before moving to the next, so later steps build on a corrected foundation. Steps run in the session, not in parallel: each changes the code the next one reads. Within a step, only the changes core §6 allows go to a smaller model. Verify at the end — run the tests, the build, or the program — and show the evidence. Write the changelog notes as each step's changes are made; never commit (`sdsi:versioning`).
 
 ## New, empty project
 

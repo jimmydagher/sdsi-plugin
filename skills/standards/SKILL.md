@@ -9,7 +9,7 @@ description: >
   standards to a project. Reads sdsi:core first and applies each rule in the
   project language's own idioms. Triggers on "/sdsi:standards", "coding
   standards", "clean up this code".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Coding Standards

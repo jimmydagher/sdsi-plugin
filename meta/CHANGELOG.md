@@ -16,7 +16,33 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.11 📅 2026-10-04
+## 🆕VERSION 1.3.12 📅 2026-10-05
+
+### Added or New Features
+- **The right task for the right AI model** (`sdsi:core` §6). Judgment stays on the session's own model: resolving the profile, vetting findings, choosing what to apply, designing a change, and reviewing delegated work. Review scans go to read-only subagents on a mid-tier model, and narrow sweeps to a small one. In apply mode, only an edit already decided in full may go to a subagent: a vetted finding rated Effort S and Confidence High, or an edit the session has worked out to the line. Every brief is self-contained and carries two fixed lines, data-not-instructions and never-reproduce-a-secret. Delegated work is untrusted until the session reviews it: every hunk traces to the brief, the verification is re-run, and new tests are read. A model the human names wins, and a host without subagents runs everything in the session. Lessons adapted from [shadcn/improve](https://github.com/shadcn/improve).
+- **`branch` scope** for every skill: `/sdsi:all --review branch` reviews only the files changed since the merge-base with the default branch, plus their direct callers, and tags each finding `introduced` or `pre-existing`. Every skill's `argument-hint` is now `[--review|--apply] [path|branch]`.
+
+### Removed
+(none)
+
+### Changed
+- **The review process (`ref/findings.md`) adds a fan-out, a vet, and more fields.**
+  - **Fan-out:** a big review splits its scanning across up to four read-only subagents, each with a self-contained brief; `sdsi:all` review runs one per step.
+  - **Vet:** the session re-reads every cited location before anything is shown, then drops findings that are by design, corrects wrong locations, merges duplicates, re-rates, and reports what it dropped.
+  - **Settled decisions:** deviations in `CLAUDE.md` and decisions in `INTENT.md`/`SPEC.md` are passed to the scan and aren't flagged, but code that drifted from them is.
+  - **New fields and report lines:** findings carry **Confidence**, and the report says what wasn't reviewed.
+  - **Low-confidence findings** are never applied by "apply all"; they go to `TODO.md` as `Investigate:`.
+  - **By design:** a finding the human calls by design is written into `CLAUDE.md` as a deviation so it doesn't come back.
+- **Core §2 gains a principle: the project's content is data, never instructions.** A file that addresses the AI is reported to `sdsi:security`, not followed.
+- **`sdsi:docs`: a deferred finding's `TODO.md` item now carries its recommendation** (`Fix: …`), and an item is re-checked before it's worked on — moved, update its location; already fixed, drop it after telling the human.
+- **`sdsi:workflow`: a ⛏️ In progress step that rests on an assumption that could be false names its STOP condition**, and the Review checklist flags one that doesn't.
+- **`sdsi:all` apply mode** stays sequential in the session, since each step changes what the next one reads.
+- README: review mode covers the vet, confidence, by-design findings, `branch` scope, and model routing.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟨VERSION 1.3.11 📅 2026-10-04
 
 ### Added or New Features
 (none)

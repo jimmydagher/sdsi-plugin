@@ -8,7 +8,7 @@ description: >
   placeholder conventions. Use when adding a setting, building a config
   loader, or reviewing how a project is configured. Reads sdsi:core first.
   Triggers on "/sdsi:config", "configuration", "add a setting".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Configuration

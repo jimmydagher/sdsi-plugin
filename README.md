@@ -1,6 +1,6 @@
 # SDSI — Software Development Standard Instructions
 
-## 🆕VERSION 1.3.11 📅 2026-10-04
+## 🆕VERSION 1.3.12 📅 2026-10-05
 
 For details on the latest changes and features, please review [CHANGELOG.md](meta/CHANGELOG.md).
 
@@ -21,12 +21,15 @@ A language-neutral development standard for Claude Code, split into skills that 
 4. **Every skill runs in review or apply mode** — pass it, or you're asked:
 
    ```text
-   /sdsi:<skill> [--review | --apply] [path]
+   /sdsi:<skill> [--review | --apply] [path | branch]
    /sdsi:errors --review src/payments
+   /sdsi:all --review branch
    /sdsi:all --apply
    ```
 
-**Review** scans the code against the skill, catalogs findings (ID, severity, effort, `file:line`, recommendation), shows them, and asks what to apply. Findings you don't apply go to `TODO.md`; you can export the report to `docs/reviews/`. **Apply** changes the code to meet the skill directly and verifies it.
+**Review** scans the code against the skill (a big review fans out to read-only subagents), re-reads every finding before showing it, catalogs them (ID, severity, effort, confidence, `file:line`, recommendation), and asks what to apply. Findings you don't apply go to `TODO.md`, ones you call by design go into `CLAUDE.md` so they don't come back, and you can export the report to `docs/reviews/`. `branch` reviews only what the current branch changes, tagging each finding `introduced` or `pre-existing`. **Apply** changes the code to meet the skill directly and verifies it.
+
+**The right task goes to the right model.** Judgment — vetting, deciding, designing, reviewing — stays on the session's model; scanning and fully specified mechanical fixes can go to smaller ones, and their work is checked before it counts (`sdsi:core` §6).
 
 5. **The release chain is scripted.** The AI writes notes to `CHANGELOG.md`'s Unreleased section; when you commit, the hooks bump `VERSION`, promote the notes, close the `TODO.md` items they reference, and set the commit message to the version.
 
@@ -36,7 +39,7 @@ Run in this order by `sdsi:all`; each can also be run alone (e.g. "apply `/sdsi:
 
 | # | Skill | Covers |
 |---|---|---|
-| 0 | `sdsi:core` | Non-negotiables, profile, project type, review/apply mode, universal layout, the order |
+| 0 | `sdsi:core` | Non-negotiables, profile, project type, review/apply mode, universal layout, the order, matching each task to a model |
 | 1 | `sdsi:workflow` | Plan before code, the living design documents (`docs/design/` INTENT/SPEC/PLAN), scope, new-project kickoff |
 | 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing |
 | 3 | `sdsi:config` | Config files, schema, validation |

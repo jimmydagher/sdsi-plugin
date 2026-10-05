@@ -12,7 +12,7 @@ description: >
   or deciding how a change should move from idea to commit. Reads sdsi:core
   first. Triggers on "/sdsi:workflow", "start a new project", "how should
   we plan this".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Workflow
@@ -32,7 +32,7 @@ Idea → Intent (why) → Spec (what) → Plan (how) → Implementation → Vali
 | `PLAN.md` | How | Architecture, components, and how each is built and verified — plus **⛏️ In progress** (below) |
 
 - **They're living documents**, rewritten in place (`sdsi:docs`): after any change they read as if the project had been designed that way from the start. A feature that's dropped is removed, not struck through.
-- **⛏️ In progress** is the first section of `PLAN.md`: the steps of the change underway — which files change, in what order, and what proves each step worked. The human approves it before code. When the change is done, its steps are merged into the plan's body, and the section goes back to `(none)`.
+- **⛏️ In progress** is the first section of `PLAN.md`: the steps of the change underway — which files change, in what order, and what proves each step worked. A step that rests on an assumption that could turn out false names its **STOP condition** — what would mean stop and report rather than improvise ("if the callers rely on the empty-list return, stop"). The human approves it before code. When the change is done, its steps are merged into the plan's body, and the section goes back to `(none)`.
 - **Brainstorming sits above SDSI.** A brainstorming skill (such as `superpowers:brainstorming`) turns an idea into something concrete; its result is merged into these three documents, and any per-topic design file it writes isn't kept.
 
 ## Plan before code, always
@@ -111,4 +111,4 @@ The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 ## Review checklist
 
-No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a missing `docs/design/INTENT.md`, `SPEC.md`, or `PLAN.md` · a feature in the code the design documents don't describe, or one they describe that's gone · a non-functional requirement that can't be checked · a non-trivial change with no approved ⛏️ In progress · ⛏️ In progress left holding a finished change · a per-change design file kept beside the documents · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.
+No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a missing `docs/design/INTENT.md`, `SPEC.md`, or `PLAN.md` · a feature in the code the design documents don't describe, or one they describe that's gone · a non-functional requirement that can't be checked · a non-trivial change with no approved ⛏️ In progress · ⛏️ In progress left holding a finished change · a per-change design file kept beside the documents · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a plan step resting on an assumption it never checks, with no STOP condition · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.

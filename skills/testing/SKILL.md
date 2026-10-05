@@ -9,7 +9,7 @@ description: >
   when writing tests, setting up a test suite, or reviewing test quality.
   Reads sdsi:core first. Triggers on "/sdsi:testing", "tests", "test
   coverage".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Testing

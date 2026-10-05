@@ -17,7 +17,7 @@ description: >
   authentication, authorization, or permission management. Reads sdsi:core
   first. Triggers on "/sdsi:logging", "logging", "add logs", "audit trail",
   "audit log".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Logging & Output

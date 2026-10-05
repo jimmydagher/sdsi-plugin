@@ -11,7 +11,7 @@ description: >
   handler or error reporting, adding retries, reviewing how failures
   surface, or defining exit codes. Reads sdsi:core first. Triggers
   on "/sdsi:errors", "error handling", "exceptions", "exit codes".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Error Handling

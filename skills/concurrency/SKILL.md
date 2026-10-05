@@ -14,7 +14,7 @@ description: >
   sdsi:core first. Triggers on "/sdsi:concurrency", "threading", "async",
   "parallel", "deadlock", "semaphore", "mutex", "background worker",
   "long-running job", "graceful shutdown".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Concurrency

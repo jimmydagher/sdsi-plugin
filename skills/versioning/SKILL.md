@@ -11,7 +11,7 @@ description: >
   when committing, releasing, setting up a repo, or reviewing version and
   changelog discipline. Reads sdsi:core first. Triggers on
   "/sdsi:versioning", "version bump", "changelog", "commit", "release".
-argument-hint: "[--review|--apply] [path]"
+argument-hint: "[--review|--apply] [path|branch]"
 ---
 
 # SDSI: Versioning, Changelog & Commits
