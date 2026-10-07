@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.14 📅 2026-10-05
+## 🆕VERSION 1.3.15 📅 2026-10-07
+
+### Added or New Features
+- **The release chain writes notes from the diff when no one wrote any** (TODO #17). A commit with an empty Unreleased — a change the human made without the AI, like adding a `TODO.md` item or a small fix — is no longer refused. The pre-commit script writes one plain-English bullet per staged file (added, removed, renamed, or edited with line counts), describes `TODO.md` item by item and a hand-set `VERSION` by its old and new value, and tags each bullet `_(from the diff)_`. `"auto_notes": false` in `scripts/git/release.json` restores the refusal. Operator: copy the new `scripts/python/release.py` and `scripts/git/pre-commit` into each project that uses the release chain.
+
+### Removed
+(none)
+
+### Changed
+- `sdsi:versioning` describes the notes written from the diff and the `auto_notes` setting.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟪VERSION 1.3.14 📅 2026-10-05
 
 ### Added or New Features
 - **`sdsi:security` gains four rule areas**, adapted from [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill):

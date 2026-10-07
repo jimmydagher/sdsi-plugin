@@ -1,6 +1,6 @@
 # SDSI — Software Development Standard Instructions
 
-## 🆕VERSION 1.3.14 📅 2026-10-05
+## 🆕VERSION 1.3.15 📅 2026-10-07
 
 For details on the latest changes and features, please review [CHANGELOG.md](meta/CHANGELOG.md).
 

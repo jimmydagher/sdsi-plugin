@@ -6,8 +6,9 @@
 # VERSION, promotes CHANGELOG.md's "## 🚧 Unreleased" section to the new
 # version, closes every TODO.md item the notes reference ("TODO #<n>"),
 # and stages the result. A docs-only commit folds the notes into the
-# current version instead of bumping. Refused if a code commit has nothing
-# in Unreleased. See release.py's header for the full behavior.
+# current version instead of bumping. With nothing in Unreleased, notes are
+# written from the staged diff first. See release.py's header for the full
+# behavior.
 #
 # Deliberately not a release?  git commit --no-verify
 # Installed via:               git config core.hooksPath scripts/git

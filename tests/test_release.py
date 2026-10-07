@@ -176,6 +176,65 @@ class HelpersTest(unittest.TestCase):
             release.set_json_version('{"name": "x"}', "p.json", "0.2.0")
 
 
+class DiffNotesTest(unittest.TestCase):
+    def test_describe_todo_names_each_item_change(self) -> None:
+        after = TODO.replace("- [ ] #3 Unrelated item\n", "- [ ] #3 Unrelated item, reworded\n- [ ] #4 New idea\n")
+        after = after.replace("- [ ] #2 Add an export command\n", "")
+        self.assertEqual(release.describe_todo(TODO, after), [
+            "removed item #2 — Add an export command",
+            "reworded item #3",
+            "added item #4 — New idea",
+        ])
+
+    def test_describe_todo_checked_off_by_hand(self) -> None:
+        after = TODO.replace("- [ ] #1 Crash", "- [x] #1 Crash")
+        self.assertEqual(release.describe_todo(TODO, after), ["checked off item #1 by hand"])
+
+    def test_quoted_item_cannot_close_another(self) -> None:
+        # Regression guard: a note left in Unreleased (no release yet) is scanned
+        # for "TODO #n" at the next release; a quoted item must not close #1.
+        quoted = release.quote("Follow-up to TODO #1")
+        self.assertEqual(release.todo_refs(quoted), [])
+        self.assertIn("TODO \\#1", quoted)
+
+    def test_quote_shortens_long_text(self) -> None:
+        quoted = release.quote("x" * 200)
+        self.assertEqual(len(quoted), release.QUOTED_CHARS)
+        self.assertTrue(quoted.endswith("…"))
+
+    def test_describe_file(self) -> None:
+        self.assertEqual(release.describe_file("A", "a.py", "", (4, 0)), "Added `a.py` (4 lines)")
+        self.assertEqual(release.describe_file("D", "a.py", "", (0, 4)), "Removed `a.py`")
+        self.assertEqual(release.describe_file("M", "a.py", "", (2, 1)), "Edited `a.py` (+2 −1 lines)")
+        self.assertEqual(release.describe_file("M", "a.png", "", (None, None)), "Edited `a.png` (binary)")
+        self.assertEqual(release.describe_file("R", "b.py", "a.py", (0, 0)), "Renamed `a.py` to `b.py`")
+        self.assertEqual(
+            release.describe_file("R", "b.py", "a.py", (1, 1)),
+            "Renamed `a.py` to `b.py`, edited (+1 −1 lines)",
+        )
+
+    def test_diff_notes_files_each_change_under_its_subsection(self) -> None:
+        texts = {
+            ("HEAD", "meta/VERSION"): "1.0.0\n", (release.INDEX, "meta/VERSION"): "1.1.0\n",
+            ("HEAD", "meta/TODO.md"): TODO, (release.INDEX, "meta/TODO.md"): TODO + "- [ ] #5 Later\n",
+        }
+        changes = [("A", "new.py", ""), ("D", "old.py", ""), ("M", "meta/VERSION", ""), ("M", "meta/TODO.md", "")]
+        notes = release.diff_notes(changes, {"new.py": (3, 0)}, lambda rev, path: texts.get((rev, path), ""))
+        tag = release.AUTO_TAG
+        self.assertEqual(notes["Added or New Features"], [f"- Added `new.py` (3 lines) {tag}"])
+        self.assertEqual(notes["Removed"], [f"- Removed `old.py` {tag}"])
+        self.assertEqual(notes["Changed"], [
+            f"- `meta/VERSION` set to 1.1.0 by hand (was 1.0.0) {tag}",
+            f"- `meta/TODO.md`: added item #5 — Later {tag}",
+        ])
+
+    def test_diff_notes_counts_files_past_the_listing_limit(self) -> None:
+        changes = [("M", f"f{i}.py", "") for i in range(release.LISTED_PATHS + 3)]
+        notes = release.diff_notes(changes, {}, lambda rev, path: "")
+        self.assertEqual(len(notes["Changed"]), release.LISTED_PATHS + 1)
+        self.assertIn("… and 3 more file(s)", notes["Changed"][-1])
+
+
 class HookEndToEndTest(unittest.TestCase):
     """Commits for real through the installed hooks in a throwaway repo."""
 
@@ -259,10 +318,51 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertIn(f"## 🆕VERSION 1.0.0 📅 {date.today().isoformat()}\n", self.read("README.md"))
         self.assertEqual(self.git("status", "--porcelain").stdout, "")
 
-    def test_code_commit_with_empty_unreleased_is_refused(self) -> None:
+    def empty_unreleased(self) -> None:
         self.write("meta/CHANGELOG.md", release.promote(CHANGELOG, "1.0.1", TODAY))
-        self.git("add", "meta/CHANGELOG.md")
+        self.write("meta/VERSION", "1.0.1\n")
+        self.git("add", "meta/CHANGELOG.md", "meta/VERSION")
         self.git("commit", "-q", "-m", "x", "--no-verify")
+
+    def test_code_commit_with_empty_unreleased_releases_notes_from_the_diff(self) -> None:
+        # TODO #17: a human's own change, with no notes written, still ships
+        # with a changelog entry saying what changed.
+        self.empty_unreleased()
+        self.write("src/app.txt", "one\ntwo\n")
+        self.git("add", "src/app.txt")
+        result = self.git("commit", "-q", "-m", "x")
+        self.assertIn("wrote 1 from the diff", result.stderr)
+        self.assertEqual(self.last_message(), "VERSION 1.0.2")
+        entry = self.read("meta/CHANGELOG.md").split("## 🆕VERSION 1.0.2")[1].split("## 🟧")[0]
+        self.assertIn(f"### Added or New Features\n- Added `src/app.txt` (2 lines) {release.AUTO_TAG}", entry)
+        self.assertEqual(self.git("status", "--porcelain").stdout, "")
+
+    def test_todo_edit_alone_folds_a_note_into_the_current_version(self) -> None:
+        # TODO #17's own case: the human adds a TODO item and commits.
+        self.empty_unreleased()
+        self.write("meta/TODO.md", self.read("meta/TODO.md").replace(
+            "- [ ] #3 Unrelated item\n", "- [ ] #3 Unrelated item\n- [ ] #4 Follow up on TODO #1\n"))
+        self.git("add", "meta/TODO.md")
+        self.git("commit", "-q", "-m", "x")
+        self.assertEqual(self.last_message(), "VERSION 1.0.1+1")
+        self.assertIn(
+            f"- `meta/TODO.md`: added item #4 — Follow up on TODO \\#1 {release.AUTO_TAG}",
+            self.read("meta/CHANGELOG.md").split("## 🆕VERSION 1.0.1")[1],
+        )
+        self.assertIn("- [ ] #1 Crash", self.read("meta/TODO.md"))  # quoting it didn't close it
+
+    def test_written_notes_are_never_replaced_by_the_diff(self) -> None:
+        self.write("src/app.txt", "code\n")
+        self.git("add", "src/app.txt")
+        result = self.git("commit", "-q", "-m", "x")
+        self.assertNotIn("from the diff", result.stderr)
+        self.assertNotIn(release.AUTO_TAG, self.read("meta/CHANGELOG.md"))
+
+    def test_code_commit_with_empty_unreleased_is_refused_when_auto_notes_are_off(self) -> None:
+        self.write("scripts/git/release.json", '{"auto_notes": false}\n')
+        self.git("add", "scripts/git/release.json")
+        self.git("commit", "-q", "-m", "settings", "--no-verify")
+        self.empty_unreleased()
         self.write("src/app.txt", "code\n")
         self.git("add", "src/app.txt")
         result = self.git("commit", "-q", "-m", "x", check=False)
@@ -307,8 +407,8 @@ class HookEndToEndTest(unittest.TestCase):
         self.assertIn("documented", self.read("meta/CHANGELOG.md"))
 
     def test_partial_commit_is_allowed_when_it_releases_no_notes(self) -> None:
-        # A docs-only commit with nothing in Unreleased takes nothing, so
-        # committing part of the tree can't strand anyone's notes.
+        # With nothing in Unreleased the notes come from the staged diff alone,
+        # so committing part of the tree can't strand anyone's notes.
         self.write("meta/CHANGELOG.md", release.promote(CHANGELOG, "1.0.1", TODAY))
         self.git("add", "meta/CHANGELOG.md")
         self.git("commit", "-q", "-m", "x", "--no-verify")

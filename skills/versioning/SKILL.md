@@ -103,8 +103,8 @@ All notable changes, newest first. See `VERSION` for the current release.
 - **Exactly one 🆕** — the current version. Every shipped version gets a color square when it's replaced, cycling 🟥 🟧 🟨 🟩 🟦 🟪 🟫 and wrapping — assigned once, never changed.
 - **📅 date** in `YYYY-MM-DD` — the day of the entry's latest change: the releasing commit, then any docs-only commit folded into it.
 - **Only the 🆕 entry ever changes after release**, and only by a docs-only commit (below). Every older entry is final: a mistake there is corrected by a new version and a new entry, never a rewrite.
-- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump; the notes in Unreleased — one short sentence under Changed per document changed (`sdsi:docs`) — fold into the current 🆕 entry, and its 📅 moves to the day of the commit. With nothing in Unreleased (an edit to `TODO.md`, say), the changelog is left alone. The message becomes `VERSION x.y.z+k`, the k-th docs-only commit since x.y.z. `+k` is SemVer build metadata, so every tool still reads the version as x.y.z, and `VERSION` itself doesn't change.
-- **A code commit with an empty Unreleased is refused.** Add the bullet, then commit. `--no-verify` is the escape hatch for a commit that genuinely isn't a release.
+- **Code commit** → new version. **Docs-only commit** (by the script's `docs_patterns`) → no bump; the notes in Unreleased — one short sentence under Changed per document changed (`sdsi:docs`) — fold into the current 🆕 entry, and its 📅 moves to the day of the commit. The message becomes `VERSION x.y.z+k`, the k-th docs-only commit since x.y.z. `+k` is SemVer build metadata, so every tool still reads the version as x.y.z, and `VERSION` itself doesn't change.
+- **A commit with an empty Unreleased gets notes written from its diff.** That's a change the human made without the AI — a `TODO.md` item, a small code fix, metadata — so no one wrote notes. The script writes one plain-English bullet per staged file: added, removed, renamed, or edited with its line counts, under the matching subsection. `TODO.md` is described item by item (added, removed, reworded, checked off by hand), and a hand-set `VERSION` gives its old and new value. Each bullet is tagged `_(from the diff)_`, and the commit releases or folds as usual. These notes are a fallback, not the AI's notes: an AI change still gets its own bullet as it's made. With `"auto_notes": false` in the settings below, a code commit with an empty Unreleased is refused instead, and a docs-only one leaves the changelog alone.
 - **A commit referencing a `TODO #n` that doesn't exist is refused**, so a typo can't silently leave an item open.
 - **A partial commit that would release notes is refused.** The notes in Unreleased describe the whole change, so a commit that consumes them must contain all of it — no tracked file with unstaged edits, no untracked file git doesn't ignore (the release files themselves excepted; the script stages those). Otherwise the notes ship in a version that lacks half their work, and the rest is stranded with nothing left to release it. The usual cause is an editor's commit button with a few files already staged — it commits only those. Stage everything (`git add -A`) and commit again; `--no-verify` is the escape hatch for a commit that genuinely isn't a release.
 
@@ -144,11 +144,12 @@ Put those commands in whatever script bootstraps local development, so a fresh c
 ```json
 {
   "docs_patterns": ["docs/*", "*.md"],
-  "version_files": ["package.json"]
+  "version_files": ["package.json"],
+  "auto_notes": true
 }
 ```
 
-`docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A staged `meta/VERSION` is always a release, even if a pattern matches it. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`.
+`docs_patterns` (fnmatch) decide what counts as docs-only; the default is shown. A staged `meta/VERSION` is always a release, even if a pattern matches it. A repo where Markdown *is* the product (a skills plugin, a docs site) narrows it to the true docs. `version_files` lists JSON files whose `"version"` is kept equal to `VERSION`. `auto_notes` (default `true`) writes notes from the diff when Unreleased is empty; `false` restores the refusal.
 
 **The README carries the version line — required.** The root `README.md` holds a line in the changelog's heading format — `## 🆕VERSION x.y.z 📅 YYYY-MM-DD` — directly under its title, followed by a pointer to `meta/CHANGELOG.md` for the details. The script rewrites it on every release and docs-only commit to match the changelog's current heading, so it's never edited by hand. Add it when the release chain is installed; before the first release, write the version in `VERSION` and today's date, and the first commit corrects it. The script leaves a README without the line alone, so its absence is caught in review, not by a refused commit.
 
