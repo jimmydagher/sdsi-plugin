@@ -93,6 +93,8 @@ CURRENT_HEADING_RE = re.compile(r"^## 🆕VERSION \S+ 📅 \S+$", re.M)
 TODO_REF_RE = re.compile(r"TODO #(\d+)")
 OPEN_TODO_RE = r"^- \[ \] #{number} (.*)$"
 DONE_TODO_RE = r"^- \[x\] #{number} "
+# The indented note lines under an item's title line; they travel with it when it closes.
+NOTE_LINES_RE = re.compile(r"(?:[ \t]+\S.*\n?)+")
 JSON_VERSION_RE = re.compile(r'("version"\s*:\s*")[^"]*(")')
 TODO_ITEM_RE = re.compile(r"^- \[( |x)\] #(\d+) (.*)$", re.M)
 
@@ -310,8 +312,11 @@ def close_todos(todo: str, numbers: list[int], version: str, today: str) -> str:
             raise ReleaseError(
                 f"{CHANGELOG_FILE} references TODO #{number}, but {TODO_FILE} has no open item #{number}."
             )
-        todo = todo[: match.start()] + todo[match.end() + 1:]
-        closed.append(f"- [x] #{number} {match.group(1)} — completed {today} · VERSION {version}")
+        notes = NOTE_LINES_RE.match(todo, match.end() + 1)
+        end = notes.end() if notes else match.end() + 1
+        todo = todo[: match.start()] + todo[end:]
+        item = f"- [x] #{number} {match.group(1)} — completed {today} · VERSION {version}"
+        closed.append(item + ("\n" + notes.group(0).rstrip("\n") if notes else ""))
     if not closed:
         return todo
     todo = todo.rstrip("\n") + "\n"

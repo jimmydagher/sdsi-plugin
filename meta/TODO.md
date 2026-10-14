@@ -1,7 +1,9 @@
 # SDSI
 
-- [ ] #16 Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
-- [ ] #17 Check skills pony-tail to enhance the coding instructions <#maestro feature=FX0013_PONYTAIL>
+- [ ] #16 Review and expand companion instructions
+  Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
+- [ ] #17 Check the ponytail skill
+  Check skills pony-tail to enhance the coding instructions <#maestro feature=FX0013_PONYTAIL>
 
 
 ---

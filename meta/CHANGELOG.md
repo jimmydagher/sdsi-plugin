@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.17 📅 2026-10-14
+## 🆕VERSION 1.3.18 📅 2026-10-14
+
+### Added or New Features
+(none)
+
+### Removed
+(none)
+
+### Changed
+- `sdsi:docs`, `ref/findings.md`: every `TODO.md` item has a short title on the checkbox line and its description as indented notes beneath; upkeep line and review checklist enforce it.
+
+### Bug/Issues/Fixes
+- `release.py`: closing a `TODO.md` item moves its indented notes to Done with the title instead of leaving them behind in the open list.
+
+## 🟧VERSION 1.3.17 📅 2026-10-14
 
 ### Added or New Features
 - `sdsi:core`: before writing code, climb the ladder (needed? already in the codebase? standard library? platform feature? installed dependency? one line?), after reading the code it touches; it never cuts validation, data-loss handling, security, or accessibility (TTD017, from the ponytail skill).

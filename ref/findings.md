@@ -97,11 +97,13 @@ Then act on every choice (§7). Choosing nothing to apply is valid: all findings
 
 - **Applied** — make the change using apply mode as core §1 Step 3 defines it (verify without leaving files behind, report, write changelog notes in `sdsi:versioning`'s format), limited to the selected findings, delegating only what core §6 allows. A finding not selected but fully fixed as a side effect of another is marked `Applied (with F-00n)` and doesn't go to `TODO.md`. Each changelog note cites its finding ID(s): `- Retries only transient failures in the DB client (F-003).`
 - **By design** — the human says the code is right. Write it into `.claude/CLAUDE.md` as a deviation (core §1 Step 4): the rule, where it applies, and the human's reason in one line. The next review collects it in §1 and doesn't raise it again.
-- **Not applied** — appended to `TODO.md` as numbered items, next number after the highest in the file (`sdsi:docs`). Each item carries its recommendation, so a later session can act on it without the review in front of it; for a Needs-validation finding, the text after the bracketed tag starts with `Check:`:
+- **Not applied** — appended to `TODO.md` as numbered items, next number after the highest in the file (`sdsi:docs`). Each item has a short title after the bracketed tag, and its description as indented notes on the line beneath. The notes carry the recommendation, so a later session can act on it without the review in front of it; for a Needs-validation finding, the title starts with `Check:`:
 
   ```markdown
-  - [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44. Fix: retry only timeouts and dropped connections.
-  - [ ] #13 [F-007 sdsi:security] Check: does the gateway cap request bodies? The upload handler has no limit — src/upload.py:18
+  - [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error
+    src/db.py:44. Fix: retry only timeouts and dropped connections.
+  - [ ] #13 [F-007 sdsi:security] Check: does the gateway cap request bodies?
+    The upload handler has no limit — src/upload.py:18
   ```
 
 When a later change fixes one, its changelog note says `(TODO #12)` and the release script closes it. If the human answered "discard", unapplied findings are dropped instead — say how many.

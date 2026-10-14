@@ -59,17 +59,22 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 ```markdown
 # TODO
 
-- [ ] #4 <what needs doing, in plain language> — <why, if not obvious>
+- [ ] #4 <short title, a few words>
+  <what needs doing, in plain language> — <why, if not obvious>
 - [ ] #5 <...>
+  <...>
 
 ---
 
 ## Done
 
-- [x] #1 <what was done> — completed 2026-09-23 · VERSION 1.0.1
+- [x] #1 <short title> — completed 2026-09-23 · VERSION 1.0.1
+  <the notes it was written with>
 ```
 
-- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review, and its recommendation, so a later session can act on it without the review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error — src/db.py:44. Fix: retry only timeouts and dropped connections.` A Needs-validation finding is a fact to check instead: `[F-007 sdsi:security] Check: …`. (`ref/findings.md` adds these automatically for findings not applied).
+- **Every item has a title and notes.** The title is one short line (a few words, imperative: "Re-pin the Python base image") and is all that follows the number on the checkbox line. The description — what to do, why, where, any `PLAN §` reference — goes on its own line(s) under it, indented two spaces, as the item's notes. Never put the description on the title line. The release script moves an item's notes with its title when it closes.
+
+- **A deferred review finding** keeps its finding ID and skill in brackets, so it can be traced to its review, and its recommendation, so a later session can act on it without the review: `- [ ] #12 [F-003 sdsi:errors] Retry wraps a non-transient DB error` with the notes beneath: `  src/db.py:44. Fix: retry only timeouts and dropped connections.` A Needs-validation finding is a fact to check instead: `[F-007 sdsi:security] Check: …` as its title. (`ref/findings.md` adds these automatically for findings not applied).
 - **Re-check an item before working on it.** Code moves. Confirm what the item describes still exists where it says. Moved → update its location. Already fixed by other work → tell the human and drop the line rather than leave it open.
 - **Numbers are never reused.** A new item takes the highest number in the file (open or done) plus one.
 - **The AI updates it continuously** — a session that ends without a pass over `TODO.md` leaves it stale. **The human can add items any time**, in the same format.
@@ -82,8 +87,8 @@ The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 - Any change that affects a document → update that document in the same change, rewritten in place (never appended), with one short sentence under Changed in `meta/CHANGELOG.md`'s Unreleased (`sdsi:docs`)
 - After finishing a `meta/TODO.md` item → remove anything temporary it left behind, update every document it touched, and cite it as `(TODO #n)` in its changelog bullet (`sdsi:docs`)
-- Work left undone at the end of a session → a numbered `meta/TODO.md` item (`sdsi:docs`)
+- Work left undone at the end of a session → a numbered `meta/TODO.md` item: a short title on the checkbox line, the description as indented notes on the line(s) under it (`sdsi:docs`)
 
 ## Review checklist
 
-A code change without its matching doc update · a correction appended under stale text instead of rewriting it · the same fact maintained in two documents · a document change with no sentence in the changelog · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · items closed by hand instead of by the release script.
+A code change without its matching doc update · a correction appended under stale text instead of rewriting it · the same fact maintained in two documents · a document change with no sentence in the changelog · a document other than `README.md` loose at the root · a README missing setup, run, test, deploy, or config keys · a command block that doesn't say where it runs · no docs index · `TODO.md` items without numbers · `TODO.md` items with no short title, or with the description on the title line instead of in indented notes · items closed by hand instead of by the release script.

@@ -128,6 +128,18 @@ class TodoTest(unittest.TestCase):
             "- [x] #2 Add an export command — completed 2026-09-23 · VERSION 1.0.1\n"
         ))
 
+    def test_close_carries_the_notes_under_the_title(self) -> None:
+        # Regression: an item's indented notes were left behind in the open list
+        # when its title line was moved to Done.
+        todo = "# TODO\n\n- [ ] #1 Fix crash\n  Crash on empty input.\n  Seen by ops.\n- [ ] #2 Other\n  Keep me.\n"
+        result = release.close_todos(todo, [1], "1.0.1", TODAY)
+        self.assertIn("- [ ] #2 Other\n  Keep me.\n", result)
+        self.assertNotIn("Crash on empty input.\n- [ ]", result)
+        self.assertTrue(result.endswith(
+            "- [x] #1 Fix crash — completed 2026-09-23 · VERSION 1.0.1\n"
+            "  Crash on empty input.\n  Seen by ops.\n"
+        ))
+
     def test_unknown_reference_refuses(self) -> None:
         with self.assertRaises(release.ReleaseError):
             release.close_todos(TODO, [9], "1.0.1", TODAY)
