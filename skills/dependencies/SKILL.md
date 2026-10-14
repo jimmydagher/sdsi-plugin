@@ -21,7 +21,7 @@ Before anything else, read `../core/SKILL.md` and run its steps. Apply each rule
 - **Standard library first.** If it can be built with the language's own standard library, build it that way. A third-party package is added only when genuinely necessary and it has a long, trustworthy track record.
 - **Few, well-understood dependencies** over a large transitive tree — a couple of direct REST calls beat a full vendor SDK when that's all you need. Every dependency must be scanned, updated, and trusted.
 - **Add at the latest stable version** at the time it's added — not an old pin copied from another project.
-- **Pin versions and commit the lockfile**, so resolution is reproducible.
+- **Pin versions and commit the lockfile**, so resolution is reproducible. The manifest and lockfile sit with the application in its source folder, not at the root (core §3).
 - **Always develop in an isolated environment** (the language's virtual environment, a project-local install) — never against global packages.
 - **Scan for known vulnerabilities in CI.** A scan that's merely scheduled doesn't count — it has to be clean, or explicitly and visibly waived, before merge.
 - **Review and update on a regular cadence**, not only when something breaks.
@@ -30,4 +30,4 @@ Before anything else, read `../core/SKILL.md` and run its steps. Apply each rule
 
 ## Review checklist
 
-A dependency the standard library already covers · a heavy SDK used for one call · unpinned versions or no committed lockfile · global installs · no vulnerability scan in CI, or an unwaived finding · a floating tag or undigested image in a deployed artifact.
+A dependency the standard library already covers · a heavy SDK used for one call · unpinned versions or no committed lockfile · a manifest or lockfile at the root that its tooling could read from the source folder · global installs · no vulnerability scan in CI, or an unwaived finding · a floating tag or undigested image in a deployed artifact.

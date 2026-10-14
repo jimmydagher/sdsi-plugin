@@ -16,7 +16,23 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.15 📅 2026-10-07
+## 🆕VERSION 1.3.16 📅 2026-10-14
+
+### Added or New Features
+- `sdsi:standards`: new "Dead code and cleanup sweeps" section, two Upkeep lines, and Review checklist items. A sweep starts from a commit, lists unused code with proof before deleting anything, merges duplicates, inventories entry points, and never deletes externally called code (webhooks, scheduled jobs, auth callbacks) without asking. It also sets a cadence: a simplification pass after each feature, and a regular full sweep. `sdsi:core` §2 points to it.
+- `sdsi:security`: new "Every exposed entry point is inventoried" section, an Upkeep line, and Review checklist items. Removing a feature or UI control now removes the endpoints only it called, or keeps each one on purpose with a written reason (OWASP API9:2023).
+
+### Removed
+(none)
+
+### Changed
+- `sdsi:core` §3 and `sdsi:dependencies`: the dependency manifest and lockfile now live with the application, in its source folder (`src/` by default, or `app/` or `site/` by project type), instead of at the root. The root is allowed only when the language's tooling can't read them from anywhere else, and a tool that takes a file path never counts. Operator: in each project with these files at the root, move them with `git mv`, regenerate the lockfile, and update the container build, CI and setup docs that name them.
+- `sdsi:security`: the skill's `description` is shortened to fit the 1024-character limit, so claude.ai no longer truncates it.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟫VERSION 1.3.15 📅 2026-10-07
 
 ### Added or New Features
 - **The release chain writes notes from the diff when no one wrote any** (TODO #17). A commit with an empty Unreleased — a change the human made without the AI, like adding a `TODO.md` item or a small fix — is no longer refused. The pre-commit script writes one plain-English bullet per staged file (added, removed, renamed, or edited with line counts), describes `TODO.md` item by item and a hand-set `VERSION` by its old and new value, and tags each bullet `_(from the diff)_`. `"auto_notes": false` in `scripts/git/release.json` restores the refusal. Operator: copy the new `scripts/python/release.py` and `scripts/git/pre-commit` into each project that uses the release chain.

@@ -3,7 +3,9 @@ name: standards
 description: >
   SDSI's coding standards, language-neutral — naming and casing, no magic
   strings (constants and enums), comments and docstrings, reuse over
-  reimplementation (DRY), SOLID applied practically, and strict typing
+  reimplementation (DRY), dead-code cleanup sweeps (proof before deleting,
+  never deleting externally called code without asking), SOLID applied
+  practically, and strict typing
   (input validation and every other security rule live in sdsi:security). Use when writing or reviewing
   code for readability and consistency, or when asked to apply coding
   standards to a project. Reads sdsi:core first and applies each rule in the
@@ -48,6 +50,17 @@ Before writing something, check whether the shared layer already provides it (an
 
 One source of truth for logic, constants, types, and validation rules. Refactor into a shared home the **second** time the same semantic rule appears — not preemptively, and not for code that merely looks similar but means something different (coincidental duplication stays).
 
+## Dead code and cleanup sweeps
+
+An AI agent treats dead code as a live pattern and copies it into new work, and every unused line is context it has to read. So unused and duplicated code gets removed, but only in a cleanup sweep, as a change of its own (core §2).
+
+- **Start from a checkpoint.** The working tree is clean and the human has committed before anything is deleted, so one revert undoes the whole sweep.
+- **List before deleting, with proof.** Every unreferenced file, function, export, type, and constant is listed with the evidence that nothing uses it (a search with no callers, or the language's unused-code analyzer). Nothing is deleted until the human approves the list (core §2, "Confirm before anything destructive or bulk").
+- **Merge duplicates.** The same rule implemented in two places becomes one shared function, and every caller moves to it (Reuse over reimplementation, above). Otherwise a bug fixed in one copy stays live in the other.
+- **Inventory the entry points.** List every route, page, server action, command, and scheduled job with what calls each. Flag any that nothing calls: removing a UI doesn't remove the endpoint behind it (`sdsi:security`).
+- **Never delete code called from outside the codebase without asking.** That means webhooks, scheduled jobs, auth callbacks, queue consumers, plugin hooks, and anything invoked through configuration or reflection. A reference search can't see their callers, so they always look unused. The list marks them as external, not dead.
+- **Cadence.** Run a simplification pass over the changed code when a feature is finished (Claude Code's `/simplify`), and a full sweep of the codebase on a regular schedule (weekly on an active project).
+
 ## SOLID, applied practically
 
 - **Single responsibility.** A type or module has one reason to change; if describing it needs "and", it's probably two things.
@@ -63,6 +76,13 @@ One source of truth for logic, constants, types, and validation rules. Refactor 
 - **Untrusted input is validated once, at the boundary** (`sdsi:security`). Once validated, it's typed like any other value.
 - **Give easily confused primitives their own small type** (an ID, a money amount, a currency code) so they can't be passed in the wrong order.
 
+## Upkeep
+
+The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
+
+- Finishing a feature → run a simplification pass over the code it changed and remove what it made unused; leave pre-existing dead code for a cleanup sweep of its own (`sdsi:standards`)
+- Before deleting code that looks unused → have the human commit first, list each item with proof that nothing calls it, and wait for approval; never delete a webhook, scheduled job, auth callback, or anything else called from outside the codebase without asking (`sdsi:standards`)
+
 ## Review checklist
 
-Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · code far longer than the problem needs · an import, variable, or function the change made unused and left behind · pre-existing dead code deleted in an unrelated change (core §2).
+Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · code far longer than the problem needs · an import, variable, or function the change made unused and left behind · pre-existing dead code deleted in an unrelated change (core §2) · unused code that has piled up with no cleanup sweep · a sweep that deleted code without a listed proof and approval, or from an uncommitted tree · an externally invoked entry point (webhook, scheduled job, auth callback) deleted as unused · a route, page, or job that nothing calls left in place unflagged.
