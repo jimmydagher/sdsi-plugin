@@ -16,7 +16,24 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.16 📅 2026-10-14
+## 🆕VERSION 1.3.17 📅 2026-10-14
+
+### Added or New Features
+- `sdsi:core`: before writing code, climb the ladder (needed? already in the codebase? standard library? platform feature? installed dependency? one line?), after reading the code it touches; it never cuts validation, data-loss handling, security, or accessibility (TTD017, from the ponytail skill).
+- `sdsi:testing`: risky logic (branch, loop, parser, money, security) gets at least one small test (TTD017).
+- `sdsi:workflow`: the closing report names what was skipped or not checked and any known risk (TTD017).
+- `sdsi:standards`: a deliberate shortcut is marked `shortcut:` and listed in `meta/TODO.md`; matching upkeep line and review items (TTD017).
+
+### Removed
+(none)
+
+### Changed
+(none)
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟥VERSION 1.3.16 📅 2026-10-14
 
 ### Added or New Features
 - `sdsi:standards`: new "Dead code and cleanup sweeps" section, two Upkeep lines, and Review checklist items. A sweep starts from a commit, lists unused code with proof before deleting anything, merges duplicates, inventories entry points, and never deletes externally called code (webhooks, scheduled jobs, auth callbacks) without asking. It also sets a cadence: a simplification pass after each feature, and a regular full sweep. `sdsi:core` §2 points to it.

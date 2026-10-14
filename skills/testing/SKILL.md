@@ -26,6 +26,7 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - **Tests run in CI and must pass before merge.**
 - **Coverage is a signal, not a target.** A test that only pads the number — a snapshot with no real assertion, a tautology, a test that mocks the thing it claims to test — counts as zero. If you can't name the regression a test would catch, delete it.
 - **A bug fix starts with a failing test** that fails for the expected reason, then passes without being edited (`sdsi:workflow`). Every incident fix earns a permanent regression test.
+- **Risky logic gets at least one small test with the change** — a branch, loop, parser, money handling, or anything security-relevant. Trivial pass-through code doesn't need one.
 - **Something protecting a real external behavior** (a rotation, a retry, a paging walk) is tested against the real thing at least once, deliberately — a mock only proves the method was called.
 
 ## Upkeep
@@ -36,4 +37,4 @@ The line `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 ## Review checklist
 
-Tests or test config outside `tests/` · two test runners · unit tests calling real external systems · unmarked slow/integration tests in the default run · assertions that can't fail · a test that mocks what it's testing · a bug fix with no regression test · no CI gate.
+Tests or test config outside `tests/` · two test runners · unit tests calling real external systems · unmarked slow/integration tests in the default run · assertions that can't fail · a test that mocks what it's testing · a bug fix with no regression test · risky logic (branch, loop, parser, money, security) shipped with no test · no CI gate.

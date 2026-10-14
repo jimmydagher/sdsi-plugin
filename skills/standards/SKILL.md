@@ -43,6 +43,7 @@ Any value used for a comparison, dispatch, lookup key, or config/environment nam
 - **Every module opens with a short header comment/docstring**: what it's for and why it's separate from its neighbors.
 - **Every public function/method is documented** in the language's standard doc format, covering: a one-line summary, each input (type and meaning), and the output. Note what it raises/returns on failure when that isn't obvious.
 - **Comments explain why, not what.** A comment earns its place by recording a decision, constraint, or trap the code can't show.
+- **A deliberate shortcut is marked `shortcut:`** with a comment saying what was skipped and when to revisit it (`shortcut: linear scan, fine under ~1k rows`). Each one also gets a line in `meta/TODO.md` (`sdsi:docs`), the one list of deferred work. A project may rename the tag in its `CLAUDE.md`.
 
 ## Reuse over reimplementation
 
@@ -81,8 +82,9 @@ An AI agent treats dead code as a live pattern and copies it into new work, and 
 The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 - Finishing a feature → run a simplification pass over the code it changed and remove what it made unused; leave pre-existing dead code for a cleanup sweep of its own (`sdsi:standards`)
+- Taking a deliberate shortcut → mark it with a `shortcut:` comment saying when to revisit it, and add it to `meta/TODO.md` (`sdsi:standards`)
 - Before deleting code that looks unused → have the human commit first, list each item with proof that nothing calls it, and wait for approval; never delete a webhook, scheduled job, auth callback, or anything else called from outside the codebase without asking (`sdsi:standards`)
 
 ## Review checklist
 
-Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · code far longer than the problem needs · an import, variable, or function the change made unused and left behind · pre-existing dead code deleted in an unrelated change (core §2) · unused code that has piled up with no cleanup sweep · a sweep that deleted code without a listed proof and approval, or from an uncommitted tree · an externally invoked entry point (webhook, scheduled job, auth callback) deleted as unused · a route, page, or job that nothing calls left in place unflagged.
+Single-letter names · a repeated bare string used for dispatch or lookup · a public function without a doc comment · a comment that restates the code · the same rule implemented twice · a type-keyed `if`/`switch` chain that keeps growing · infrastructure constructed inside business logic · an untyped public signature or blanket suppression · code far longer than the problem needs · something built that the codebase, standard library, or platform already provides · a deliberate shortcut with no `shortcut:` comment or TODO line · an import, variable, or function the change made unused and left behind · pre-existing dead code deleted in an unrelated change (core §2) · unused code that has piled up with no cleanup sweep · a sweep that deleted code without a listed proof and approval, or from an uncommitted tree · an externally invoked entry point (webhook, scheduled job, auth callback) deleted as unused · a route, page, or job that nothing calls left in place unflagged.

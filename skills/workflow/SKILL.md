@@ -57,6 +57,8 @@ Before modifying or removing a function, type, config key, or file, read what us
 
 Every task has a way to check itself, and the check runs before the work is reported done. Validation closes the chain: the change does what `SPEC.md` says, and the deployed system meets its non-functional requirements (`sdsi:deploy`). For a bug fix: write the failing test, confirm it fails for the expected reason, then make it pass without touching the test. The project's own linter and type checker run as part of the check, not after it.
 
+**Say what wasn't covered.** The report that closes a change names what was skipped or not checked (a path not run, an environment not reachable, a case left for later) and any risk the human should know about. "Nothing skipped" is stated, not implied.
+
 Verification has two levels, and **both are required**:
 
 1. **Did the change do its job?** The task's own check — tests, a run.
@@ -106,9 +108,9 @@ The kickoff for a brand-new, empty project:
 The lines `sdsi:upkeep` installs in the project's `.claude/rules/sdsi.md`:
 
 - Before code for a new feature or a change in behavior — from `meta/TODO.md` or a prompt → update `docs/design/` first (`INTENT.md` if the why changes, `SPEC.md`, then `PLAN.md`'s ⛏️ In progress) and wait for approval of ⛏️ In progress (`sdsi:workflow`)
-- Before calling a change done → run the project's tests, linter, and type checker, plus the check that proves the change itself, and show the result (`sdsi:workflow`)
+- Before calling a change done → run the project's tests, linter, and type checker, plus the check that proves the change itself, and show the result; the closing report says what was skipped or not checked and any known risk (`sdsi:workflow`)
 - When a change is done → merge its ⛏️ In progress steps into `PLAN.md` and set the section back to `(none)` (`sdsi:workflow`)
 
 ## Review checklist
 
-No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a missing `docs/design/INTENT.md`, `SPEC.md`, or `PLAN.md` · a feature in the code the design documents don't describe, or one they describe that's gone · a non-functional requirement that can't be checked · a non-trivial change with no approved ⛏️ In progress · ⛏️ In progress left holding a finished change · a per-change design file kept beside the documents · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a plan step resting on an assumption it never checks, with no STOP condition · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification.
+No `.claude/CLAUDE.md`, or one without an SDSI profile · a file loose at the root other than `README.md` and the ones core §3 allows · a deviation from SDSI used in the code but not written in `CLAUDE.md` · a missing `docs/design/INTENT.md`, `SPEC.md`, or `PLAN.md` · a feature in the code the design documents don't describe, or one they describe that's gone · a non-functional requirement that can't be checked · a non-trivial change with no approved ⛏️ In progress · ⛏️ In progress left holding a finished change · a per-change design file kept beside the documents · a bug fix without a regression test · a mistake that recurs and isn't in `CLAUDE.md` · an empty project scaffolded without the release chain · a plan step too big to verify in one session · a plan step resting on an assumption it never checks, with no STOP condition · a function, type, or key changed or removed without its callers read · a change to a hook, script, lint/type config, or skill with no proof the guardrail still fires · lint or type-check not part of the verification · a closing report that doesn't say what was skipped or left unchecked.
