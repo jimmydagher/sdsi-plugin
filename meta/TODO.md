@@ -13,6 +13,35 @@
   3. Zombie routes: you deleted the button, not the API
   4. /simplify: built into Claude Code, most people never use it
   5. The trap: webhooks and cron jobs look unused. Don't let Claude delete them.
+- [ ] #19 Expansion tasks for web.md companion
+  the following are good recommendation to review with the developer when building web applications, depending on the type of application, review with them what would be needed.
+
+  custom 404
+  CTA above the fold
+  faq
+  meta title per page
+  meta description per page
+  open graph image
+  favicon set
+  social share
+  robots.txt
+  sitemap.xml
+  alt text on everyimage
+  canonical urls
+  mobile version / breakpoints
+  accessibility
+  sticky mobile cta
+  loading states
+  form error states
+  thank-you page
+  privacy policy page
+  terms page
+  cookie banner/concent
+  analytics installed
+  real contact address
+  check broken links
+  optimize performance
+  use single frameworks - don't mix (example mixing angular/react together)
 
 
 ---
