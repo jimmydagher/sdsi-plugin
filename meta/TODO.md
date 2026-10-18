@@ -4,6 +4,15 @@
   Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
 - [ ] #17 Check the ponytail skill
   Check skills pony-tail to enhance the coding instructions <#maestro feature=FX0013_PONYTAIL>
+- [ ] #18 Code cleanup and efficiencies
+  As AI coding took off, duplicate code blocks jumped 8x in 2024 (GitClear, 211M lines). And every extra line is something Claude has to read. I want to add instructions that when doing review or standards we should make sure the following are taking place. if standards are not the right place, propose a new skill.
+
+  delete prompts to run after every feature:
+  1. Dead code: Claude can't tell it's dead, and copies it
+  2. Duplicates: fix a bug in one copy, the other still ships it
+  3. Zombie routes: you deleted the button, not the API
+  4. /simplify: built into Claude Code, most people never use it
+  5. The trap: webhooks and cron jobs look unused. Don't let Claude delete them.
 
 
 ---

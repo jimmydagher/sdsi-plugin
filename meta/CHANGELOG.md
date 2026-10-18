@@ -16,7 +16,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.18 📅 2026-10-14
+## 🆕VERSION 1.3.18 📅 2026-10-18
 
 ### Added or New Features
 (none)
@@ -26,6 +26,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 
 ### Changed
 - `sdsi:docs`, `ref/findings.md`: every `TODO.md` item has a short title on the checkbox line and its description as indented notes beneath; upkeep line and review checklist enforce it.
+- `meta/TODO.md`: added item #18 — Code cleanup and efficiencies _(from the diff)_
 
 ### Bug/Issues/Fixes
 - `release.py`: closing a `TODO.md` item moves its indented notes to Done with the title instead of leaving them behind in the open list.
