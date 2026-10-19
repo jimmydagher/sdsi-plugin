@@ -28,6 +28,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 - `sdsi:docs`, `ref/findings.md`: every `TODO.md` item has a short title on the checkbox line and its description as indented notes beneath; upkeep line and review checklist enforce it.
 - `meta/TODO.md`: added item #18 — Code cleanup and efficiencies _(from the diff)_
 - `meta/TODO.md`: added item #19 — Expansion tasks for web.md companion _(from the diff)_
+- `meta/TODO.md`: added item #20 — when creating TODO.md use title/description _(from the diff)_
 
 ### Bug/Issues/Fixes
 - `release.py`: closing a `TODO.md` item moves its indented notes to Done with the title instead of leaving them behind in the open list.

@@ -42,6 +42,8 @@
   check broken links
   optimize performance
   use single frameworks - don't mix (example mixing angular/react together)
+- [ ] #20 when creating TODO.md use title/description
+  When creating TODO.md items use the first line to mark the checkbox and a title, then under that title add the description, ensure this stays as an upkeep rule.
 
 
 ---
