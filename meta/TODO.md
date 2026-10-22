@@ -44,6 +44,8 @@
   use single frameworks - don't mix (example mixing angular/react together)
 - [ ] #20 when creating TODO.md use title/description
   When creating TODO.md items use the first line to mark the checkbox and a title, then under that title add the description, ensure this stays as an upkeep rule.
+- [ ] #21 make MCP changed with two commands (search/execute)
+  MCP protocols have multitude of commands that returns a small portion of data, this create a lot of calls and re-reads of tokens becoming very expensive. instead of call the MCP multiple times, understand what is needed and give it to the MCP to generate the search or task and let the code be generated inside the service.
 
 
 ---

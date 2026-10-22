@@ -16,7 +16,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.18 📅 2026-10-18
+## 🆕VERSION 1.3.18 📅 2026-10-22
 
 ### Added or New Features
 (none)
@@ -29,6 +29,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 - `meta/TODO.md`: added item #18 — Code cleanup and efficiencies _(from the diff)_
 - `meta/TODO.md`: added item #19 — Expansion tasks for web.md companion _(from the diff)_
 - `meta/TODO.md`: added item #20 — when creating TODO.md use title/description _(from the diff)_
+- `meta/TODO.md`: added item #21 — make MCP changed with two commands (search/execute) _(from the diff)_
 
 ### Bug/Issues/Fixes
 - `release.py`: closing a `TODO.md` item moves its indented notes to Done with the title instead of leaving them behind in the open list.
