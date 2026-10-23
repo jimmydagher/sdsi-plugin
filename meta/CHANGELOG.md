@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.18 📅 2026-10-23
+## 🆕VERSION 1.3.19 📅 2026-10-23
+
+### Added or New Features
+- `ref/web.md`: a launch checklist (pages, search and sharing, compliance, screens and states, pre-launch) reviewed with the developer under `sdsi:workflow`; one UI framework per app under `sdsi:standards`; a broken-link check under `sdsi:testing` (TTD019).
+
+### Removed
+(none)
+
+### Changed
+(none)
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟨VERSION 1.3.18 📅 2026-10-23
 
 ### Added or New Features
 (none)

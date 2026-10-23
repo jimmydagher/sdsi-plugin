@@ -9,6 +9,12 @@ Language- and framework-neutral: apply each rule through the framework the proje
 ## sdsi:workflow
 
 - **`SPEC.md` states the web non-functional targets up front** — the accessibility level (WCAG 2.2 AA unless stated otherwise), the performance budget (Core Web Vitals "good" at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1), and the browsers supported. A target nobody wrote down can't be verified at deploy.
+- **Review the launch checklist with the developer while writing `SPEC.md`.** Go group by group, ask which items this application needs (a public marketing site needs most; an internal tool or API few), and record in `SPEC.md` each one that applies and each one deliberately skipped, so none is forgotten or built by default:
+  - **Pages and content** — a custom 404 (and 403/500, built under `## sdsi:errors`), a call to action above the fold, an FAQ, a real contact address, a privacy policy page, a terms page, a thank-you page after each form.
+  - **Search and sharing** — a unique meta title and meta description per page, canonical URLs, `robots.txt`, `sitemap.xml`, an Open Graph image, social-share links or previews, and a full favicon set.
+  - **Compliance and measurement** — a cookie banner with consent before any non-essential cookie or script, analytics installed (and gated by that consent), and nothing loaded that the privacy policy doesn't mention.
+  - **Screens and states** — mobile layout and its breakpoints, a sticky mobile call to action where the page has one primary action, a loading state for every wait, and an error state for every form field and for the form as a whole. Alt text on every informative image (accessibility itself is the target above).
+  - **Before launch** — links checked for breakage, performance measured against the budget above.
 - **An HTTP API is designed contract-first.** The endpoint's request, response, and error shapes are written in the project's API description (an OpenAPI document or the framework's equivalent) and approved with the plan, before the handler is written.
 - **Every new endpoint or page names who may use it** in the plan — anonymous, signed in, or a specific role — so access control is designed, not discovered in review. An anonymous one also names every field it returns. Guest flows such as bill pay return redacted fragments only (`sdsi:security`).
 
@@ -20,6 +26,7 @@ Language- and framework-neutral: apply each rule through the framework the proje
 - **API shapes are conservative and extensible** — a JSON response's root is an object, never a bare array; unknown or read-only input fields are rejected rather than silently bound (no mass assignment); field naming follows one casing across the whole API; every list endpoint is paginated.
 - **UI code reuses the established design** — palette, type, spacing, components. Load a design skill before writing new markup or styles, and ground new tokens in what's already on the page rather than starting a parallel visual language.
 - **UI meets WCAG 2.2 AA** — semantic elements before ARIA, a label on every form control, everything operable by keyboard with a visible focus, text contrast at least 4.5:1 (3:1 for large text), and pointer targets at least 24×24 CSS px.
+- **One UI framework per application.** Never mix two component frameworks (Angular with React, say) in one front end; pick one in the plan and use it throughout. A deliberate micro-frontend or migration is the exception, recorded in `SPEC.md` with its end date.
 - **A served asset is never edited in place** when it's built from a source asset; the source is edited and the served copy rebuilt. Name the two so which is which is obvious.
 
 ## sdsi:config
@@ -93,6 +100,7 @@ Tests:
 - **Services are tested directly**, without the HTTP layer.
 - **Request-level tests use the framework's test client** — status codes, error shapes, and auth behavior.
 - **Security tests — access denial, guest response bodies, headers and cookies — are in `## sdsi:security` above.**
+- **A link check runs against the built site** (CI or the deploy check) and fails on a broken internal link; external links are checked on a schedule, not on every build.
 - **A few end-to-end browser tests cover the critical user flows** (sign-in, the main task), not every page — and run an automated accessibility check on the pages they visit. Automated checks catch only part of WCAG; they are a floor, not a pass.
 
 ## sdsi:dependencies
