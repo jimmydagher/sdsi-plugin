@@ -4,8 +4,6 @@
   Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
 - [ ] #17 Check the ponytail skill
   Check skills pony-tail to enhance the coding instructions <#maestro feature=FX0013_PONYTAIL>
-- [ ] #18 Code cleanup and efficiencies
-  As AI coding took off, duplicate code blocks jumped 8x in 2024 (GitClear, 211M lines). And every extra line is something Claude has to read. I want to add instructions that when doing review or standards we should make sure the following are taking place. if standards are not the right place, propose a new skill.
 
   delete prompts to run after every feature:
   1. Dead code: Claude can't tell it's dead, and copies it
@@ -68,3 +66,5 @@
 - [x] #5 Grow `sdsi:concurrency` from a real project — only its shutdown rules come from practice so far — completed 2026-10-04 · VERSION 1.3.6
 - [x] #11 Add an audit trail to `sdsi:logging` — security-relevant decisions (authorization grants and denials, permission changes) recorded as their own replayable stream, separate from application logs; read `sdsi:logging` and `sdsi:errors` in full first — from the Simple-AI-DLC review; matters most for larger organizations — completed 2026-10-04 · VERSION 1.3.7
 - [x] #17 When files are updated outside of AI, CHANGELOG.md is empty because the human didn't modify anything. could be they added a TODO item, did a small code change or simply updated metadata. in this situaiton, before the commit, if nothing is found in the CHANGELOG, can the code/git hook compare the previous commit to the new commit and write what is different in plain english? — completed 2026-10-07 · VERSION 1.3.15
+- [x] #18 Code cleanup and efficiencies — completed 2026-10-23 · VERSION 1.3.18
+  As AI coding took off, duplicate code blocks jumped 8x in 2024 (GitClear, 211M lines). And every extra line is something Claude has to read. I want to add instructions that when doing review or standards we should make sure the following are taking place. if standards are not the right place, propose a new skill.
