@@ -44,6 +44,8 @@
   When creating TODO.md items use the first line to mark the checkbox and a title, then under that title add the description, ensure this stays as an upkeep rule.
 - [ ] #21 make MCP changed with two commands (search/execute)
   MCP protocols have multitude of commands that returns a small portion of data, this create a lot of calls and re-reads of tokens becoming very expensive. instead of call the MCP multiple times, understand what is needed and give it to the MCP to generate the search or task and let the code be generated inside the service.
+- [ ] #22 create /sdsi:optimize sub-skills
+  currently multiple instructions to optimize the code in multiple ways are sitting in different part of sdsi. i want to move them into a optimize sub-skill, which of course, run when using /sdsi:all. I want this optimization skills to be present thru the lifecycle of the coding, but when doing maintenance I would like to re-run those particular instructions to ensure there is no dead code. these instructions should be similar to /simplify and look deeper at ponytail (https://github.com/dietrichgebert/ponytail) and impeccable (https://github.com/pbakaus/impeccable) as well as other principles already in sdsi, and move them into this new sub-skill.
 
 
 ---

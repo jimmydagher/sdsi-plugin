@@ -16,7 +16,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.19 📅 2026-10-23
+## 🆕VERSION 1.3.19 📅 2026-11-01
 
 ### Added or New Features
 - `ref/web.md`: a launch checklist (pages, search and sharing, compliance, screens and states, pre-launch) reviewed with the developer under `sdsi:workflow`; one UI framework per app under `sdsi:standards`; a broken-link check under `sdsi:testing` (TTD019).
@@ -25,7 +25,7 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 (none)
 
 ### Changed
-(none)
+- `meta/TODO.md`: added item #22 — create /sdsi:optimize sub-skills _(from the diff)_
 
 ### Bug/Issues/Fixes
 (none)
