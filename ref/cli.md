@@ -78,10 +78,13 @@ Language- and framework-neutral: apply each rule through the project language's 
 - **Test the non-interactive path the way CI runs it:** stdout and stdin not a terminal, `NO_COLOR` set, `--no-input`. Assert no escape codes, no prompt, and nothing hanging. A tool that only works in a terminal breaks the first time it's scripted.
 - **Run the subprocess tests on every operating system the tool ships for.** Paths, line endings, signals, and terminal detection differ between them.
 
+## sdsi:optimize
+
+- **Startup time is a budget.** `--help`, `--version`, and a usage error should feel instant, and anything else should show output within about a tenth of a second. Load each command's heavy dependencies only when that command runs (`sdsi:optimize`'s lazy loading, applied per command).
+
 ## sdsi:dependencies
 
 - **Keep the dependency tree especially small.** The tool has to coexist with whatever is already installed where it lands.
-- **Startup time is a budget.** `--help`, `--version`, and a usage error should feel instant, and anything else should show output within about a tenth of a second. Load each command's heavy dependencies only when that command runs (`sdsi:dependencies`' lazy loading, applied per command).
 
 ## sdsi:docs
 

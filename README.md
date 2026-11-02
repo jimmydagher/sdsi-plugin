@@ -1,6 +1,6 @@
 # SDSI — Software Development Standard Instructions
 
-## 🆕VERSION 1.3.19 📅 2026-11-01
+## 🆕VERSION 1.3.20 📅 2026-11-01
 
 For details on the latest changes and features, please review [CHANGELOG.md](meta/CHANGELOG.md).
 
@@ -41,17 +41,18 @@ Run in this order by `sdsi:all`; each can also be run alone (e.g. "apply `/sdsi:
 |---|---|---|
 | 0 | `sdsi:core` | Non-negotiables, profile, project type, review/apply mode, universal layout, the order, matching each task to a model |
 | 1 | `sdsi:workflow` | Plan before code, the living design documents (`docs/design/` INTENT/SPEC/PLAN), scope, new-project kickoff |
-| 2 | `sdsi:standards` | Naming, constants, comments, reuse, SOLID, typing |
+| 2 | `sdsi:standards` | Naming, constants, comments, SOLID, typing |
 | 3 | `sdsi:config` | Config files, schema, validation |
 | 4 | `sdsi:security` | Every security rule in one place: secrets (store, naming, rotation, redaction), untrusted input, protected data only to its owner (guest flows get redacted fragments), tenant isolation on every path and copy, AI/LLM features, bounded cost, CI and release, trust-boundary settings, and how a security finding is rated and fixed — the other skills point here |
 | 5 | `sdsi:logging` | Central logger, levels, the log queue and its single writer, file rotation and retention, the audit trail |
 | 6 | `sdsi:errors` | Global error handler, try/catch discipline, error hierarchy, retries, exit outcomes |
 | 7 | `sdsi:concurrency` | Threads/async, timeouts, shutdown |
 | 8 | `sdsi:testing` | Test layout, pyramid, meaningful coverage |
-| 9 | `sdsi:dependencies` | Adding, pinning, scanning |
-| 10 | `sdsi:docs` | README, `docs/`, numbered `TODO.md` |
-| 11 | `sdsi:versioning` | `VERSION`, `CHANGELOG.md`, commits, the release hooks |
-| 12 | `sdsi:deploy` | Deploy target (asked), local env, containers |
+| 9 | `sdsi:optimize` | Lean code through the whole lifecycle: the ladder before writing, reuse, the pass when a feature is finished, the maintenance sweep for dead code and duplicates (`/sdsi:optimize --review` on the whole project), performance tuning only from measurement, lazy loading, marked shortcuts |
+| 10 | `sdsi:dependencies` | Adding, pinning, scanning |
+| 11 | `sdsi:docs` | README, `docs/`, numbered `TODO.md` |
+| 12 | `sdsi:versioning` | `VERSION`, `CHANGELOG.md`, commits, the release hooks |
+| 13 | `sdsi:deploy` | Deploy target (asked), local env, containers |
 | — | `sdsi:all` | Everything above, in order |
 | — | `sdsi:upkeep` | Leaves the topics' standing instructions in a project (`.claude/rules/sdsi.md`, loaded every session) — offered, optional |
 

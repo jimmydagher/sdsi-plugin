@@ -5,8 +5,8 @@ description: >
   first, few well-trusted dependencies, latest stable at the time a
   dependency is added, pinned versions with a committed lockfile, isolated
   environments, vulnerability scanning that must actually be clean before
-  merge, lazy loading of heavy or environment-specific modules, and no
-  floating tags in anything deployed. Use when adding, upgrading, or
+  merge, and no floating tags in anything deployed (lazy loading lives in
+  sdsi:optimize). Use when adding, upgrading, or
   auditing dependencies. Reads sdsi:core first. Triggers on
   "/sdsi:dependencies", "add a package", "dependency audit".
 argument-hint: "[--review|--apply] [path|branch]"
@@ -25,7 +25,6 @@ Before anything else, read `../core/SKILL.md` and run its steps. Apply each rule
 - **Always develop in an isolated environment** (the language's virtual environment, a project-local install) — never against global packages.
 - **Scan for known vulnerabilities in CI.** A scan that's merely scheduled doesn't count — it has to be clean, or explicitly and visibly waived, before merge.
 - **Review and update on a regular cadence**, not only when something breaks.
-- **Load heavy or environment-specific modules lazily, by name from config**, so a deployment only pays for what it uses.
 - **No floating versions in anything deployed** — no `latest`, `main`, or `HEAD` for a dependency or base image. Pin container images to a digest, not just a tag.
 
 ## Review checklist

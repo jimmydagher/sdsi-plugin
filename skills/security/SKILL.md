@@ -99,7 +99,7 @@ An owner or tenant field on a record isn't isolation. Isolation is the check tha
 ## Every exposed entry point is inventoried
 
 - **Removing a caller doesn't remove the endpoint.** Deleting a button, page, or feature leaves its routes, server actions, and handlers reachable from outside. A retired endpoint is either removed in the same change or kept on purpose, with the reason written down (OWASP API9:2023, Improper Inventory Management).
-- **The project can list everything it exposes:** every route, page, server action, and externally invoked handler (webhook, scheduled job, auth callback), with what calls each one. Anything with no caller and no stated external one is a finding. Cleanup sweeps use this list (`sdsi:standards`).
+- **The project can list everything it exposes:** every route, page, server action, and externally invoked handler (webhook, scheduled job, auth callback), with what calls each one. Anything with no caller and no stated external one is a finding. Cleanup sweeps use this list (`sdsi:optimize`).
 
 ## CI and the release path
 

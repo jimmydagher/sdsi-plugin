@@ -16,7 +16,23 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.19 📅 2026-11-01
+## 🆕VERSION 1.3.20 📅 2026-11-01
+
+### Added or New Features
+- `sdsi:optimize`, step 9 of `sdsi:all`: one topic for lean, simple, fast code through the whole lifecycle — the ladder before writing, the size check after, the pass when a feature is finished (reuse, simplification, efficiency, altitude, after Claude Code's `/simplify`), the maintenance sweep (`/sdsi:optimize --review` on the whole project), every element earning its place, and performance tuning only from a before-and-after measurement (after Impeccable's `distill` and `optimize`); six upkeep lines; a `## sdsi:optimize` section in `ref/web.md` (TODO #22).
+
+### Removed
+(none)
+
+### Changed
+- Rules moved into `sdsi:optimize`, now stated only there: the ladder and size check from `sdsi:core` §2 (core keeps the principle), reuse over reimplementation, dead-code cleanup sweeps, and the `shortcut:` marker from `sdsi:standards`, lazy loading from `sdsi:dependencies`, and the CLI startup budget from `ref/cli.md`'s `## sdsi:dependencies` (TODO #22).
+- `sdsi:all` runs 13 steps; dependencies, docs, versioning, and deploy are now steps 10–13 (TODO #22).
+- `sdsi:standards` no longer has upkeep lines. A project that installed them: run `/sdsi:upkeep` and choose `optimize`; `sdsi:upkeep` now drops a topic whose `## Upkeep` section is gone and says where its lines went (TODO #22).
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟩VERSION 1.3.19 📅 2026-11-01
 
 ### Added or New Features
 - `ref/web.md`: a launch checklist (pages, search and sharing, compliance, screens and states, pre-launch) reviewed with the developer under `sdsi:workflow`; one UI framework per app under `sdsi:standards`; a broken-link check under `sdsi:testing` (TTD019).

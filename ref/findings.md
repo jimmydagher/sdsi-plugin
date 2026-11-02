@@ -5,7 +5,7 @@ Read by any SDSI skill running in **review mode** (`sdsi:core` §1, Step 3), by 
 ## 1. Intake — scan against the skill's standard
 
 - **The invoking skill is the lens.** Check the in-scope code against that skill's rules and its **Review checklist**, plus the project-type companion's section for that skill, if it has one (core §1 Step 2). Apply them in the project language's idioms.
-- **For `sdsi:all`, every step is a lens**, in core §4's order. Tell the human which step is scanning ("Step 6/12 — `sdsi:errors` + cli").
+- **For `sdsi:all`, every step is a lens**, in core §4's order. Tell the human which step is scanning ("Step 6/13 — `sdsi:errors` + cli").
 - **Scope** is the path the human gave, `branch` (core §1 Step 3), else the whole project — say which.
 - **Settled decisions aren't findings; drift is.** Before scanning, collect what the project has already decided: the deviations in `.claude/CLAUDE.md` (core §1 Step 4) and the decisions and non-goals in `docs/design/INTENT.md` and `SPEC.md` (`sdsi:workflow`). Code that follows a written decision isn't flagged. Code that has drifted from what a decision says is — either the document or the code is wrong, and the human should know which.
 - **Build on earlier reviews.** Read the most recent export in `docs/reviews/` that covered the same lens, either the skill's own export or an `sdsi-all` one, if there is one:
@@ -19,7 +19,7 @@ Read by any SDSI skill running in **review mode** (`sdsi:core` §1, Step 3), by 
 
 ## 2. Fan out when the review is big
 
-A review of `sdsi:all`, or of a scope too large to read closely in one pass, splits the scanning across read-only subagents — one per lens (one per step for `sdsi:all`), or one per area of the scope for a single lens. They run in batches of up to four at once (three batches for `sdsi:all`'s twelve steps) unless the human asks for more. The session's own model keeps the judgment: it writes the briefs, vets, catalogs, and presents (core §6).
+A review of `sdsi:all`, or of a scope too large to read closely in one pass, splits the scanning across read-only subagents — one per lens (one per step for `sdsi:all`), or one per area of the scope for a single lens. They run in batches of up to four at once unless the human asks for more. The session's own model keeps the judgment: it writes the briefs, vets, catalogs, and presents (core §6).
 
 Each subagent's brief follows core §6 and also gives:
 

@@ -103,6 +103,13 @@ Tests:
 - **A link check runs against the built site** (CI or the deploy check) and fails on a broken internal link; external links are checked on a schedule, not on every build.
 - **A few end-to-end browser tests cover the critical user flows** (sign-in, the main task), not every page — and run an automated accessibility check on the pages they visit. Automated checks catch only part of WCAG; they are a floor, not a pass.
 
+## sdsi:optimize
+
+- **Performance is measured against `SPEC.md`'s Core Web Vitals budget (`## sdsi:workflow` above) on a throttled mobile profile**, not a fast desktop connection — before and after any tuning (`sdsi:optimize`).
+- **Images are sized for the size they're displayed at**, served in a modern compressed format, and lazy-loaded below the fold — never above it, where lazy loading delays the largest paint.
+- **Space is reserved for media, embeds, and late-loading content** (explicit dimensions or an aspect ratio), and nothing is injected above content already on screen, so the layout doesn't shift.
+- **A script or third-party tag that loads on every page but runs on one is a sweep item** — load it only where it runs.
+
 ## sdsi:dependencies
 
 - **Client-side packages follow the same rules as server-side ones** — their own lockfile committed, their own vulnerability scan in CI — and count toward "few dependencies": every one ships to every user's browser.
@@ -146,6 +153,7 @@ Tests:
 - W3C Trace Context — https://www.w3.org/TR/trace-context/
 - W3C Web Content Accessibility Guidelines (WCAG) 2.2 — https://www.w3.org/TR/WCAG22/
 - web.dev, Web Vitals — https://web.dev/articles/vitals
+- Impeccable, `optimize` and `distill` references (Apache-2.0) — https://github.com/pbakaus/impeccable
 - MDN, Cross-Origin Resource Sharing (CORS) — https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
 - Zalando RESTful API Guidelines, Compatibility — https://github.com/zalando/restful-api-guidelines/blob/main/chapters/compatibility.adoc
 - Microsoft Azure REST API Guidelines — https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md
