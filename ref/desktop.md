@@ -1,10 +1,15 @@
 # SDSI Companion — Desktop Application
 
-For projects whose profile says **Project type: desktop**: a GUI application installed on users' own machines (Windows, macOS, Linux), whether it's built on a native toolkit, a cross-platform toolkit, or embedded web technology. This file isn't a skill. `sdsi:core` §1 Step 2 reads it when the project type is desktop, and a running skill applies **only the section headed with its own name**. A skill with no section here has no desktop-specific additions and proceeds on its own rules.
+For projects whose profile lists **desktop** in `Companions`: a GUI application installed on users' own machines (Windows, macOS, Linux), whether it's built on a native toolkit, a cross-platform toolkit, or embedded web technology. This file isn't a skill. `sdsi:core` §1 Step 2 reads it when the profile names it, and a running skill applies **only the section headed with its own name**. A skill with no section here has no desktop-specific additions and proceeds on its own rules.
 
 Language- and framework-neutral: apply each rule through the toolkit and packaging tools the project uses. Lessons specific to a toolkit or framework belong in the project's own `CLAUDE.md`, not here.
 
-**A researched base, not yet grown from a real project.** These rules are drawn from platform vendors' guidance and widely used standards (sources at the end), not from a real desktop project yet. When the first real project disagrees with a rule, correct the rule.
+**A researched base, not yet grown from a real project.** These rules are drawn from platform vendors' guidance and widely used standards, and were checked in 2026-11 against the Electron and Tauri security and updater docs, Flatpak's sandbox model, and current code-signing requirements (sources at the end). When the first real project disagrees with a rule, correct the rule.
+
+## sdsi:workflow
+
+- **`SPEC.md` states the desktop decisions before code:** the supported OS versions and architectures; the distribution shape and update channels on each OS; what works offline; whether the app is single-instance; what happens to user data on a downgrade; and whether diagnostics and crash reports leave the machine (off until the user consents, unless `SPEC.md` records otherwise with its reason). Each one decides later rules below, so none is left to whoever writes the code.
+- **A change that touches stored user data plans its upgrade check** — install release N-1, create real data, upgrade — as a step of its own (`## sdsi:testing`).
 
 ## sdsi:standards
 
@@ -29,19 +34,16 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 ## sdsi:security
 
 - **Every way into the app is an untrusted boundary.** That includes files the user opens, drag-and-drop, the clipboard, command-line arguments, URL-scheme or deep-link activations, file-type associations, and messages from other processes (IPC between the app's own processes included). Validate each one once, at the point it enters (`sdsi:security`). A deep link that becomes a file path or a shell command without validation is a remote-code-execution bug.
-- **Opening something externally goes through one helper with an allowlist.** URLs handed to the OS's "open" mechanism are limited to an explicit allowlist of schemes (typically `https:` and `mailto:`), and never come straight from content. Without it, a crafted link runs whatever handler the OS has registered.
-- **Embedded web content is treated as hostile.** When the UI renders web content, the renderer gets no direct OS or file-system access: keep it isolated and sandboxed, apply a restrictive content-security policy, don't load remote code over plain HTTP, restrict navigation and new windows, and check the sender of every message the privileged side receives. Each relaxation is written down with its reason.
-- **Runs as a standard user.** No feature needs elevation or writes to machine-wide locations at runtime. A task that truly needs admin rights is split into a separate, minimal, explicitly elevated helper, never the whole app.
-- **Everything shipped to a user's machine is public.** An API key, client secret, or signing key bundled into the app, its config, or its resources can be extracted. A credential that must stay secret stays on a server the app calls. The only keys that ship are public client identifiers, labeled as public where they're configured.
-- **The user's own credentials go in the OS credential store**: the platform keychain, credential vault, or Secret Service, read at runtime. They never go into a preferences file, a plain local database, or the cache. Locally persisted sensitive data that doesn't fit a credential store is encrypted with the OS's per-user data-protection API.
+- **Embedded web content is treated as hostile, and links leave through one gate.** When the UI renders web content, the renderer gets no direct OS or file-system access: keep it isolated and sandboxed, apply a restrictive content-security policy, don't load remote code over plain HTTP, restrict navigation and new windows, and check the sender of every message the privileged side receives. Opening anything externally goes through one helper that limits the URLs handed to the OS's "open" mechanism to an explicit allowlist of schemes (typically `https:` and `mailto:`), never straight from content — otherwise a crafted link runs whatever handler the OS has registered. Each relaxation is written down with its reason.
+- **Least privilege, at runtime and in the package.** The app runs as a standard user; no feature needs elevation or writes to machine-wide locations at runtime, and a task that truly needs admin rights is a separate, minimal, explicitly elevated helper, never the whole app. The entitlements, sandbox permissions, or capabilities the package declares are the fewest the features need, each with its reason written down; a sandboxed app reaches the user's files through the platform's file portals or user-granted, scoped access, not broad file-system access.
+- **Everything shipped to a user's machine is public; the user's own credentials go in the OS credential store.** An API key, client secret, or signing key bundled into the app, its config, or its resources can be extracted, so a credential that must stay secret stays on a server the app calls, and the only keys that ship are public client identifiers, labeled as public where they're configured. The user's credentials live in the platform keychain, credential vault, or Secret Service, read at runtime — never in a preferences file, a plain local database, or the cache. Locally persisted sensitive data that doesn't fit a credential store is encrypted with the OS's per-user data-protection API.
 - **Sign-in follows OAuth for native apps.** Use the system browser, not an embedded web view; use PKCE; and redirect to a loopback address, a private-use URI scheme, or a claimed HTTPS URI. Never ship a client secret.
-- **Code-signing and update-signing keys never live on a developer machine or in the repository.** They're held in a hardware security module, a cloud signing service, or the CI secrets store, and only the release pipeline can use them. If one leaks, every user is exposed.
 
 ## sdsi:logging
 
 - **Logs are written to the OS's per-user log or state location**, rotated and retained by `sdsi:logging`'s settings, so a long-running install never fills the disk.
 - **The user can find them.** A menu item or the about screen opens the log folder or copies a diagnostics bundle, which is how a support request gets evidence.
-- **Logs stay on the machine unless the user agrees otherwise.** Sending diagnostics or usage data off the device requires the user's explicit consent, is off until they give it, and is redacted before it leaves (`sdsi:security`). Never log the contents of the user's documents, file paths under their home folder beyond what's needed, or personal data.
+- **Logs stay on the machine unless the user agrees otherwise.** Sending diagnostics or usage data off the device follows the consent decision in `SPEC.md` (`## sdsi:workflow` above) — off until the user gives consent, by default — and is redacted before it leaves (`sdsi:security`). Never log the contents of the user's documents, file paths under their home folder beyond what's needed, or personal data.
 
 ## sdsi:errors
 
@@ -67,7 +69,7 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 
 ## sdsi:dependencies
 
-- **A bundled runtime or embedded browser engine is a dependency, with its own update cadence.** When it falls behind its supported line, security fixes stop reaching users. Track it, scan it, and update it like any other dependency.
+- **A bundled runtime or embedded browser engine is a dependency, with its own update cadence.** When it falls behind its supported line, security fixes stop reaching users. Track it, scan it, and update it like any other dependency, moving up one major line at a time.
 - **Native libraries are pinned per OS and architecture**, and the lockfile covers each target, so every platform build resolves the same versions.
 - **Every dependency that ships to users is a license obligation.** Keep the third-party notices the licenses require inside the app (an about or licenses screen), generated from the lockfile.
 
@@ -84,21 +86,18 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 
 ## sdsi:deploy
 
-- **The deploy target is "distributed package."** Decide the shape per OS and write it down: a store package, a signed installer, a platform package format, or a portable archive. Each one decides how updates, uninstall, and sandboxing work.
-- **A sanctioned deviation from `sdsi:deploy`'s "config stays out of the built artifact."** The shipped defaults (`config/default.yaml`) are bundled read-only, because nothing can mount config onto a user's machine; the user and policy layers (`sdsi:config` above) are what stay outside the package.
-- **Every executable and installer is code-signed with a consistent publisher identity and timestamped.** That covers helper binaries and bundled libraries as well as the installer. On macOS, distribution outside the store also requires the hardened runtime and notarization. An unsigned or untimestamped build is never published.
-- **Updates are authenticated end to end.** Updates are served over HTTPS, the update metadata and payload are signed with a key separate from transport TLS, and the app verifies the signature before installing anything. The design defends against the attacks described by The Update Framework: arbitrary or mismatched packages, rollback, and freeze.
+- **The deploy target is "distributed package."** Decide the shape per OS and write it down: a store package, a signed installer, a platform package format, or a portable archive. Each one decides how updates, uninstall, and sandboxing work. **A sanctioned deviation from `sdsi:deploy`'s "config stays out of the built artifact":** the shipped defaults (`config/default.yaml`) are bundled read-only, because nothing can mount config onto a user's machine; the user and policy layers (`sdsi:config` above) are what stay outside the package.
+- **Every release is signed the way its OS checks it, with a consistent publisher identity.** On Windows, every executable, helper, bundled library, and installer is Authenticode-signed and timestamped. On macOS, distribution outside the store also needs a Developer ID signature, the hardened runtime, and notarization. On Linux, the repository or package format is signed (the distribution's package signing, Flatpak or Snap's own), not each binary. An unsigned or untimestamped build is never published. The OS code-signing keys live in a hardware security module or a cloud signing service, as public code-signing certificates have required since June 2023; the update-signing key lives in the CI secrets store with an offline backup, since losing it strands every installed copy. Only the release pipeline can use either, and neither is ever on a developer machine or in the repository.
+- **Updates are authenticated end to end.** Updates are served over HTTPS, the update metadata and payload are signed with a key separate from transport TLS, and the app verifies the signature before installing anything. Mismatched or arbitrary packages and rollback (`sdsi:versioning` above) are always refused; freeze attacks are defended with signed, expiring update metadata where the updater supports it, as The Update Framework describes.
 - **Promote the signed artifact, never rebuild it.** The exact binaries tested on the beta channel are the ones published to stable (`sdsi:versioning`).
 - **Install as a standard user where the platform allows it**, and support a silent, unattended install for managed deployment. The installer brings every prerequisite that isn't on a clean OS image.
-- **Uninstall removes everything the installer put down**: files, shortcuts, file associations, URL-scheme registrations, scheduled tasks, and registry or desktop entries. User data is left alone unless the user chooses to remove it. Upgrading from release N-1 to N leaves nothing behind from N-1.
-- **Integrate with the desktop through the platform's declarative mechanism**: a package manifest, a bundle property list, or a desktop entry file and its MIME registration. Integration is declared, not done by writing shell or registry hooks at runtime, so it installs and uninstalls cleanly.
+- **Desktop integration is declared, and uninstall removes it.** File associations, URL schemes, shortcuts, and menu entries are declared through the platform's mechanism (a package manifest, a bundle property list, a desktop entry file and its MIME registration), never written as shell or registry hooks at runtime, and no login item or background agent is registered at runtime either. Uninstall removes everything the installer put down, as far as the package format allows; what a format leaves behind (a macOS app dragged to the Trash) is documented with how to remove it. User data is left alone unless the user chooses to remove it, and upgrading from release N-1 to N leaves nothing behind from N-1.
 
 ## Sources
 
 - Microsoft Learn — Prepare to package a desktop application (MSIX): https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-prepare
 - Microsoft Learn — Understanding how packaged desktop apps run on Windows: https://learn.microsoft.com/en-us/windows/msix/desktop/desktop-to-uwp-behind-the-scenes
 - Microsoft Learn — Code signing options for Windows app developers: https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options
-- Microsoft Learn (archive) — Everything you need to know about Authenticode code signing: https://learn.microsoft.com/en-us/archive/blogs/ieinternals/everything-you-need-to-know-about-authenticode-code-signing
 - Microsoft Learn — Accessibility checklist (Windows apps): https://learn.microsoft.com/en-us/windows/apps/design/accessibility/accessibility-checklist
 - Microsoft Learn — High DPI desktop application development on Windows: https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
 - Microsoft Learn — Keep the UI thread responsive: https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/keep-the-ui-thread-responsive
@@ -111,8 +110,10 @@ Language- and framework-neutral: apply each rule through the toolkit and packagi
 - freedesktop.org — XDG Base Directory Specification: https://specifications.freedesktop.org/basedir/latest/
 - freedesktop.org — Desktop Entry Specification: https://specifications.freedesktop.org/desktop-entry/latest/
 - freedesktop.org — Secret Service API: https://specifications.freedesktop.org/secret-service/latest-single/
+- Flatpak — Sandbox permissions and portals: https://docs.flatpak.org/en/latest/sandbox-permissions.html
 - The Update Framework — Security (attacks and design principles): https://theupdateframework.io/docs/security/
 - Sparkle — Documentation (EdDSA-signed updates, HTTPS): https://sparkle-project.org/documentation/
+- Tauri — Updater (signed updates, key handling): https://v2.tauri.app/plugin/updater/
 - Electron — Security checklist: https://www.electronjs.org/docs/latest/tutorial/security
 - IETF RFC 8252 — OAuth 2.0 for Native Apps: https://datatracker.ietf.org/doc/html/rfc8252
 - OWASP — Desktop App Security Top 10: https://owasp.org/www-project-desktop-app-security-top-10/

@@ -1,15 +1,15 @@
 # SDSI Companion — Mobile App
 
-For projects whose profile says **Project type: mobile** — an app installed on phones or tablets (iOS, Android, or both from one cross-platform codebase) and distributed through an app store. Not a skill: `sdsi:core` §1 Step 2 reads this file when the project type is mobile, and a running skill applies **only the section headed with its own name**. A skill with no section here has no mobile-specific additions; it proceeds on its own rules.
+For projects whose profile lists **mobile** in `Companions` — an app installed on phones or tablets (iOS, Android, or both from one cross-platform codebase) and distributed through an app store. Not a skill: `sdsi:core` §1 Step 2 reads this file when the profile names it, and a running skill applies **only the section headed with its own name**. A skill with no section here has no mobile-specific additions; it proceeds on its own rules.
 
 Language-, framework-, and platform-neutral: apply each rule through the toolkit the project uses — native or cross-platform. Where a rule names a platform mechanism (the iOS Keychain, the Android Keystore), it's an example of the kind of thing to use, not a requirement to call it directly. Framework-specific lessons belong in the project's own `CLAUDE.md`, not here.
 
-**A seed, not a finished standard** — a researched base drawn from OWASP MASVS/MASTG and Apple's and Google's published platform and store guidance (Sources, below), not yet grown from a real mobile project. Correct it from the first one that disagrees.
+**A seed, not a finished standard** — a researched base drawn from OWASP MASVS/MASTG and Apple's and Google's published platform and store guidance, checked in 2026-11 (Sources, below), not yet grown from a real mobile project. Correct it from the first one that disagrees. Store requirements change on a schedule: rules here name the requirement, and the dated details live on the store pages in Sources.
 
 ## sdsi:workflow
 
 - **`SPEC.md` states the supported platforms and their minimum OS versions, the form factors (phone, tablet, foldable), and each feature's offline behavior** — what works with no network, what queues, what refuses. Each is checkable on a device, and each later decides the test matrix (`sdsi:testing`).
-- **Store requirements are acceptance criteria, written into `SPEC.md` before the feature that triggers them:** a privacy policy linked in the app and the listing; in-app account deletion wherever accounts can be created; a working reviewer demo account or demo mode for anything behind sign-in. A store rejection is a spec gap found late.
+- **Store requirements are acceptance criteria, written into `SPEC.md` before the feature that triggers them:** a privacy policy linked in the app and the listing; account deletion wherever accounts can be created — started inside the app, plus a web link where a user can ask for deletion without reinstalling it; a working reviewer demo account or demo mode for anything behind sign-in. A store rejection is a spec gap found late.
 - **A change that adds a permission, a data type collected, or a third-party SDK is flagged as scope** (`sdsi:workflow`, "scope changes get flagged"), because it also changes the store's privacy declarations (`sdsi:docs`).
 
 ## sdsi:standards
@@ -30,22 +30,18 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 ## sdsi:security
 
 - **Every externally reachable entry is an untrusted boundary**: deep links and universal/app links, push-notification payloads, data shared in from other apps, exported components, and anything a web view passes back. Validate there (`sdsi:security`); a component that isn't meant to be reached from outside isn't exposed, and a web view never bridges native functions to content the app doesn't control.
-- **Transport security is configured, not left to defaults:** cleartext traffic is disabled in every release variant through the platform's network-security configuration; debug-only trust anchors (a proxy's CA) live in a debug-only override the release build ignores.
-- **Certificate or public-key pinning is a stated decision recorded in `CLAUDE.md`, not a default.** It applies only to endpoints the team controls; when used, it carries at least one backup pin and a written rotation plan, since a pin the server outgrows cuts off every installed copy until users update.
-- **The shipped app is public.** Anything in the binary or its resources — config, strings, obfuscated or not — can be extracted by anyone who installs it. No server credential ships in the app; an operation that needs one goes through the project's own backend, which holds it.
-- **A key that has to ship** (a maps key, a public client ID, an analytics write key) is restricted at its provider to this app's bundle identifier or signing certificate and to the narrowest scope, and is labelled as public where it's configured.
-- **Credentials at rest on the device live only in the platform's secure store** (Keychain on iOS, the Keystore on Android, or a wrapper over them) — never in preferences, plain files, or the app's database. Keys are generated non-exportable and hardware-backed where the device supports it.
-- **Tokens, keys, and device-bound identifiers are excluded from device and cloud backups** (the platform's backup rules, device-only accessibility on secure-store items), so restoring onto another device can't carry them across.
+- **Transport security is configured, not left to defaults.** Both platforms refuse cleartext by default (Android's network-security configuration, iOS's App Transport Security); a release variant never opts back in, and any exception is a finding. Debug-only trust anchors (a proxy's CA) live in a debug-only override the release build ignores.
+- **Certificate or public-key pinning is off by default, and turned on by a decision recorded in `CLAUDE.md`** when the app handles high-risk data (financial, health, credentials, private messages), targets MASVS L2, or a regulator or contract requires it. It covers only endpoints the team controls — never a third-party, CDN, or user-configured host. When used, it pins the public-key hash of a key the team controls (its own CA or the issuing intermediate, never a public-CA leaf that rotates within months), carries at least one backup pin held offline, sets a recorded pin expiry where the platform supports one (accepting that an expired pin fails open), ships a new pin several supported releases before the server changes, and rehearses rotation in staging. Pinning done in code has a validated remote-config switch to turn it off (`sdsi:config`), since a pin the server outgrows cuts off every installed copy until users update.
+- **The shipped app is public.** Anything in the binary or its resources — config, strings, obfuscated or not — can be extracted by anyone who installs it. No server credential ships in the app; an operation that needs one goes through the project's own backend, which holds it. A key that has to ship (a maps key, a public client ID, an analytics write key) is restricted at its provider to this app's bundle identifier or signing certificate and to the narrowest scope, and is labelled as public where it's configured.
+- **Credentials at rest on the device live only in the platform's secure store** (Keychain on iOS, the Keystore on Android, or a wrapper over them) — never in preferences, plain files, or the app's database. Keys are generated non-exportable and hardware-backed where the device supports it; tokens, keys, and device-bound identifiers are excluded from device and cloud backups, so restoring onto another device can't carry them across. A sensitive operation (a payment, revealing a stored secret) asks for biometrics or the device credential, through a key the secure store releases only on that check.
 - **Sensitive values never leak through the OS:** not into the clipboard, notifications, the keyboard's learning cache (sensitive fields are marked secure or no-suggestions), or the app-switcher snapshot of a sensitive screen.
-- **App-signing keys and store-upload credentials are secrets** — held in CI's secret store, never in the repo or a developer's machine alone. Use the store's managed app signing where it's offered, so a lost upload key is recoverable.
 
 ## sdsi:logging
 
 - **The device's system log is readable off the device** (attached debuggers, other tools, bug reports). Release builds strip debug and verbose logging at compile time — not just filter it at runtime — and nothing user-identifying goes to the system log at any level.
 - **Crash reporting and analytics are log destinations that leave the device**, so they're fed through the central logger's fan-out (`sdsi:logging`) and redacted (`sdsi:security`) like any other off-box text — never wired up as a parallel logging path.
 - **Every request to the backend carries a per-session correlation ID** that also tags the app's own logs and crash reports, so one user's problem can be traced across device and server. It's random per install or session — never a hardware identifier or the advertising ID.
-- **Telemetry upload respects the device:** buffered on disk with a size cap, sent in batches when the network is available, never a request per event.
-- **What's collected is what's declared.** Every analytics event or crash field that carries user data matches the store privacy declarations (`sdsi:docs`); tracking a user across other companies' apps or sites needs the platform's tracking consent (App Tracking Transparency on iOS) before any tracking call.
+- **What's collected is what's declared.** Every analytics event or crash field that carries user data matches the store privacy declarations (`sdsi:docs`). Tracking a user across other companies' apps or sites needs the platform's tracking consent (App Tracking Transparency on iOS) before any tracking call, and sending personal data to a third-party AI service needs the user's disclosed, explicit permission first.
 
 ## sdsi:errors
 
@@ -61,7 +57,7 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 - **Work tied to a screen is cancelled with that screen**, through the toolkit's lifecycle-scoped work, so it neither leaks nor writes to a UI that's gone.
 - **Work that must outlive the screen or the process goes through the platform's scheduled-work API**, with stated constraints (network, charging), never an in-process thread that the OS will freeze. Long-running foreground work uses the platform's sanctioned mechanism and its required user-visible notice.
 - **Offline-first data: the local store is the source of truth for reads.** Writes land locally first, then sync; each sync operation is idempotent (a client-generated ID or idempotency key), and the conflict rule — last write wins, or a merge — is stated in `SPEC.md`, never left to whichever request arrives last.
-- **No polling to stay current.** Use server push, or scheduled sync the OS can batch; foreground refresh is on user action or screen entry.
+- **No polling, and no request per event.** Stay current through server push, or scheduled sync the OS can batch; foreground refresh is on user action or screen entry. Telemetry is buffered on disk with a size cap and sent in batches when the network is available.
 
 ## sdsi:testing
 
@@ -73,9 +69,8 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 
 ## sdsi:dependencies
 
-- **Every SDK's data collection is the app's data collection.** Before adding one, find out what it collects and transmits; adding it updates the store privacy declarations in the same change (`sdsi:docs`), and on iOS it must ship its own privacy manifest.
-- **The stores require targeting a recent OS API level on a schedule**, and new builds must use a current toolchain — keeping the platform SDK and build tools current is on `sdsi:dependencies`' regular cadence, because falling behind blocks the next release, not just a scan.
-- **Size is a cost:** every dependency adds to download and install size; a heavy SDK for one feature needs the same justification as any other (`sdsi:dependencies`).
+- **Every SDK's data collection is the app's data collection.** Before adding one, find out what it collects and transmits; adding it updates the store privacy declarations in the same change (`sdsi:docs`). On iOS the app ships its own privacy manifest declaring the required-reason APIs it uses, and an SDK on Apple's list of commonly used SDKs must ship its own manifest and signature.
+- **The stores require a recent target OS API level and a current toolchain on a published schedule** — keeping the platform SDK and build tools current is on `sdsi:dependencies`' regular cadence, because falling behind blocks the next release, not just a scan. Check the current deadlines on the stores' requirement pages (Sources) when planning a release, rather than recording dates here.
 - **No downloaded executable code that changes the app's behavior** — store policy forbids it. Remote config changes behavior only through code paths already shipped in the binary.
 
 ## sdsi:docs
@@ -96,10 +91,11 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 ## sdsi:deploy
 
 - **The deploy target is "distributed package" through the app stores** — record which stores and which tracks (internal, beta, production) in the profile's deploy notes.
+- **App-signing keys and store-upload credentials are secrets** — held in CI's secret store, never in the repo or a developer's machine alone. Use the store's managed app signing where it's offered, so a lost upload key is recoverable.
 - **One signed build is promoted, never rebuilt:** CI builds and signs it once, then the same artifact moves internal → beta → production, the store-track form of `sdsi:deploy`'s promote-by-retag.
 - **Every production release is staged** — the store's phased or percentage rollout — with the crash-free rate and the key flows watched at each step, and the halt criteria written down before it starts.
 - **A store release can't be rolled back, only halted and superseded** by a new, higher build that also has to pass review. Risky features ship behind a remote kill switch so they can be turned off without a release.
-- **A release build is checked before submission:** not debuggable, no debug trust anchors, cleartext disabled, logging stripped, minified and obfuscated, symbols uploaded, and the version and build number both as expected.
+- **A release build is checked before submission:** not debuggable, no debug trust anchors, no cleartext exception, logging stripped, minified and obfuscated, symbols uploaded, and the version and build number both as expected.
 - **A deploy is verified by installing from the store track** and reading the version and build number off the app's about screen — proof the release users get is the one just shipped.
 
 ## Sources
@@ -111,8 +107,10 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 - OWASP MASWE-0005, API keys hardcoded in the app package — https://mas.owasp.org/MASWE/MASVS-STORAGE/MASWE-0005/
 - OWASP MASWE-0001, sensitive data in logs — https://mas.owasp.org/MASWE/MASVS-STORAGE/MASWE-0001/
 - Apple App Store Review Guidelines — https://developer.apple.com/app-store/review/guidelines/
+- Apple upcoming requirements (SDK and toolchain deadlines) — https://developer.apple.com/news/upcoming-requirements/
 - Apple Human Interface Guidelines: Accessibility — https://developer.apple.com/design/human-interface-guidelines/accessibility
 - Apple privacy manifest files — https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+- Apple, privacy manifests and signatures for commonly used SDKs — https://developer.apple.com/news/?id=r1henawx
 - Apple App Tracking Transparency — https://developer.apple.com/documentation/apptrackingtransparency
 - Apple Keychain Services — https://developer.apple.com/documentation/security/keychain-services
 - App Store Connect: Release a version update in phases — https://developer.apple.com/help/app-store-connect/update-your-app/release-a-version-update-in-phases/
@@ -121,9 +119,11 @@ Language-, framework-, and platform-neutral: apply each rule through the toolkit
 - Android Build an offline-first app — https://developer.android.com/topic/architecture/data-layer/offline-first
 - Android Background work overview — https://developer.android.com/develop/background-work/background-tasks
 - Android Security best practices — https://developer.android.com/privacy-and-security/security-best-practices
-- Android Network security configuration — https://developer.android.com/privacy-and-security/security-config
+- Android Network security configuration (cleartext, pinning, pin expiry) — https://developer.android.com/privacy-and-security/security-config
 - Android Keystore system — https://developer.android.com/privacy-and-security/keystore
 - Android Back up user data with Auto Backup — https://developer.android.com/identity/data/autobackup
 - Android Version your app — https://developer.android.com/studio/publish/versioning
+- Google Play target API level requirements — https://developer.android.com/google/play/requirements/target-sdk
 - Google Play: Data safety section — https://support.google.com/googleplay/android-developer/answer/10787469
+- Google Play: Account deletion requirements — https://support.google.com/googleplay/android-developer/answer/13327111
 - Google Play: Release app updates with staged rollouts — https://support.google.com/googleplay/android-developer/answer/6346149

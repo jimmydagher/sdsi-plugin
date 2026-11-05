@@ -16,7 +16,46 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.20 📅 2026-11-01
+## 🆕VERSION 1.3.21 📅 2026-11-04
+
+### Added or New Features
+- The SDSI profile now declares which companions apply. A new `Companions` field lists each one with the evidence for it, main type first, and any extra companion names the part of the code it covers. Core §1 Step 2 gains sharper evidence per type, a table of the usual mixes (a library with a CLI wrapper, a web app with a management CLI, Electron and Tauri apps, mobile backends), and a tie-breaker question: what ships, and who consumes it? A profile without the field gets its type's single companion, recorded on the next run (TODO #16).
+- `sdsi:workflow` has a new upkeep line and a matching Review-checklist item: a change that adds a new kind of surface updates `Companions`. Projects with workflow upkeep installed should run `/sdsi:upkeep` to pick up the line (TODO #16).
+- New companion rules from a review against current guidance and real tools (TODO #16):
+  - web: SSRF and redirect allowlists, upload handling, CSRF beyond `SameSite`, and a TLS 1.2 floor.
+  - cli: `--confirm=<name>`, a pager only on a terminal, and an exit code for "no" answers.
+  - mw: a freshness target, data minimisation and retention, a drift warning, and a `retry_budget` config key.
+  - lib: shipped type information, peer dependencies, experimental marking, and a license with its SPDX identifier.
+  - desktop: a `## sdsi:workflow` section and least-privilege packaging.
+  - mobile: biometric gating for sensitive operations, consent before personal data goes to third-party AI, and a web link for account deletion.
+- `tests/test_skills.py` checks the companions: every heading names a skill, every core type has its file, each companion has Sources, and no block runs past 7 bullets (TODO #16).
+
+### Removed
+- Companion rules a base skill already states (TODO #16):
+  - web's "session, signing, and CSRF keys are secrets".
+  - mobile's "size is a cost".
+
+### Changed
+- Settled the four open points (TODO #16):
+  - **CLI secrets:** a CLI may take a secret from an environment variable, as a documented, sanctioned deviation, for headless and CI runs only. The preferred sources come first: a credential store, then a file or stdin.
+  - **`--json` errors:** they go to stderr as one JSON object. stdout carries only success data, and the exit code is the authority.
+  - **mw destinations:** the shape a service writes is a versioned contract. A breaking change bumps both the contract and the service a MAJOR, and evolves by expand-then-contract.
+  - **Mobile pinning:** off by default, and turned on by a recorded, risk-based decision with pin-type, backup, expiry, and rotation rules.
+- Every companion was checked against current guidance and how mature projects behave, and trimmed to 7 bullets or fewer per block (TODO #16):
+  - web: security is now 12 bullets in three `###` groups.
+  - mw: standards went from 14 to 7 bullets, and errors from 9 to 4.
+  - The other companions are trimmed the same way. Moved rules are stated only in their new section.
+- Corrections from that check (TODO #16):
+  - mw: retries cover only transient statuses. The cache is kept when a run resumes.
+  - lib: dependency ranges have a floor and no cap beyond the ecosystem's caret. Dropping a language version on a declared schedule is MINOR. Environment reads are limited to the ecosystem's standard variables.
+  - desktop: code signing is set per OS, with hardware-held keys as code-signing certificates have required since June 2023. Freeze protection and uninstall apply as far as the updater and package format allow.
+  - web: `frame-ancestors` comes before `X-Frame-Options`, the idempotency-key header is marked as a draft, `Deprecation` and `Sunset` use their correct date formats, and a static site needs no health endpoints.
+  - cli: only the conventional long flag names are reserved.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟦VERSION 1.3.20 📅 2026-11-01
 
 ### Added or New Features
 - `sdsi:optimize`, step 9 of `sdsi:all`: one topic for lean, simple, fast code through the whole lifecycle — the ladder before writing, the size check after, the pass when a feature is finished (reuse, simplification, efficiency, altitude, after Claude Code's `/simplify`), the maintenance sweep (`/sdsi:optimize --review` on the whole project), every element earning its place, and performance tuning only from a before-and-after measurement (after Impeccable's `distill` and `optimize`); six upkeep lines; a `## sdsi:optimize` section in `ref/web.md` (TODO #22).

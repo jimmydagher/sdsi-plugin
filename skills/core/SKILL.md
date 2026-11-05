@@ -37,6 +37,7 @@ Every rule is applied through the project's profile. Look for an `## SDSI profil
 
 - Language: <e.g. Python 3.13>
 - Project type: <web | mw | cli | lib | desktop | mobile | other: short description>
+- Companions: <each companion that applies, main type first, with its evidence; a second one names the code it covers — or none>
 - Deploy target: <recorded by sdsi:deploy when first asked>
 - Upkeep: <recorded by sdsi:upkeep — the installed topics, or declined>
 ```
@@ -48,21 +49,33 @@ If the section or a field the current skill needs is missing, **ask with `AskUse
 
   | Type | Companion | For | Evidence in the code |
   |---|---|---|---|
-  | `web` | `ref/web.md` | Anything serving pages or an HTTP API to users | A web framework dependency, routes/handlers, templates |
-  | `mw` | `ref/mw.md` | Services moving and reconciling data between systems (sync, ETL, connectors) | Connectors to external systems, scheduled or triggered sync tasks, a destination write |
-  | `cli` | `ref/cli.md` | A tool meant to be run and reused, not a one-off | An argument parser at the entry point, commands, no server |
-  | `lib` | `ref/lib.md` | A library or package other code imports — published to a registry or shared internally | A package manifest with an exported API and no entry point of its own; consumers import it |
-  | `desktop` | `ref/desktop.md` | A GUI application installed on users' machines (Windows, macOS, Linux) | A desktop UI toolkit dependency, windows/views, an installer or app bundle definition |
-  | `mobile` | `ref/mobile.md` | An iOS, Android, or cross-platform mobile app | A mobile SDK or framework, app manifests (`Info.plist`, `AndroidManifest.xml`), store build config |
+  | `web` | `ref/web.md` | Anything serving pages or an HTTP API to users | A web framework dependency, routes/handlers, templates or a front-end bundle, an HTTP listener with sessions or CORS, an API description, health endpoints |
+  | `mw` | `ref/mw.md` | Services moving and reconciling data between systems (sync, ETL, connectors) | Connectors to external systems with auth and paging settings, scheduled or queue-triggered tasks, a watermark or state store, a rejects store, a destination write |
+  | `cli` | `ref/cli.md` | A tool meant to be run and reused, not a one-off | An argument parser at a declared executable entry point, commands and an exit-code table, completion or man pages, no server |
+  | `lib` | `ref/lib.md` | A library or package other code imports — published to a registry or shared internally | A package manifest with an exported API and a publish step, no entry point or deployable of its own; consumers import it |
+  | `desktop` | `ref/desktop.md` | A GUI application installed on users' machines (Windows, macOS, Linux) | A desktop UI toolkit or native shell (including web-tech shells), windows/views, per-OS installer, signing, and updater config |
+  | `mobile` | `ref/mobile.md` | An iOS, Android, or cross-platform mobile app | A mobile SDK or framework with committed `ios/`/`android/` projects, app manifests (`Info.plist`, `AndroidManifest.xml`), store build and signing config |
   | `other` | — | Anything else | — |
 
-  A project can be more than one (a web app that ships a CLI); record the main type, and name the second in the profile when its companion should apply too.
+  **A project can need more than one companion.** Record the main type in `Project type`, and list every companion that applies in `Companions` — main type first, each with its evidence in one clause, and each extra one with the code it covers. An extra companion's rules apply only inside that scope: a library's CLI wrapper follows the CLI's exit codes, its importable modules never do. The usual mixes:
 
-  **Identify it from the code when it isn't recorded** — say what you found and why ("web: a web framework dependency and route handlers in `src/app/`") and record it. Ask with `AskUserQuestion` only when the evidence is mixed or the project is empty. Never pick one silently.
+  | Project | Main type | Extra companion |
+  |---|---|---|
+  | A library with a thin CLI wrapper | `lib` | `cli`, on the wrapper only |
+  | A web app with a management CLI | `web` | `cli`, on the command surface |
+  | An integration service with a webhook receiver | `mw` | `web`, on the receiver |
+  | An Electron or Tauri app | `desktop` | — (not `web`) |
+  | A terminal UI | `cli` | — |
+  | An API-only service, a static site, a PWA | `web` | — |
+  | The backend of a mobile app | `web` or `mw` | — (`mobile` only where the app project is in the repo) |
+  | A cross-platform toolkit with phone targets | `mobile` | `desktop`, when desktop targets also ship |
+  | An SDK for the company's own API | `lib` | — |
+
+  **Identify it from the code when it isn't recorded** — say what you found and why ("web: a web framework dependency and route handlers in `src/app/`") and record it. When the evidence is mixed, ask what ships and who consumes it: a person typing a command (cli), code importing it (lib), a browser or HTTP client (web), a schedule or another system (mw), an installer (desktop), a store (mobile). Ask with `AskUserQuestion` only when that still ties or the project is empty. Never pick one silently. A profile with `Project type` but no `Companions` gets the one companion its type names, over the whole project — recorded and reported. `other` records `Companions: none`.
 
 A topic may ask its own questions (e.g. `sdsi:deploy` asks the deploy target); it records its answer in the same profile section.
 
-**The project-type companion.** Once the type is known, a skill reads its companion (`../../ref/<type>.md` — each recorded type's, when there are two) and applies **only the section headed with its own name** (`## sdsi:errors` for `sdsi:errors`) on top of its own rules — in apply mode as extra rules, in review mode as part of the lens. When the companion has no section for the running skill, or the type is `other`, there's nothing to add: say so in one line ("no web-specific considerations for errors") and continue. A companion never overrides core or the skill; where it deliberately deviates (e.g. the CLI's flag precedence over `sdsi:config`), it says so.
+**The project-type companion.** Once the companions are known, a skill reads each one (`../../ref/<type>.md`) and applies **only the section headed with its own name** (`## sdsi:errors` for `sdsi:errors`) on top of its own rules, within that companion's scope — in apply mode as extra rules, in review mode as part of the lens. When the companion has no section for the running skill, or the profile says `Companions: none`, there's nothing to add: say so in one line ("no web-specific considerations for errors") and continue. A rule for a surface the project doesn't have (sessions on a static site) is skipped the same way, in one line. A companion never overrides core or the skill; where it deliberately deviates (e.g. the CLI's flag precedence over `sdsi:config`), it says so.
 
 ### Step 3 — Resolve the mode: review or apply
 

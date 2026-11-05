@@ -1,10 +1,10 @@
 # SDSI Companion — Command-Line Tool
 
-For projects whose profile says **Project type: cli**: a tool meant to be run and reused, not a one-off script. This is not a skill. `sdsi:core` §1 Step 2 reads this file when the project type is cli, and a running skill applies **only the section headed with its own name**. A skill with no section here has no CLI-specific additions and proceeds on its own rules.
+For projects whose profile lists **cli** in `Companions`: a tool meant to be run and reused, not a one-off script. This is not a skill. `sdsi:core` §1 Step 2 reads this file when the profile names it, and a running skill applies **only the section headed with its own name**, within the scope the profile gives (the whole project, or only the command surface of a library or web app). A skill with no section here has no CLI-specific additions and proceeds on its own rules.
 
 Language- and framework-neutral: apply each rule through the project language's own argument parser and packaging. Parser-specific lessons belong in the project's own `CLAUDE.md`, not here.
 
-**A seed, not a finished standard.** It's built on the widely shared CLI conventions (POSIX utility syntax, the GNU coding standards, the Command Line Interface Guidelines, NO_COLOR, XDG) and has not yet been distilled from a real CLI project. Correct it from the first one that disagrees.
+**A researched base, checked in 2026-11** against the widely shared CLI conventions (POSIX utility syntax, the GNU coding standards, the Command Line Interface Guidelines, NO_COLOR, XDG) and the documented behavior of mature tools (gh, kubectl, the AWS CLI, terraform, npm, cargo, go). It hasn't been distilled from a real CLI project of ours yet. Correct it from the first one that disagrees.
 
 ## sdsi:workflow
 
@@ -12,15 +12,10 @@ Language- and framework-neutral: apply each rule through the project language's 
 
 ## sdsi:standards
 
-- **One callable per command, dispatched from a registry** that asserts completeness at startup. An unwired command fails immediately instead of the first time someone runs it.
-- **Group commands by the noun they act on** (`tool user add`, `tool user list`) once there are more than a handful, not before a second command needs the grouping. A group name on its own is an area, not an action: it shows that group's help and exits as invalid input. Use the same verb for the same action across every noun.
-- **Follow the platform's argument syntax through a real parser, never hand-rolled `argv` splitting.** Every option has a long form, and a one-letter alias only if it's used often. `--` ends option parsing. `-` as a file operand means stdin or stdout. Options and their order work wherever the parser allows. The parser also gives you usage errors, help, and completion for free.
-- **Names are lowercase and kebab-case** (`--dry-run`, `user-group`). Option names are nouns and leaf commands are verbs. Plural or singular is consistent across options that take several values.
-- **Reuse the conventional flag names, never with another meaning:** `-h/--help`, `--version`, `-q/--quiet`, `-v/--verbose`, `-n/--dry-run`, `-f/--force`, `-o/--output`, `--json`, `--no-input`, `--no-color`. A user's muscle memory is part of the interface.
-- **No catch-all command and no implicit prefix abbreviation** (`tool inst` for `tool install`). Either one blocks adding a command later without breaking someone's script.
-- **Prefer flags to positional arguments** once a command takes more than one kind of value. Several positionals of the same kind (`tool rm a b c`) are fine. Two different things by position (`cp src dest`) are fine only when the convention is universal.
-- **Destructive actions confirm safely:** a `--yes`/`--force` flag for scripted use, and an interactive prompt only when stdin is a real terminal. A prompt must never block CI forever. `--no-input` turns off every prompt, and a missing answer then fails as invalid input naming the flag that supplies it.
-- **A command that changes state supports `--dry-run`** when the change is non-trivial, so you can see what it would do before it does it.
+- **The command grammar is regular.** One callable per command, dispatched from a registry. Group commands by the noun they act on (`tool user add`, `tool user list`) once there are more than a handful, not before a second command needs the grouping; a group name on its own is an area, not an action: it shows that group's help and exits as invalid input. Use the same verb for the same action across every noun. No catch-all command and no implicit prefix abbreviation (`tool inst` for `tool install`) — either one blocks adding a command later without breaking someone's script.
+- **Follow the platform's argument syntax through a real parser, never hand-rolled `argv` splitting.** Every option has a long form, and a one-letter alias only if it's used often. `--` ends option parsing. `-` as a file operand means stdin or stdout. The parser also gives you usage errors, help, and completion for free. Names are lowercase and kebab-case (`--dry-run`, `user-group`); option names are nouns and leaf commands are verbs; plural or singular is consistent across options that take several values.
+- **Conventional flag names keep their conventional meaning.** The long names `--help`, `--version`, `--quiet`, `--verbose`, `--dry-run`, `--force`, `--json`, `--no-input`, and `--no-color` are never used for anything else, nor are `-h` and `-q`. Other short aliases (`-v`, `-f`, `-n`, `-o`) mean different things across real tools, so give one only when this tool's users expect it, and never with a meaning that contradicts its long name. Prefer flags to positional arguments once a command takes more than one kind of value; several positionals of the same kind (`tool rm a b c`) are fine, and two different things by position (`cp src dest`) only where the convention is universal.
+- **Changes are safe to make.** A destructive action takes `--yes`/`--force` for scripted use and prompts only when stdin is a real terminal — a prompt never blocks CI. `--no-input` turns off every prompt, and a missing answer then fails as invalid input naming the flag that supplies it. A severe, hard-to-undo action asks for the target's name (`--confirm=<name>`), not just yes. A command that changes state non-trivially supports `--dry-run`, so you can see what it would do before it does it.
 
 ## sdsi:config
 
@@ -32,33 +27,33 @@ Language- and framework-neutral: apply each rule through the project language's 
 
   The last layer is `sdsi:config`'s default file shipped inside the package, never a default written in code. Every layer is merged first, and then the merged result is schema-validated once.
 - **Say which layer won:** a `--show-config` or verbose mode reports where each effective value came from.
-- **An environment variable is for what persists across runs** (an endpoint, a default profile). A flag is for what the user decides now. The tool's own variables share one uppercase prefix (`TOOL_ENDPOINT`), and each one is documented.
+- **Each layer has its job:** a config file holds what persists across runs, an environment variable what varies with the context the tool runs in (a CI job, a shell session), and a flag what the user decides now. The tool's own variables share one uppercase prefix (`TOOL_ENDPOINT`), and each one is documented.
 - **User files go where the platform expects them:** the XDG base directories on Linux and similar systems (`$XDG_CONFIG_HOME`, defaulting to `~/.config/<tool>`, plus the data, state, and cache homes for each kind of file), and the platform's own locations elsewhere. Never a new dotfile in the home directory. Ignore a relative XDG path, and create missing directories as user-only.
 - **Respect the standard environment variables for capabilities the tool has:** `NO_COLOR`, `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`, `TMPDIR`, `PAGER`, `EDITOR`, `HOME`. This is a second sanctioned deviation from `sdsi:config`'s rule about environment variables, because users set these once for every tool they use.
 - **Never edit a file the tool doesn't own** (a shell profile, another tool's config) without asking first.
 
 ## sdsi:security
 
-- **A secret is never accepted as a flag.** It would show up in shell history and process listings. Read it from the secrets store, or from an environment variable or file the user points to.
-- **Prefer a file or stdin to an environment variable** (`--token-file <path>`, or `-` for stdin). Environment variables are inherited by every child process and show up in crash dumps and container inspection. Never put a secret in the environment of a subprocess the tool starts unless that subprocess needs it.
+- **A secret is never accepted as a flag** — it would show up in shell history and process listings. The tool accepts one, in this order: the platform's credential store or a credential helper; a file or stdin the user points to (`--token-file <path>`, or `-`), including a `TOOL_<NAME>_FILE` variable holding a path; and an environment variable (`TOOL_TOKEN`), documented as the input for headless and CI runs — never the first thing the docs show an interactive user. **A sanctioned deviation from `sdsi:security`'s "environment variable as a last resort":** the tool runs in its caller's environment, not in a deployment the project controls, and a CI runner has no secrets store to offer it.
+- **A secret from the environment is read once and contained:** never echoed, logged, shown by `--show-config`, written to a config file, or passed into the environment of a subprocess the tool starts unless that subprocess needs it.
 - **Interactive secret input is never echoed**, and a prompt for it only appears when stdin is a terminal.
-- **A credential the tool caches** (a login token) lives in the platform's credential store, or else in a user-only file under the config or state directory. Never in the config file, and never readable by other users.
+- **A credential the tool caches** (a login token) lives in the platform's credential store, or else in a user-only file under the config or state directory. Never in the config file, and never readable by other users. Falling back to a plain file because no store is available is said to the user when it happens.
 
 ## sdsi:logging
 
 - **stdout is the tool's output; stderr is everything else:** progress, warnings, and diagnostics. A caller piping stdout never has to filter out noise.
 - **Color is decided once, from whether stdout is an interactive terminal.** Piped output is plain unless the user forces it (`--color=always`). Color is also off when `NO_COLOR` is set to a non-empty value, when `TERM=dumb`, or with `--no-color`. An explicit flag overrides `NO_COLOR`. stderr's color is decided from stderr's own terminal check.
-- **Spinners, progress bars, and cursor tricks only run when stderr is a terminal.** In a pipe or CI, report progress as occasional plain lines or not at all. Never redraw a line into a log file.
+- **Terminal tricks only run on a terminal.** Spinners, progress bars, and cursor redraws only when stderr is a terminal; in a pipe or CI, report progress as occasional plain lines or not at all, and never redraw a line into a log file. Long output goes through a pager only when stdout is a terminal, honoring `PAGER`, with `--no-pager` to turn it off.
 - **`-q` and `-v` set the logger's floor for this run** (a flag overriding the configured level). Quiet still prints errors. Verbose or debug detail (stack traces, timings, request details) is never shown by default.
 - **What a person reads on the console is messages, not log records.** No timestamps or level labels on normal output. The full structured record goes to the log file or the verbose mode. Both still go through the one central logger, with a console format chosen at startup.
 - **No usage data is sent anywhere without opt-in consent.** If the tool collects telemetry, the docs and the opt-in prompt say what it collects, why, and how long it's kept.
 
 ## sdsi:errors
 
-- **Exit codes are documented and stable:** `0` for success and a distinct code for each outcome class in `sdsi:errors`' table. They're listed in the help text or README and kept as stable as flag names.
-- **Choose codes that don't collide with what the shell reserves.** `2` is the conventional usage error (Invalid input). Never use `126`, `127`, or `128` and above for the tool's own outcomes, because the shell uses them for "not executable", "not found", and "killed by signal N". `Interrupted` exits `128 + signal number` (130 for Ctrl-C) so a calling shell sees what really happened. Pick any other custom codes from a small documented range (`64`–`113` is the traditional one). Don't adopt `sysexits` wholesale: its own maintainers have deprecated it.
+- **Exit codes are documented, stable, and clear of the shell's.** `0` is success and each outcome class in `sdsi:errors`' table gets a distinct code, listed in the help text or README and kept as stable as flag names. `2` is the default usage error (Invalid input); a tool that diverges documents its own table. Never use `126`, `127`, or `128` and above for the tool's own outcomes — the shell uses them for "not executable", "not found", and "killed by signal N" — except `Interrupted`, which exits `128 + signal number` (130 for Ctrl-C) so a calling shell sees what really happened. Pick other custom codes from a small documented range (`64`–`113` is the traditional one). Don't adopt `sysexits` wholesale: its own maintainers have deprecated it.
+- **A command whose answer can be "no" says so with its own code**, not a failure: no match, or differences found, exits `1`, as `grep` and `diff` do, and the command's real failures use a different code.
 - **No command given is an invalid-input error** with usage on stderr, never a silent success. When the tool expects input on stdin and stdin is a terminal with nothing piped, show usage instead of waiting silently.
-- **A machine-readable mode (`--json`) for any command a script might wrap**, including its errors. Scripts never parse the human-readable text. The machine-readable shape is a versioned contract.
+- **A machine-readable mode (`--json`) for any command a script might wrap.** Scripts never parse the human-readable text; the machine-readable shape is a versioned contract. stdout carries only success data and is empty on failure; the error goes to stderr — with `--json`, as one JSON object of a documented shape — and the exit code is the authority, so `tool --json | jq` never receives an error as data. The one exception is a command that is itself a stream of events (a build, a plan): its diagnostics are records in that stream, and it still exits non-zero.
 - **An expected error reads like an instruction, not a trace:** what failed, the value or file involved, and what to do next, on stderr. Put the most important line last, where the eye lands. The stack trace still goes to the log through the global handler, and to the console only in verbose mode.
 - **An unexpected error tells the user how to report it:** where the full detail was written and where to file the bug. Never just a bare trace.
 - **A closed output pipe is not a failure** (`tool list | head`). Exit quietly, the way the platform's own tools do, with no error message and no stack trace.
@@ -73,7 +68,7 @@ Language- and framework-neutral: apply each rule through the project language's 
 
 - **Test each command's callable directly**, and keep a few end-to-end tests that run the packaged entry point as a subprocess.
 - **Snapshot `--help` and machine-readable output** so an unexpected change fails loudly.
-- **An argument-wiring test names what it catches:** a flag silently ignored, a command left unregistered.
+- **The command registry asserts its completeness at startup, and a wiring test names what it catches:** a flag silently ignored, a command left unregistered. An unwired command then fails immediately instead of the first time someone runs it.
 - **Assert the exit code of every outcome class** at least once through the subprocess path. A wrong exit code passes every assertion on stdout and breaks every script that wraps the tool.
 - **Test the non-interactive path the way CI runs it:** stdout and stdin not a terminal, `NO_COLOR` set, `--no-input`. Assert no escape codes, no prompt, and nothing hanging. A tool that only works in a terminal breaks the first time it's scripted.
 - **Run the subprocess tests on every operating system the tool ships for.** Paths, line endings, signals, and terminal detection differ between them.
@@ -120,3 +115,8 @@ Language- and framework-neutral: apply each rule through the project language's 
 - Advanced Bash-Scripting Guide, Exit Codes With Special Meanings — https://tldp.org/LDP/abs/html/exitcodes.html
 - 12 Factor CLI Apps (Jeff Dickey) — https://medium.com/@jdxcode/12-factor-cli-apps-dd3c227a0e46
 - hyperfine PR #932, handling a broken stdout pipe gracefully — https://github.com/sharkdp/hyperfine/pull/932
+- GitHub CLI, environment variables and exit codes — https://cli.github.com/manual/gh_help_environment, https://cli.github.com/manual/gh_help_exit-codes
+- AWS CLI, environment variables and return codes — https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html, https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-returncodes.html
+- Terraform, machine-readable UI — https://developer.hashicorp.com/terraform/internals/machine-readable-ui
+- Cargo, JSON messages for external tools — https://doc.rust-lang.org/cargo/reference/external-tools.html
+- npm/cli #5716, JSON errors on stdout reported as breaking — https://github.com/npm/cli/issues/5716

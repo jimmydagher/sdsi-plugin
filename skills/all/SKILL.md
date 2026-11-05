@@ -20,8 +20,8 @@ Before anything else, read `../core/SKILL.md` — it defines the steps, the orde
 
 ## How the run goes
 
-1. **Core's steps, once for the whole run** (core §1): say what's running, load the project profile (language, and the project type — detected from the code or asked), read the project-type companion once, and resolve the mode — review or apply — **once**, not once per topic.
-2. **Walk core §4's table in order**, top to bottom. For each row, read that skill's `SKILL.md` (`../<name>/SKILL.md`) and add the companion's section for that skill, if it has one. Before each step, tell the human which it is and whether the companion adds anything ("Step 5/13 — `sdsi:logging` + web").
+1. **Core's steps, once for the whole run** (core §1): say what's running, load the project profile (language, the project type, and its companions — detected from the code or asked), read each companion once, and resolve the mode — review or apply — **once**, not once per topic.
+2. **Walk core §4's table in order**, top to bottom. For each row, read that skill's `SKILL.md` (`../<name>/SKILL.md`) and add each companion's section for that skill, if it has one, within that companion's scope. Before each step, tell the human which it is and whether a companion adds anything ("Step 5/13 — `sdsi:logging` + web").
 3. **Topic questions are asked when their step comes up** (e.g. `sdsi:deploy` asks the deploy target when its step comes up) and recorded in the profile like any other answer.
 
 ## Review mode

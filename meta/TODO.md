@@ -1,7 +1,5 @@
 # SDSI
 
-- [ ] #16 Review and expand companion instructions
-  Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)
 - [ ] #17 Check the ponytail skill
   Check skills pony-tail to enhance the coding instructions <#maestro feature=FX0013_PONYTAIL>
 
@@ -70,3 +68,5 @@
   As AI coding took off, duplicate code blocks jumped 8x in 2024 (GitClear, 211M lines). And every extra line is something Claude has to read. I want to add instructions that when doing review or standards we should make sure the following are taking place. if standards are not the right place, propose a new skill.
 - [x] #22 create /sdsi:optimize sub-skills — completed 2026-11-01 · VERSION 1.3.20
   currently multiple instructions to optimize the code in multiple ways are sitting in different part of sdsi. i want to move them into a optimize sub-skill, which of course, run when using /sdsi:all. I want this optimization skills to be present thru the lifecycle of the coding, but when doing maintenance I would like to re-run those particular instructions to ensure there is no dead code. these instructions should be similar to /simplify and look deeper at ponytail (https://github.com/dietrichgebert/ponytail) and impeccable (https://github.com/pbakaus/impeccable) as well as other principles already in sdsi, and move them into this new sub-skill.
+- [x] #16 Review and expand companion instructions — completed 2026-11-04 · VERSION 1.3.21
+  Review and expand the companion instructions (`ref/web.md`, `cli.md`, `mw.md`, `lib.md`, `desktop.md`, `mobile.md`) — they're a researched base; confirm or correct each rule against real projects, trim sections over ~7 bullets, and settle the open points the research flagged (CLI secrets via environment variables, where `--json` errors go, mw's schema-change-is-MAJOR rule, mobile pinning)

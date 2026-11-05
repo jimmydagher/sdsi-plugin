@@ -1,10 +1,10 @@
 # SDSI Companion — Web
 
-For projects whose profile says **Project type: web** — anything serving pages or an HTTP API to users. Not a skill: `sdsi:core` §1 Step 2 reads this file when the project type is web, and a running skill applies **only the section headed with its own name**. A skill with no section here has no web-specific additions; it proceeds on its own rules.
+For projects whose profile lists **web** in `Companions` — anything serving pages or an HTTP API to users. Not a skill: `sdsi:core` §1 Step 2 reads this file when the profile names it, and a running skill applies **only the section headed with its own name**. A skill with no section here has no web-specific additions; it proceeds on its own rules. A rule for a surface the project doesn't have — pages on an API-only service, sessions on a static site — is skipped, in one line.
 
-Language- and framework-neutral: apply each rule through the framework the project uses. Framework-specific lessons belong in the project's own `CLAUDE.md`, not here. The security rules follow OWASP (Top 10, ASVS, cheat sheets); where a rule names a header or status code, it is the standard one, not a house invention.
+Language- and framework-neutral: apply each rule through the framework the project uses. Framework-specific lessons belong in the project's own `CLAUDE.md`, not here. The security rules follow OWASP (Top 10:2025, ASVS 5.0, the cheat sheets); where a rule names a header or status code, it is the standard one, not a house invention.
 
-**A seed, not a finished standard.** Grow a section when a real web project teaches something that holds across frameworks.
+**A seed, not a finished standard** — checked in 2026-11 against OWASP, the HTTP RFCs, WCAG 2.2, web.dev, and the public API guidelines of Zalando and Microsoft (Sources, below). Grow a section when a real web project teaches something that holds across frameworks.
 
 ## sdsi:workflow
 
@@ -12,7 +12,7 @@ Language- and framework-neutral: apply each rule through the framework the proje
 - **Review the launch checklist with the developer while writing `SPEC.md`.** Go group by group, ask which items this application needs (a public marketing site needs most; an internal tool or API few), and record in `SPEC.md` each one that applies and each one deliberately skipped, so none is forgotten or built by default:
   - **Pages and content** — a custom 404 (and 403/500, built under `## sdsi:errors`), a call to action above the fold, an FAQ, a real contact address, a privacy policy page, a terms page, a thank-you page after each form.
   - **Search and sharing** — a unique meta title and meta description per page, canonical URLs, `robots.txt`, `sitemap.xml`, an Open Graph image, social-share links or previews, and a full favicon set.
-  - **Compliance and measurement** — a cookie banner with consent before any non-essential cookie or script, analytics installed (and gated by that consent), and nothing loaded that the privacy policy doesn't mention.
+  - **Compliance and measurement** — a cookie banner, where privacy law requires consent, collecting it before any non-essential cookie or script; analytics installed (and gated by that consent); and nothing loaded that the privacy policy doesn't mention.
   - **Screens and states** — mobile layout and its breakpoints, a sticky mobile call to action where the page has one primary action, a loading state for every wait, and an error state for every form field and for the form as a whole. Alt text on every informative image (accessibility itself is the target above).
   - **Before launch** — links checked for breakage, performance measured against the budget above.
 - **An HTTP API is designed contract-first.** The endpoint's request, response, and error shapes are written in the project's API description (an OpenAPI document or the framework's equivalent) and approved with the plan, before the handler is written.
@@ -20,54 +20,45 @@ Language- and framework-neutral: apply each rule through the framework the proje
 
 ## sdsi:standards
 
-- **The request layer is thin.** A route/handler parses and validates input at the boundary, calls one service, and shapes the response. A business rule inside a handler is a finding.
-- **Services never see request or response objects** — they take plain, validated values, so they can be called from a job, a test, or another handler unchanged.
+- **The request layer is thin.** A route/handler parses and validates input at the boundary, calls one service, and shapes the response; a business rule inside a handler is a finding. Services never see request or response objects — they take plain, validated values, so they can be called from a job, a test, or another handler unchanged.
 - **Safe methods never change state.** `GET` and `HEAD` only read; anything that writes uses `POST`, `PUT`, `PATCH`, or `DELETE`, and an endpoint rejects methods it doesn't support with `405`.
 - **API shapes are conservative and extensible** — a JSON response's root is an object, never a bare array; unknown or read-only input fields are rejected rather than silently bound (no mass assignment); field naming follows one casing across the whole API; every list endpoint is paginated.
 - **UI code reuses the established design** — palette, type, spacing, components. Load a design skill before writing new markup or styles, and ground new tokens in what's already on the page rather than starting a parallel visual language.
 - **UI meets WCAG 2.2 AA** — semantic elements before ARIA, a label on every form control, everything operable by keyboard with a visible focus, text contrast at least 4.5:1 (3:1 for large text), and pointer targets at least 24×24 CSS px.
 - **One UI framework per application.** Never mix two component frameworks (Angular with React, say) in one front end; pick one in the plan and use it throughout. A deliberate micro-frontend or migration is the exception, recorded in `SPEC.md` with its end date.
-- **A served asset is never edited in place** when it's built from a source asset; the source is edited and the served copy rebuilt. Name the two so which is which is obvious.
 
 ## sdsi:config
 
 - **HTTPS forcing, HSTS, trusted origins and proxies, CORS, and the security headers are settings in config**, but the rules for them are in `## sdsi:security` below.
-- **Allowed hosts list both the bare domain and its `www.` variant** for every environment reachable by either — the forgotten one fails with a 400 or a silent CSRF rejection.
+- **The host allowlist names every hostname the app is reached by in each environment** — both the bare domain and its `www.` variant where either works. The forgotten one fails with a 400 or a silent CSRF rejection.
 - **Session and timeout values are settings** — idle timeout, absolute session lifetime, upload size limit, and rate limits live in config with the rest, not as framework defaults nobody chose.
 - **The framework's settings module is a bridge, not a source.** It maps validated SDSI config onto framework settings; no setting is authored there and no environment variable is read there for an ordinary setting.
 - **Every environment has the files and assets it serves.** When creating an environment, check that each file the site expects (`favicon.ico`, `robots.txt`, error pages, static assets) is in place for it, and create any that's missing rather than letting it 404.
 
 ## sdsi:security
 
-Access and data exposure:
+### Access and data
 
-- **Access control is deny-by-default and checked server-side on every request**, including per object: loading a record by an ID from the request checks that this user may see that record. That's the web form of `sdsi:security`'s "Isolation reaches every path and every copy". A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk).
+- **Access control is deny-by-default and checked server-side on every request.** A route with no stated rule, or a check that exists only in the UI, is a finding (broken access control is OWASP's #1 risk). Loading a record by an ID from the request checks that this user may see that record — the web form of `sdsi:security`'s "Isolation reaches every path and every copy".
 - **A guest endpoint's response is shaped by a dedicated, redacted response type.** It's never the account model serialized with fields hidden in the template or the script. A page reached without signing in also gets no protected data in its markup, inline script state, or hidden inputs, and is served `Cache-Control: no-store`.
 - **Output is encoded for its context by the template engine's auto-escaping**, and every query is parameterized. A bypass of either (a raw-HTML marker, string-built SQL or shell) is justified in a comment next to the line, or it's a finding.
+- **A URL from the request is never followed blindly.** A server-side fetch of a user-supplied URL (a webhook target, an import, a preview) goes only to an allowlist of schemes and hosts, and never to internal, loopback, link-local, or cloud-metadata addresses — checked after DNS resolution and again on every redirect. A redirect target taken from the request (a post-sign-in `next`) is a local path or an allowlisted origin.
+- **Uploads are untrusted files.** The type is allowlisted by content, not by the name's extension; the size is capped in config; the file is stored outside the served root under a generated name, served back as a download with `X-Content-Type-Options: nosniff`, and never executed or included.
 
-Transport and headers, each stated in every environment override:
+### Transport and headers
 
-- **Forcing HTTPS is its own explicit setting, never derived from debug mode.** Turning debug off without stating HTTPS forcing inherits a default that redirects to an `https://` nothing serves and sets secure-only cookies the browser refuses, anywhere without TLS termination. Every environment override states it.
-- **HSTS, secure-only cookies, and the HTTPS redirect are each stated per environment** alongside HTTPS forcing — same reason. HSTS (`Strict-Transport-Security`) is only ever sent from an environment that genuinely serves HTTPS, since browsers remember it.
-- **A self-hosted, LAN-only deployment gets its own security settings** — HTTPS forcing off, its own address in allowed hosts — never a cloud deployment's settings inherited as a default.
-- **Trusted origins are added only when needed** — when a request's `Origin` won't match its own scheme and host (a TLS-terminating proxy changes the scheme). A plain-HTTP deployment reached at its own address usually needs none.
-- **Trusted proxies are configured explicitly**, so the client address, scheme, and host read from forwarding headers come only from a proxy you run — never trusted from any caller.
+Each is stated in every environment override:
+
+- **HTTPS forcing, HSTS, secure-only cookies, and the HTTPS redirect are each an explicit setting per environment**, never derived from debug mode — turning debug off without stating them inherits defaults that redirect to an `https://` nothing serves and set cookies the browser refuses, anywhere without TLS termination. HSTS (`Strict-Transport-Security`) is only sent from an environment that genuinely serves HTTPS, since browsers remember it. A self-hosted, LAN-only deployment gets its own settings (HTTPS forcing off, its own address in the host allowlist), never a cloud deployment's inherited as a default. Where HTTPS is served, it's TLS 1.2 or higher, with certificate renewal automated.
+- **Trusted origins and trusted proxies are configured explicitly.** A trusted origin is added only when a request's `Origin` won't match its own scheme and host (a TLS-terminating proxy changes the scheme); a plain-HTTP deployment reached at its own address usually needs none. The client address, scheme, and host read from forwarding headers come only from a proxy you run — never trusted from any caller.
 - **CORS is an explicit allowlist of origins in config**, off when nothing cross-origin needs it. Never `*` with credentials, and a response that varies by origin sends `Vary: Origin`.
-- **Security headers are set once, centrally, from config** — a `Content-Security-Policy` (strict: nonces or hashes, no `unsafe-inline`, `object-src 'none'`, `base-uri 'none'`; rolled out first as `Content-Security-Policy-Report-Only`), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, framing denied (`frame-ancestors 'none'` or `X-Frame-Options: DENY`), and a `Permissions-Policy` for unused features. Headers that only advertise the stack (`Server` detail, `X-Powered-By`) are removed.
+- **Security headers are set once, centrally, from config** — a `Content-Security-Policy` (strict: nonces or hashes, no `unsafe-inline`, `object-src 'none'`, `base-uri 'none'`, framing denied with `frame-ancestors 'none'`; rolled out first as `Content-Security-Policy-Report-Only`), `X-Frame-Options: DENY` only as the fallback for older browsers, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and a `Permissions-Policy` for unused features. Obsolete headers (`X-XSS-Protection`, `Expect-CT`) aren't sent, and headers that only advertise the stack (`Server` detail, `X-Powered-By`) are removed.
 
-Secrets and sessions:
+### Sessions and credentials
 
-- **Session, signing, and CSRF keys are secrets** — from the secrets store, one per environment, never a framework-generated default left in a settings file.
-- **Nothing secret reaches the browser.** Client-side bundles, page source, and API responses never carry a server credential; a public client key is labelled as public where it's configured.
-- **A credential never travels in a URL** — not an API key, token, password, or session ID in a path or query string, where it lands in access logs, browser history, and `Referer` headers. It goes in a header or the body.
-- **Session cookies are `Secure`, `HttpOnly`, and `SameSite=Lax` or `Strict`**, and use the `__Host-` prefix where the deployment allows. The session ID is regenerated at sign-in and any privilege change, and destroyed server-side at sign-out.
-- **Passwords are stored only with a slow, salted password-hashing function** built for the job (Argon2id first; scrypt; bcrypt for legacy; PBKDF2 where FIPS is required — at OWASP's current recommended cost), never a fast general hash or reversible encryption.
-
-Tests:
-
-- **Access control is tested as denial, not only as success:** for each protected route, a test proves an anonymous caller, the wrong role, and a different user's object are all refused.
-- **A test asserts each guest endpoint's whole response body**: only the fields `SPEC.md` names, each one redacted. The test checks the raw payload, not the rendered page, and confirms no full value appears anywhere in it.
-- **A test asserts the security headers and cookie attributes** on a representative page and API response, so a framework upgrade or middleware reorder can't drop them silently.
+- **Nothing secret reaches the browser, and no credential travels in a URL.** Client-side bundles, page source, and API responses never carry a server credential; a public client key is labelled as public where it's configured. An API key, token, password, or session ID never goes in a path or query string, where it lands in access logs, browser history, and `Referer` headers — it goes in a header or the body.
+- **Session cookies are `Secure`, `HttpOnly`, and `SameSite`** — `Strict` by default, `Lax` where a link from another site must arrive signed in — with the `__Host-` prefix where the deployment allows (it fixes the path to `/`). The session ID is regenerated at sign-in and any privilege change, and destroyed server-side at sign-out. A state-changing request authenticated by a cookie also carries a CSRF token or passes an `Origin` check; `SameSite` is defense in depth, not the defense.
+- **Passwords are stored only with a slow, salted password-hashing function** built for the job — Argon2id first; scrypt; bcrypt only for legacy; PBKDF2 where FIPS is required — with the parameters from OWASP's Password Storage Cheat Sheet, never a fast general hash or reversible encryption.
 
 ## sdsi:logging
 
@@ -92,14 +83,16 @@ Tests:
 - **Outbound calls from a request have timeouts inside the request's own budget**, so one slow dependency can't hold every worker.
 - **Shutdown stops accepting before it drains** — on the stop signal the server stops listening (and reports not-ready), lets in-flight requests finish within the bounded drain, then exits.
 - **Concurrent updates don't silently overwrite each other.** An update to a resource two users can edit is conditional — an `ETag` with `If-Match`, or a version column — and the loser gets `412` or `409`, not a lost write.
-- **A non-idempotent operation a client may retry is made safe to repeat** — a payment, an order, a send accepts an idempotency key and returns the first result for a repeat, rather than doing the work twice.
+- **A non-idempotent operation a client may retry is made safe to repeat.** Prefer a natural guard first — a conditional request, or a unique key the client supplies (an order number). Otherwise a payment, an order, or a send accepts an idempotency key (an IETF draft header, not yet a standard) and returns the first result for a repeat: the same key with a different payload gets `422`, and a repeat while the first is still running gets `409`.
 - **Expensive or abusable endpoints are rate-limited** — sign-in, password reset, sign-up, guest account lookup, search, and anything that sends mail or costs money — with the limit in config and `429` on excess.
 
 ## sdsi:testing
 
 - **Services are tested directly**, without the HTTP layer.
 - **Request-level tests use the framework's test client** — status codes, error shapes, and auth behavior.
-- **Security tests — access denial, guest response bodies, headers and cookies — are in `## sdsi:security` above.**
+- **Access control is tested as denial, not only as success:** for each protected route, a test proves an anonymous caller, the wrong role, and a different user's object are all refused.
+- **A test asserts each guest endpoint's whole response body**: only the fields `SPEC.md` names, each one redacted. The test checks the raw payload, not the rendered page, and confirms no full value appears anywhere in it.
+- **A test asserts the security headers and cookie attributes** on a representative page and API response, so a framework upgrade or middleware reorder can't drop them silently.
 - **A link check runs against the built site** (CI or the deploy check) and fails on a broken internal link; external links are checked on a schedule, not on every build.
 - **A few end-to-end browser tests cover the critical user flows** (sign-in, the main task), not every page — and run an automated accessibility check on the pages they visit. Automated checks catch only part of WCAG; they are a floor, not a pass.
 
@@ -125,12 +118,13 @@ Tests:
 - **The running version shows in the UI, in several places** — the footer of every page, the about or help screen, and every error page beside the correlation ID, so a user's screenshot of a problem names the release it happened on. It's read from `VERSION` at build or startup, never typed into a template.
 - **On pages anyone can reach without signing in** — the login page, public error pages — showing the version is a stated decision, recorded in `CLAUDE.md`. It helps support, but security scans flag version disclosure.
 - **A public API's breaking change is a MAJOR bump** — removing or renaming a field, making an optional input required, adding an output enum value clients must handle, changing a status code. Prefer a compatible extension (add an optional field) over a break.
-- **A deprecated endpoint says so in its responses** — the `Deprecation` header (RFC 9745), a `Sunset` header with the removal date, and a `Link` with `rel="deprecation"` to the migration note — and the changelog names the release that removes it.
+- **A deprecated endpoint says so in its responses** — the `Deprecation` header (RFC 9745, its value a structured date such as `@1767225599`), a `Sunset` header with the removal date (RFC 8594, an HTTP date), and a `Link` with `rel="deprecation"` to the migration note — and the changelog names the release that removes it.
 - **Built static assets carry a content hash in their file name**, so a release can cache them for a long time and still never serve a stale file; the HTML that references them is not long-cached.
+- **A served asset is never edited in place** when it's built from a source asset; the source is edited and the served copy rebuilt. Name the two so which is which is obvious.
 
 ## sdsi:deploy
 
-- **Every web project has two health endpoints, always.** A **basic** one (e.g. `/healthz/`) — no authentication, no dependencies, it only proves the process answers — for the platform's probe and uptime checks. A **full** one (e.g. `/healthz/deep/`) checks every service the app depends on — database, secrets store, queues and caches, outbound services, writable storage — and reports each as ok or failed, returning `200` when all pass and `503` otherwise.
+- **Every web project that runs a server has two health endpoints.** A **basic** one (e.g. `/healthz/`) — no authentication, no dependencies, it only proves the process answers — for the platform's probe and uptime checks. A **full** one (e.g. `/healthz/deep/`) checks every service the app depends on — database, secrets store, queues and caches, outbound services, writable storage — and reports each as ok or failed, returning `200` when all pass and `503` otherwise. Where an orchestrator routes traffic by readiness, add a readiness endpoint that reports not-ready while starting and draining. A static site needs none.
 - **The full health endpoint is gated by an admin key** from the secrets store, sent in a header (never the query string) and compared in constant time: `404` when no key is configured for the environment, `403` with no detail for a wrong key. Its report is redacted — no secret, connection string, or file path — and it never serves as the platform's probe, so one slow dependency can't get a healthy container restarted.
 - **A deploy is checked by reading the version off the deployed page** and comparing it with the release just shipped — proof the new build is the one serving, not a cached or previous one.
 - **The deploy check also reads the response headers off the deployed site** — HTTPS redirect, HSTS, CSP, and cookie flags as configured for that environment — since a proxy or platform in front can add, strip, or rewrite them.
@@ -148,11 +142,18 @@ Tests:
 - OWASP Authorization Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
 - OWASP Logging Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
 - OWASP Password Storage Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+- OWASP Server-Side Request Forgery Prevention Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html
+- OWASP File Upload Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html
+- OWASP Unvalidated Redirects and Forwards Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html
+- OWASP Transport Layer Security Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html
 - RFC 9457, Problem Details for HTTP APIs — https://www.rfc-editor.org/rfc/rfc9457.html
 - RFC 9745, The Deprecation HTTP Response Header Field — https://www.rfc-editor.org/rfc/rfc9745.html
+- RFC 8594, The Sunset HTTP Header Field — https://www.rfc-editor.org/rfc/rfc8594.html
+- IETF draft, The Idempotency-Key HTTP Header Field — https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
 - W3C Trace Context — https://www.w3.org/TR/trace-context/
 - W3C Web Content Accessibility Guidelines (WCAG) 2.2 — https://www.w3.org/TR/WCAG22/
 - web.dev, Web Vitals — https://web.dev/articles/vitals
+- Google Search Central, SEO starter guide — https://developers.google.com/search/docs/fundamentals/seo-starter-guide
 - Impeccable, `optimize` and `distill` references (Apache-2.0) — https://github.com/pbakaus/impeccable
 - MDN, Cross-Origin Resource Sharing (CORS) — https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
 - Zalando RESTful API Guidelines, Compatibility — https://github.com/zalando/restful-api-guidelines/blob/main/chapters/compatibility.adoc

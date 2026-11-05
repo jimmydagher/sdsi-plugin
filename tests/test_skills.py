@@ -33,5 +33,53 @@ class SkillFrontmatterTest(unittest.TestCase):
                 self.assertLessEqual(len(text), MAX_DESCRIPTION)
 
 
+MAX_COMPANION_BULLETS = 7
+SOURCES_HEADING = "## Sources"
+
+
+def companion_blocks(companion: Path) -> dict:
+    """Top-level bullet count of each `##`/`###` block, keyed by its heading."""
+    counts, heading = {}, None
+    for line in companion.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## ") or line.startswith("### "):
+            heading = line.strip()
+            counts[heading] = 0
+        elif heading and line.startswith("- "):
+            counts[heading] += 1
+    return counts
+
+
+class CompanionTest(unittest.TestCase):
+    """The companions are looked up by heading (core §1 Step 2), so the headings must stay exact."""
+
+    def setUp(self):
+        core = (ROOT / "skills/core/SKILL.md").read_text(encoding="utf-8")
+        self.types = sorted(set(re.findall(r"`ref/(\w+)\.md`", core)) - {"findings"})
+        self.skills = {path.parent.name for path in ROOT.glob("skills/*/SKILL.md")}
+
+    def test_every_core_type_has_its_companion(self):
+        self.assertTrue(self.types)
+        for kind in self.types:
+            with self.subTest(type=kind):
+                self.assertTrue((ROOT / "ref" / f"{kind}.md").is_file())
+
+    def test_companion_headings_name_real_skills(self):
+        for kind in self.types:
+            blocks = companion_blocks(ROOT / "ref" / f"{kind}.md")
+            self.assertIn(SOURCES_HEADING, blocks, f"{kind}.md has no Sources")
+            for heading in blocks:
+                if heading.startswith("## ") and heading != SOURCES_HEADING:
+                    with self.subTest(type=kind, heading=heading):
+                        self.assertRegex(heading, r"^## sdsi:[a-z]+$")
+                        self.assertIn(heading[len("## sdsi:"):], self.skills)
+
+    def test_companion_blocks_stay_short(self):
+        for kind in self.types:
+            for heading, count in companion_blocks(ROOT / "ref" / f"{kind}.md").items():
+                if heading != SOURCES_HEADING:
+                    with self.subTest(type=kind, heading=heading):
+                        self.assertLessEqual(count, MAX_COMPANION_BULLETS)
+
+
 if __name__ == "__main__":
     unittest.main()
