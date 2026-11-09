@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.21 📅 2026-11-04
+## 🆕VERSION 1.3.22 📅 2026-11-08
+
+### Added or New Features
+- Added `skills/sdsi/SKILL.md` (13 lines) _(from the diff)_
+
+### Removed
+(none)
+
+### Changed
+- Edited `skills/core/SKILL.md` (+1 −1 lines) _(from the diff)_
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟪VERSION 1.3.21 📅 2026-11-04
 
 ### Added or New Features
 - The SDSI profile now declares which companions apply. A new `Companions` field lists each one with the evidence for it, main type first, and any extra companion names the part of the code it covers. Core §1 Step 2 gains sharper evidence per type, a table of the usual mixes (a library with a CLI wrapper, a web app with a management CLI, Electron and Tauri apps, mobile backends), and a tie-breaker question: what ships, and who consumes it? A profile without the field gets its type's single companion, recorded on the next run (TODO #16).

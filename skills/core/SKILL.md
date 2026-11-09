@@ -11,7 +11,7 @@ description: >
   fixed order the topic skills run in. Every other sdsi skill reads this
   first. Use it whenever writing, reviewing, planning, or scaffolding code
   under SDSI, or when a skill in another plugin needs SDSI's rules (invoke
-  `sdsi:core` by name). Also triggers on "/sdsi", "/sdsi:core", "SDSI", or
+  `sdsi:core` by name). Also triggers on "/sdsi:core", "SDSI", or
   "our dev standards".
 argument-hint: "[--review|--apply] [path|branch]"
 ---
