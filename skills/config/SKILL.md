@@ -28,6 +28,16 @@ Before anything else, read `../core/SKILL.md` and run its steps.
 - **Placeholders:** a key that must be supplied by an override is written as `<not configured>` in the default file (never a plausible fake value); a key computed at load time is written as `<set at runtime>`.
 - **Config files hold non-secret settings only.** A secret's *name* can live in config; its value never does (`sdsi:security`).
 
+## API connections
+
+Applies to every way a project calls an API — HTTP clients, SDKs, RPC, webhooks, message brokers — in every project type.
+
+- **Endpoints live in `config/default.yaml`**, grouped per API, so the full list of what the project calls is in one place, easy to review in a diff. An endpoint is a path or operation, never a host.
+- **Servers live in `config/override/<env>.yaml`.** Each environment states only the base URL (or host) of each API it uses; the default file holds `<not configured>` for them (placeholders above).
+- **The run selects the server by selecting the environment.** No code path, flag, or call site hardcodes or picks a host; the client builds its target from the merged config (server + endpoint).
+- **Credentials follow the environment**, pulled at runtime from that environment's secrets store (`sdsi:security`). Config holds only the secret's name; switching environment switches server and credentials together, so a dev run can never carry production credentials.
+- **Validate-config checks each API:** every endpoint and server is present and well-formed, and the credential is reachable, without calling the API for real.
+
 **Adding a setting is three steps, in this order:** add the config key → add its named constant (`sdsi:standards`) → add its schema entry. Skipping the schema leaves it unvalidated.
 
 ## Where a project type differs
@@ -36,4 +46,4 @@ A project type may legitimately refine these rules — a CLI allows per-invocati
 
 ## Review checklist
 
-A default value in code · an environment read inside business logic · a setting with no schema entry · validation that stops at the first error · a secret value in a config file · a fake-but-plausible value in the default file · two settings where one silently derives from the other · no validate-config command.
+A default value in code · an environment read inside business logic · a setting with no schema entry · validation that stops at the first error · a secret value in a config file · a fake-but-plausible value in the default file · two settings where one silently derives from the other · no validate-config command · an endpoint path or API host hardcoded in code · a server in the default file, or an endpoint in an override · a credential not tied to the selected environment.

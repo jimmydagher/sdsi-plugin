@@ -34,7 +34,7 @@ Any value used for a comparison, dispatch, lookup key, or config/environment nam
 
 - **A closed set of values that gets compared or dispatched on** (statuses, task names, environment names) → the language's enum construct, ideally a string-valued one.
 - **Formats, templates, and defaults that are only read** → a plain group of named constants.
-- **The one exception:** a literal specific to one integration and used nowhere else (an endpoint path, a header name) lives as a constant on that integration's own type — centralizing it only makes it harder to find.
+- **The one exception:** a literal specific to one integration and used nowhere else (a header name; endpoints are config, `sdsi:config`) lives as a constant on that integration's own type — centralizing it only makes it harder to find.
 - **Never resolve a variable by string name** from a dynamic namespace (reflection on locals/globals and similar); bind it directly.
 
 ## Comments and docstrings

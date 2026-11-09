@@ -16,7 +16,21 @@ All notable changes to the `sdsi` plugin, newest first. See `VERSION` for the cu
 ### Bug/Issues/Fixes
 (none)
 
-## 🆕VERSION 1.3.22 📅 2026-11-08
+## 🆕VERSION 1.3.23 📅 2026-11-09
+
+### Added or New Features
+- `sdsi:config` gains an "API connections" section: endpoints in `config/default.yaml`, servers per environment in `config/override/`, credentials pulled from the selected environment's secrets store — for every project type.
+
+### Removed
+(none)
+
+### Changed
+- `sdsi:standards` no longer lists endpoint paths as a per-integration constant; they now live in config.
+
+### Bug/Issues/Fixes
+(none)
+
+## 🟫VERSION 1.3.22 📅 2026-11-08
 
 ### Added or New Features
 - Added `skills/sdsi/SKILL.md` (13 lines) _(from the diff)_
